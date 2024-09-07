@@ -1,0 +1,31 @@
+---
+- hosts: firewallo
+  become: yes
+  tasks:
+    - name: Assicurati che Git sia installato
+      apt:
+        name: git
+        state: present
+      become: yes
+
+    - name: Clona o aggiorna il repository firewallo da GitHub
+      git:
+        repo: 'git@github.com:un1x80/firewallo.git'
+        dest: /opt/firewallo
+        version: main  # O master, a seconda del branch usato
+        update: yes
+
+    - name: Esegui lo script di disinstallazione
+      command: ./uninstall.sh
+      args:
+        chdir: /opt/firewallo
+        
+    - name: Esegui lo script di installazione
+      command: ./install.sh
+      args:
+        chdir: /opt/firewallo
+
+    - name: Riavvia il servizio firewallo
+      systemd:
+        name: nftables
+        state: restarted
