@@ -1,0 +1,17 @@
+#PORTE APERTE 
+TCPPORT="20 21 22 23 25 80 110 443 995 143"
+UDPPORT="123"
+#iptables -t filter -A lan2wan -m time --timestart 12:52:00 --timestop 13:00:00 -p tcp --dport 80 -j DROP
+#iptables -t filter -A lan2wan -p tcp -m mark --mark 9 -j DROP
+#REGOLE PARTICOLARI  ESEMPIO:
+#iptables -t filter -A lan2wan -p tcp -s 192.168.69.100 -d 0/0 -j REJECT
+#VARIABILI DI SISTEMA
+#LO="127.0.0.1"
+#LANIF="ethX"
+#WANIF="ethX"
+#DMZIF="ethX"
+#VPNIF="tun+"
+#DNS1="192.168.xxx.xxx"
+#DNS2="192.168.xxx.xxx"
+#DNS3="151.99.125.1"
+#LANRANGE="192.168.xxx.xxx/24"

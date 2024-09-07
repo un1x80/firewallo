@@ -1,0 +1,68 @@
+#NAT
+source /etc/firewallo/firewallo.conf
+if [ "$NFT" != "" ] ; then 
+
+$NFT "add table ip nat"
+$NFT "add chain ip nat PREROUTING { type nat hook prerouting priority -100; policy accept; }"
+$NFT "add chain ip nat INPUT { type nat hook input priority 100; policy accept; }"
+$NFT "add chain ip nat OUTPUT { type nat hook output priority -100; policy accept; }"
+$NFT "add chain ip nat POSTROUTING { type nat hook postrouting priority 100; policy accept; }"
+$NFT "add rule ip nat POSTROUTING oifname $WANIF ip saddr $LANRANGE counter masquerade"
+
+
+elif [ "$IPT" != "" ] ; then 
+	$IPT -t nat -A POSTROUTING -s $LANRANGE -o $WANIF -j MASQUERADE
+fi
+
+#Thanks to nftables Maps, if you have a previous iptables NAT (destination NAT) ruleset like this:
+
+#--------------------
+#% iptables -t nat -A PREROUTING -p tcp --dport 1000 -j DNAT --to-destination 1.1.1.1:1234
+#% iptables -t nat -A PREROUTING -p udp --dport 2000 -j DNAT --to-destination 2.2.2.2:2345
+#% iptables -t nat -A PREROUTING -p tcp --dport 3000 -j DNAT --to-destination 3.3.3.3:3456
+#--------------------
+
+#It can be easily translated to nftables in a single line:
+
+#--------------------
+#% nft add rule nat prerouting dnat to \
+#      tcp dport map { 1000 : 1.1.1.1, 2000 : 2.2.2.2, 3000 : 3.3.3.3} \
+#      : tcp dport map { 1000 : 1234, 2000 : 2345, 3000 : 3456 }
+#--------------------
+
+#Likewise, in iptables NAT (source NAT):
+
+#--------------------
+#% iptables -t nat -A POSTROUTING -s 192.168.1.1 -j SNAT --to-source 1.1.1.1
+#% iptables -t nat -A POSTROUTING -s 192.168.2.2 -j SNAT --to-source 2.2.2.2
+#% iptables -t nat -A POSTROUTING -s 192.168.3.3 -j SNAT --to-source 3.3.3.3
+#--------------------
+
+#Translated to a nftables one-liner:
+
+#--------------------
+#% nft add rule nat postrouting snat to \
+#      ip saddr map { 192.168.1.1 : 1.1.1.1, 192.168.2.2 : 2.2.2.2, 192.168.3.3 : 3.3.3.3 }
+#--------------------
+
+#Multiple NAT mapping with address and port
+
+#You might also need to define a NAT mapping that includes the IP address and port, such as:
+#--------------------
+#% nft add map nat foo { type inet_service : ipv4_addr . inet_service ; }
+#% nft add element nat foo { \
+#    1100 : 192.168.1.2 . 5061, \
+#    1101 : 192.168.1.3 . 5061, \
+#    1400 : 192.168.1.4 . 5061 \
+#}
+#% nft add rule nat pre ip protocol udp dnat ip addr . port to udp dport map @foo
+#--------------------
+
+#If your mapping does not need to be updated, you could use a anonymous map in your rule instead:
+#--------------------
+#% nft add rule nat pre ip protocol udp dnat ip addr . port to udp dport map { \
+#    1100 : 192.168.1.2 . 5061, \
+#    1101 : 192.168.1.3 . 5061, \
+#    1400 : 192.168.1.4 . 5061 \
+#}
+#--------------------

@@ -1,0 +1,25 @@
+#!/bin/bash
+printf "\nlan2vpns..."
+source $1
+source $2
+
+for i in $TCPPORT ; do
+printf "."
+ if [ "$NFT" != "" ]  ; then
+    $NFT "add rule ip filter lan2vpns tcp dport $i counter accept"; printf "tcp $i"
+elif [ "$IPT" != "" ] ; then 
+    $IPT -t filter -A lan2vpns -p tcp --dport $i -j ACCEPT ; printf "tcp $i"
+fi
+printf "."
+done
+
+for i in $UDPPORT ; do
+printf "."
+ if [ "$NFT" != "" ]  ; then
+    $NFT "add rule ip filter lan2vpns udp dport $i counter accept"; printf "udp $i"
+elif [ "$IPT" != "" ] ; then 
+    $IPT -t filter -A lan2vpns -p udp --dport $i -j ACCEPT ; printf "udp $i"
+fi
+printf "."
+done
+printf "...ok\n"

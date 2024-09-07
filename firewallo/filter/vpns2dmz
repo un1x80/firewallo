@@ -1,0 +1,17 @@
+#PORTE APERTE 
+TCPPORT=""
+UDPPORT=""
+
+#REGOLE PARTICOLARI  ESEMPIO:
+#iptables -t filter -A vpns2dmz -p tcp -s 192.168.1.32 -d 2.3.4.5 -j ACCEPT
+
+#VARIABILI DI SISTEMA
+#LO="127.0.0.1"
+#LANIF="ethX"
+#WANIF="ethX"
+#DMZIF="ethX"
+#VPNIF="tun+"
+#DNS1="192.168.xxx.xxx"
+#DNS2="192.168.xxx.xxx"
+#DNS3="151.99.125.1"
+#LANRANGE="192.168.xxx.xxx/24"
