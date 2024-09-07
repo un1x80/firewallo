@@ -23,12 +23,12 @@
         version: main
 
     - name: Esegui lo script di disinstallazione
-      command: ./uninstall.sh
+      command: ./uninstall
       args:
         chdir: /opt/firewallo
 
     - name: Esegui lo script di installazione
-      command: ./install.sh
+      command: ./install
       args:
         chdir: /opt/firewallo
       when: result_git.changed  # Esegui solo se il repository è stato clonato o aggiornato
