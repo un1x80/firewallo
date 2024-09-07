@@ -21,6 +21,7 @@
         repo: 'https://github.com/un1x80/firewallo.git'
         dest: /opt/firewallo
         version: main
+      register: result_git
 
     - name: Esegui lo script di disinstallazione
       command: ./uninstall
