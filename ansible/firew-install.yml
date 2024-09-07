@@ -1,0 +1,41 @@
+---
+- hosts: firewallo
+  become: yes
+  tasks:
+    - name: Assicurati che Git sia installato
+      apt:
+        name: git
+        state: present
+      become: yes
+    
+    - name: Assicurati che la directory /opt/firewallo esista
+      file:
+        path: /opt/firewallo
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Clona il repository firewallo in /opt/firewallo
+      git:
+        repo: 'https://github.com/un1x80/firewallo.git'
+        dest: /opt/firewallo
+        version: main
+      register: result_git
+
+    - name: Esegui lo script di disinstallazione
+      command: ./uninstall
+      args:
+        chdir: /opt/firewallo
+
+    - name: Esegui lo script di installazione
+      command: ./install
+      args:
+        chdir: /opt/firewallo
+      when: result_git.changed  # Esegui solo se il repository è stato clonato o aggiornato
+    
+    - name: Riavvia il servizio firewallo
+      systemd:
+        name: nftables
+        state: restarted
+      when: result_git.changed  # Esegui solo se il repository è stato clonato o aggiornato  
