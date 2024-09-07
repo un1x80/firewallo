@@ -31,8 +31,10 @@
       command: ./install.sh
       args:
         chdir: /opt/firewallo
-
+      when: result_git.changed  # Esegui solo se il repository è stato clonato o aggiornato
+    
     - name: Riavvia il servizio firewallo
       systemd:
         name: nftables
         state: restarted
+      when: result_git.changed  # Esegui solo se il repository è stato clonato o aggiornato  
