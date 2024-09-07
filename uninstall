@@ -1,2 +1,3 @@
+#!/bin/bash
 rm -rf /etc/firewallo /etc/init.d/firewallo.* /usr/sbin/firewallo
 #rm /etc/motd ; mv /etc/motd.orig /etc/motd
