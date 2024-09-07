@@ -7,6 +7,14 @@
         name: git
         state: present
       become: yes
+    
+    - name: Assicurati che la directory /opt/firewallo esista
+      file:
+        path: /opt/firewallo
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
 
     - name: Clona o aggiorna il repository firewallo da GitHub
       git:
