@@ -125,14 +125,14 @@ done
 ############################
 
 
-  $IPT -A tcp_flags -p tcp --tcp-flags ALL FIN,URG,PSH -j DROP
   $IPT -A tcp_flags -p tcp --tcp-flags ALL FIN,URG,PSH -j LOG --log-level warning --log-prefix "PortScanX-mas:"
-
-  $IPT -A tcp_flags -p tcp --tcp-flags ALL SYN,RST,ACK,FIN,URG -j DROP
+  $IPT -A tcp_flags -p tcp --tcp-flags ALL FIN,URG,PSH -j DROP
+ 
   $IPT -A tcp_flags -p tcp --tcp-flags ALL SYN,RST,ACK,FIN,URG -j LOG --log-level warning --log-prefix "PortScanX-mas:"
+  $IPT -A tcp_flags -p tcp --tcp-flags ALL SYN,RST,ACK,FIN,URG -j DROP
 
-  $IPT -A tcp_flags -p tcp --tcp-flags ALL ALL -j DROP
   $IPT -A tcp_flags -p tcp --tcp-flags ALL ALL -j LOG --log-level warning --log-prefix "PortScanX-mas:"
+  $IPT -A tcp_flags -p tcp --tcp-flags ALL ALL -j DROP
 
   $IPT -A tcp_flags -p tcp --tcp-flags ALL FIN -j LOG --log-level warning --log-prefix "PortScan:"
   $IPT -A tcp_flags -p tcp --tcp-flags ALL FIN -j DROP
