@@ -233,9 +233,9 @@ log_filter () {
             # Filtra i log live con grep
             journalctl -k -f | grep $opt &  # Esegui in background
             PID=$!  # Salva il PID
-            trap "echo 'Interrompendo log'; kill $PID" SIGINT  # Cattura Ctrl+C
+            trap "echo 'Exit From Log ...'; kill $PID" SIGINT  # Cattura Ctrl+C
             wait $PID  # Aspetta che il processo termini
-
+			exit
         elif [ "$1" != "live" ] && [ "$opt" != "nothing" ]; then
             # Mostra i log dall'inizio di una determinata data
             journalctl -k --since "$1" | grep $opt | less
