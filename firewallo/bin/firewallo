@@ -216,7 +216,11 @@ MENU1="live last_hour"
 opt1=""
 select opt1 in $MENU1 ; do
         if [ "$opt1" = "live" ] ; then
-			journalctl -f 
+			journalctl -f -k 
+		fi
+
+		if [ "$opt1" = "last_hour" ]; then	
+			journalctl --since "1 hour ago" -k
 		fi
 done
 }
