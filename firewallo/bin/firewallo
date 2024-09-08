@@ -235,7 +235,7 @@ log_filter () {
     echo "SELECT chains do you want to view"
 
     # Definizione del menu come array
-    MENU=("EXIT" "state" "icmp_good" "bad_tcp_flags" "POSTROUTING" "PREROUTING" "OUTPUT_DROP" "INPUT_DROP" "FORWARD_DROP"  \
+    MENU=("EXIT" "state" "icmp_good" "bad_tcp_flags" "POSTROUTING" "PREROUTING" "DROP" "OUTPUT_DROP" "INPUT_DROP" "FORWARD_DROP"  \
           "fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" \
           "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" \
           "wan2fw" "wan2lan" "wan2wan" "wan2vpns" "wan2dmz" \
