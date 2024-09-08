@@ -218,7 +218,7 @@ log_filter () {
     echo "SELECT chains do you want to view"
 
     # Definizione del menu come array
-    MENU=("EXIT" "state" "icmp_good" "bad_tcp_flags" "POSTROUTING" \
+    MENU=("EXIT" "state" "icmp_good" "bad_tcp_flags" "POSTROUTING" "PREROUTING" "OUTPUT_DROP" "INPUT_DROP" "FORWARD_DROP"  \
           "fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" \
           "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" \
           "wan2fw" "wan2lan" "wan2wan" "wan2vpns" "wan2dmz" \
@@ -230,7 +230,7 @@ log_filter () {
         if [ "$opt" = "EXIT" ]; then
             echo "Uscita dal log filter."
             break  # Esci dal ciclo
-			
+
         elif [ "$opt" = "nothing" ] && [ "$1" = "live" ]; then	
             # Mostra tutti i log in modalità live
             journalctl -k -f | less
