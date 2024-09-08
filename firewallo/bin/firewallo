@@ -216,7 +216,7 @@ done
 # Funzione per monitorare i log con Ctrl+C che uccide solo journalctl
 log_filter () { 
     echo "SELECT chains do you want to view"
-    MENU=" EXIT										  \
+    MENU=" EXIT	stato icmp_good bad_tcp_flags		  \
     fw2fw    fw2lan    fw2wan    fw2vpns    fw2dmz    \
     lan2fw   lan2lan   lan2wan   lan2vpns   lan2dmz   \
     wan2fw   wan2lan   wan2wan   wan2vpns   wan2dmz   \
@@ -234,6 +234,7 @@ log_filter () {
 
         elif [ "$1" = "live" ] && [ "$opt" != "nothing" ]; then
             # Filtra i log live con grep
+			echo "Logging $1 $opt --- Press Ctrl+C to exit"
             journalctl -k -f | grep $opt &  # Esegui in background
             PID=$!  # Salva il PID
             trap "echo 'Exit From Log ...'; kill $PID" SIGINT  # Cattura Ctrl+C
