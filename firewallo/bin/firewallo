@@ -175,14 +175,29 @@ main
 }
 saveconf () {
 if [ "$IPT" != "" ] ; then
-echo "Save Conf di IPTABLES to /etc/nftables.conf and enable nftables at startup."
-#systemctl disable iptables.service
-systemctl enable nftables.service
-iptables-nft-save > /etc/nftables.conf
+echo "Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable nftables at startup."
+echo '
+[Unit]
+Description=Restore iptables rules
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/iptables-nft-restore < /etc/iptables/rules.v4
+#ExecStartPost=/sbin/ip6tables-nft-restore < /etc/iptables/rules.v6
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+'> /etc/systemd/system/iptables-restore.service
+systemctl daemon-reload
+systemctl disable nftables.service
+systemctl enable  iptables-restore.service
+iptables-nft-save > /etc/iptables/rules.v4
 echo "..OK"
 elif [ "$NFT" != ""  ] ; then
 echo "Save Conf to /etc/nftables.conf and enable nftables at startup."
-#systemctl disable iptables.service
+systemctl disable iptables-restore.service
 systemctl enable nftables.service
 nft list ruleset > /etc/nftables.conf
 echo "..OK"
