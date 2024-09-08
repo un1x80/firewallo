@@ -22,16 +22,14 @@ elif [ "$DIALOG" != "" ] ; then
 fi
 
 networking () {
-        if [ "$DIALOG" = "dialog" ] ; then
+    if [ "$DIALOG" = "dialog" ] ; then
 		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/network/interfaces  $OPTS  2> .tmp
-	        RETVAL=$?
-		echo $RETVAL
-                if [ "$RETVAL" = "0" ]; then
-		cat .tmp >  /etc/network/interfaces ; rm .tmp
-                
-        else
-		$DIALOG /etc/network/interfaces
+	    RETVAL=$?
+        if [ "$RETVAL" = "0" ]; then
+			cat .tmp >  /etc/network/interfaces ; rm .tmp        
 		fi
+	else
+		$DIALOG /etc/network/interfaces
 	fi
 }
 
