@@ -224,33 +224,33 @@ fi
 MENU="networking sysctl conf filter nat mangle start stop restart route status rulesview saveconf nft-iptables exit"
 select opt in $MENU ; do
 	if [ "$opt" = "networking" ] ; then
-		networking
+		networking ; main
 	elif [ "$opt" = "conf" ] ; then
-		conf
+		conf ; main
 	elif [ "$opt" = "sysctl" ] ; then
-                sysctl
+                sysctl ; main
 	elif [ "$opt" = "filter" ] ; then
-                filter
+                filter ;
         elif [ "$opt" = "nat" ] ; then
-                nat
+                nat ; main
 	elif [ "$opt" = "mangle" ] ; then
-                mangle
+                mangle ; main
 	elif [ "$opt" = "start" ] ; then
-                start
+                start ; main
 	elif [ "$opt" = "stop" ] ; then
-                stop
+                stop ; main
 	elif [ "$opt" = "restart" ] ; then
-                restart
+                restart ; main
 	elif [ "$opt" = "route" ] ; then
-                route
+                route ; main
 	elif [ "$opt" = "status" ] ; then
-                status
+                status ; main
 	elif [ "$opt" = "rulesview" ] ; then
-                rules
+                rules ; main
         elif [ "$opt" = "saveconf" ] ; then
-                saveconf
+                saveconf ; main
         elif [ "$opt" = "nft-iptables" ] ; then
-                nftiptables
+                nftiptables ; main
 	elif [ "$opt" = "exit" ] ; then
                 echo ByeZzZ.
 		exit
