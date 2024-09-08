@@ -236,11 +236,11 @@ select opt in $MENU ; do
 	elif [ "$opt" = "mangle" ] ; then
         mangle ; main
 	elif [ "$opt" = "start" ] ; then
-        start ; echo "PRESS ENTER" read INVIO >> /dev/null 2>&1 ;main
+        start ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
 	elif [ "$opt" = "stop" ] ; then
-        stop ; echo "PRESS ENTER" read INVIO >> /dev/null 2>&1 ;main
+        stop ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
 	elif [ "$opt" = "restart" ] ; then
-        restart ; echo "PRESS ENTER" read INVIO >> /dev/null 2>&1 ;main
+        restart ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
 	elif [ "$opt" = "route" ] ; then
         route ; main
 	elif [ "$opt" = "status" ] ; then
