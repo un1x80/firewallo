@@ -8,6 +8,7 @@ printf "."
  if [ "$NFT" != "" ]  ; then
     $NFT "add rule ip filter wan2dmz tcp dport $i log prefix \"ACCEPTED tcp $i wan2dmz : \" counter accept"; printf "tcp $i"
 elif [ "$IPT" != "" ] ; then 
+    $IPT -t filter -A wan2dmz -p tcp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED tcp $i wan2dmz :"
     $IPT -t filter -A wan2dmz -p tcp --dport $i -j ACCEPT ; printf "tcp $i"
 fi
 printf "."
@@ -18,7 +19,8 @@ printf "."
  if [ "$NFT" != "" ]  ; then
     $NFT "add rule ip filter wan2dmz udp dport $i log prefix \"ACCEPTED udp $i wan2dmz : \" counter accept"; printf "udp $i"
 elif [ "$IPT" != "" ] ; then 
-    $IPT -t filter -A wan2dmz -p usp --dport $i -j ACCEPT ; printf "udp $i"
+    $IPT -t filter -A wan2dmz -p udp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED udp $i wan2dmz :"
+    $IPT -t filter -A wan2dmz -p udp --dport $i -j ACCEPT ; printf "udp $i"
 fi
 printf "."
 done

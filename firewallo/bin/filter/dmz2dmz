@@ -7,7 +7,8 @@ for i in $TCPPORT ; do
 printf "."
  if [ "$NFT" != "" ]  ; then
     $NFT "add rule ip filter dmz2dmz tcp dport $i log prefix \"ACCEPTED tcp $i dmz2dmz : \" counter accept"; printf "tcp $i"
-elif [ "$IPT" != "" ] ; then 
+elif [ "$IPT" != "" ] ; then
+    $IPT -t filter -A dmz2dmz -p tcp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED tcp $i dmz2dmz :"
     $IPT -t filter -A dmz2dmz -p tcp --dport $i -j ACCEPT ; printf "tcp $i"
 fi
 
@@ -19,6 +20,7 @@ printf "."
  if [ "$NFT" != "" ]  ; then
     $NFT "add rule ip filter dmz2dmz udp dport $i log prefix \"ACCEPTED udp $i dmz2dmz : \" counter accept"; printf "udp $i"
 elif [ "$IPT" != "" ] ; then 
+    $IPT -t filter -A dmz2dmz -p udp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED udp $i dmz2dmz :"
     $IPT -t filter -A dmz2dmz -p udp --dport $i -j ACCEPT ; printf "udp $i"
 fi
 printf "."

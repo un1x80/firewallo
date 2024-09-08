@@ -7,7 +7,8 @@ for i in $TCPPORT ; do
 printf "."
  if [ "$NFT" != "" ]  ; then
     $NFT "add rule ip filter lan2vpns tcp dport $i log prefix \"ACCEPTED tcp $i lan2vpns : \" counter accept"; printf "tcp $i"
-elif [ "$IPT" != "" ] ; then 
+elif [ "$IPT" != "" ] ; then
+    $IPT -t filter -A lan2vpns -p tcp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED tcp $i lan2vpns :"
     $IPT -t filter -A lan2vpns -p tcp --dport $i -j ACCEPT ; printf "tcp $i"
 fi
 printf "."
@@ -17,7 +18,8 @@ for i in $UDPPORT ; do
 printf "."
  if [ "$NFT" != "" ]  ; then
     $NFT "add rule ip filter lan2vpns udp dport $i log prefix \"ACCEPTED udp $i lan2vpns : \" counter accept"; printf "udp $i"
-elif [ "$IPT" != "" ] ; then 
+elif [ "$IPT" != "" ] ; then
+    $IPT -t filter -A lan2vpns -p udp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED udp $i lan2vpns :"
     $IPT -t filter -A lan2vpns -p udp --dport $i -j ACCEPT ; printf "udp $i"
 fi
 printf "."
