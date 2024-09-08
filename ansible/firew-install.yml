@@ -42,5 +42,5 @@
     #    state: restarted
     #  when: result_git.changed  # Esegui solo se il repository è stato clonato o aggiornato  
     - name: Esegui lo script di restart
-      command: /etc/init.d/firewallo restart
+      command: /etc/init.d/firewallo.nft restart
       when: install.changed  # Esegui solo se firewallo è stato installato
