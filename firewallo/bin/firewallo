@@ -209,21 +209,12 @@ select opt1 in $MENU1 ; do
 		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf
                 printf 'IPT=\"/sbin/iptables\"' >> $DIRCONF/firewallo.conf
 		return
-         fi
+        fi
 done
 }
 main () {
 clear
-echo "
- _____ _                        _ _       
-|  ___(_)_ __ _____      ____ _| | | ___  
-| |_  | | '__/ _ \ \ /\ / / _` | | |/ _ \ 
-|  _| | | | |  __/\ V  V / (_| | | | (_) |
-|_|   |_|_|  \___| \_/\_/ \__,_|_|_|\___/ 
-                                          
-###########################################
-FIREWALLO $VERS  DEFAULT EDITOR: $DIALOG 
-###########################################"
+cat $DIRCONF/motd
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
 fi
