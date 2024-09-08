@@ -210,6 +210,17 @@ select opt1 in $MENU1 ; do
         fi
 done
 }
+logs () {
+echo "SELECT log type"
+MENU1="live last_hour"
+opt1=""
+select opt1 in $MENU1 ; do
+        if [ "$opt1" = "live" ] ; then
+			journalctl -f 
+		fi
+}
+
+
 main () {
 clear
 cat $DIRCONF/motd
@@ -251,6 +262,8 @@ select opt in $MENU ; do
         saveconf ; main
     elif [ "$opt" = "nft-iptables" ] ; then
         nftiptables ; main
+	elif [ "$opt" = "logs" ] ; then
+        logs ;
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
