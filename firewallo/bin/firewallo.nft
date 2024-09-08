@@ -303,9 +303,10 @@ vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw     ";
 for CAT0 in $CHAINS0 ; do
 /bin/bash $DIRCONF/bin/filter/$CAT0  "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf"
 done
-nft insert rule ip filter INPUT log prefix "INPUT_DROP: " flags all
-nft insert rule ip filter FORWARD log prefix "FORWARD_DROP: " flags all
-nft insert rule ip filter OUTPUT log prefix "OUTPUT_DROP: " flags all
+
+$NFT "add rule ip filter INPUT log prefix \"INPUT_DROP: \" flags all"
+$NFT "add rule ip filter FORWARD log prefix \"FORWARD_DROP: \" flags all"
+$NFT "add rule ip filter OUTPUT log prefix \"OUTPUT_DROP: \" flags all"
 
 echo "Firewall setting are finish...                                  ...OK"
 }
