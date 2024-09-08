@@ -216,7 +216,7 @@ done
 # Funzione per monitorare i log con Ctrl+C che uccide solo journalctl
 log_filter () { 
     echo "SELECT chains do you want to view"
-    MENU="
+    MENU=" EXIT										  \
     fw2fw    fw2lan    fw2wan    fw2vpns    fw2dmz    \
     lan2fw   lan2lan   lan2wan   lan2vpns   lan2dmz   \
     wan2fw   wan2lan   wan2wan   wan2vpns   wan2dmz   \
@@ -225,7 +225,10 @@ log_filter () {
     nothing"
 
     select opt in $MENU; do
-        if [ "$opt" = "nothing" ] && [ "$1" = "live" ]; then	
+		if [ "$opt" = "EXIT" ] ; then
+			logs
+
+        elif [ "$opt" = "nothing" ] && [ "$1" = "live" ]; then	
             # Mostra tutti i log in modalità live
             journalctl -k -f | less
 
@@ -250,9 +253,13 @@ log_filter () {
 # Funzione per selezionare il tipo di log
 logs () {
     echo "SELECT log type"
-    MENU1="live last_week last_day last_hour last_minute"
+    MENU1="live last_week last_day last_hour last_minute EXIT"
     select opt1 in $MENU1; do
+		if [ "$opt" = "EXIT" ] ; then
+			main
+		else
         log_filter "$opt1"
+		fi
     done
 }
 
