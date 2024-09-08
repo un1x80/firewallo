@@ -214,7 +214,16 @@ done
 }
 main () {
 clear
-echo "FIREWALLO $VERS  DEFAULT EDITOR: $DIALOG "
+echo "
+ _____ _                        _ _       
+|  ___(_)_ __ _____      ____ _| | | ___  
+| |_  | | '__/ _ \ \ /\ / / _` | | |/ _ \ 
+|  _| | | | |  __/\ V  V / (_| | | | (_) |
+|_|   |_|_|  \___| \_/\_/ \__,_|_|_|\___/ 
+                                          
+###########################################
+FIREWALLO $VERS  DEFAULT EDITOR: $DIALOG 
+###########################################"
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
 fi
