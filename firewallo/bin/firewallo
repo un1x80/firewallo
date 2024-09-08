@@ -152,20 +152,20 @@ less $DIRCONF/status.log
 
 rules () {
 if [ "$IPT" != "" ]  ;then
-$IPT -t filter 	-L -vn > .filter
-$IPT -t nat 	-L -vn > .nat
-$IPT -t mangle 	-L -vn > .mangle
+	$IPT -t filter 	-L -vn > .filter
+	$IPT -t nat 	-L -vn > .nat
+	$IPT -t mangle 	-L -vn > .mangle
 elif [ "$NFT" != "" ] ; then
-$NFT list ruleset > .ruleset
+	$NFT list ruleset > .ruleset
 fi
 
 if [ -e .filter ] ; then
-echo "##############IPTABLES RULES##################"
-cat .filter .nat .mangle | less
+	echo "##############IPTABLES RULES##################"
+	cat .filter .nat .mangle | less
 fi
 if [ -e .ruleset ]  ; then
-echo "#################NFT RULESET##################"
-cat .ruleset | less
+	echo "#################NFT RULESET##################"
+	cat .ruleset | less
 fi
 
 rm .filter .nat .mangle .ruleset 2>/dev/null
@@ -175,8 +175,8 @@ main
 }
 saveconf () {
 if [ "$IPT" != "" ] ; then
-echo "Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable nftables at startup."
-echo '
+	echo "Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable nftables at startup."
+	echo '
 [Unit]
 Description=Restore iptables rules
 After=network.target
@@ -190,17 +190,18 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 '> /etc/systemd/system/iptables-restore.service
-systemctl daemon-reload
-systemctl disable nftables.service
-systemctl enable  iptables-restore.service
-iptables-nft-save > /etc/iptables/rules.v4
-echo "..OK"
+	systemctl daemon-reload
+	systemctl disable nftables.service
+	systemctl enable  iptables-restore.service
+	if  [ ! -e /etc/iptables ]  ; then mkdir /etc/iptables/ ; fi
+	iptables-nft-save > /etc/iptables/rules.v4
+	echo "..OK"
 elif [ "$NFT" != ""  ] ; then
-echo "Save Conf to /etc/nftables.conf and enable nftables at startup."
-systemctl disable iptables-restore.service
-systemctl enable nftables.service
-nft list ruleset > /etc/nftables.conf
-echo "..OK"
+	echo "Save Conf to /etc/nftables.conf and enable nftables at startup."
+	systemctl disable iptables-restore.service
+	systemctl enable nftables.service
+	nft list ruleset > /etc/nftables.conf
+	echo "..OK"
 fi
 }
 nftiptables () {
