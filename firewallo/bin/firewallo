@@ -235,7 +235,7 @@ elif [ "$1" != "live" ] && [ "$opt" != "nothing" ]; then
 elif [ "$1" != "live" ] && [ "$opt" = "nothing" ]; then
 	journalctl -k -f --since $1 | less
 fi
-
+done
 }
 
 
