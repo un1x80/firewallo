@@ -228,31 +228,31 @@ select opt in $MENU ; do
 	elif [ "$opt" = "conf" ] ; then
 		conf ; main
 	elif [ "$opt" = "sysctl" ] ; then
-                sysctl ; main
+        sysctl ; main
 	elif [ "$opt" = "filter" ] ; then
-                filter ;
-        elif [ "$opt" = "nat" ] ; then
-                nat ; main
+        filter ;
+    elif [ "$opt" = "nat" ] ; then
+        nat ; main
 	elif [ "$opt" = "mangle" ] ; then
-                mangle ; main
+        mangle ; main
 	elif [ "$opt" = "start" ] ; then
-                start ; main
+        start ; main
 	elif [ "$opt" = "stop" ] ; then
-                stop ; main
+        stop ; main
 	elif [ "$opt" = "restart" ] ; then
-                restart ; main
+        restart ; main
 	elif [ "$opt" = "route" ] ; then
-                route ; main
+        route ; main
 	elif [ "$opt" = "status" ] ; then
-                status ; main
+        status ; main
 	elif [ "$opt" = "rulesview" ] ; then
-                rules ; main
-        elif [ "$opt" = "saveconf" ] ; then
-                saveconf ; main
-        elif [ "$opt" = "nft-iptables" ] ; then
-                nftiptables ; main
+        rules ; main
+    elif [ "$opt" = "saveconf" ] ; then
+        saveconf ; main
+    elif [ "$opt" = "nft-iptables" ] ; then
+        nftiptables ; main
 	elif [ "$opt" = "exit" ] ; then
-                echo ByeZzZ.
+        echo ByeZzZ.
 		exit
 	fi
 done
