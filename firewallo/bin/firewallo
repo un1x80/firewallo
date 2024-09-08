@@ -253,7 +253,7 @@ log_filter () {
 # Funzione per selezionare il tipo di log
 logs () {
     echo "SELECT log type"
-    MENU1="live last_week last_day last_hour last_minute EXIT"
+    MENU1="live lastweek lastday lasthour lastminute EXIT"
     select opt1 in $MENU1; do
 		if [ "$opt" = "EXIT" ] ; then
 			main
