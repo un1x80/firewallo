@@ -226,7 +226,7 @@ log_filter () {
 
     select opt in $MENU; do
 		if [ "$opt" = "EXIT" ] ; then
-			logs
+			main
 
         elif [ "$opt" = "nothing" ] && [ "$1" = "live" ]; then	
             # Mostra tutti i log in modalità live
