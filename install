@@ -15,5 +15,5 @@ chmod -R +x /etc/firewallo/mangle
 chmod -R +x /etc/firewallo/route
 
 else
-	echo "firewallo esiste!"
+	echo "Firewallo already Exist!"
 fi

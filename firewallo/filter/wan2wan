@@ -2,14 +2,20 @@
 TCPPORT=""
 UDPPORT=""
 
-#REGOLE PARTICOLARI  ESEMPIO:
-#iptables -t filter -A wan2wan -p tcp -s 192.168.1.32 -d 2.3.4.5 -j ACCEPT
-#VARIABILI DI SISTEMA
+#IPTABLES Example Rules:
+#$IPT -t filter -A wan2wan -p tcp --dport 80 -s 192.168.1.32 -d 2.3.4.5 -j LOG --log-level info --log-prefix "ACCEPTED tcp 80 wan2wan from 192.168.1.32 to 2.3.4.5 :"
+#$IPT -t filter -A wan2wan -p tcp --dport 80 -s 192.168.1.32 -d 2.3.4.5 -j ACCEPT
+
+#NFTABLES Example Rules:
+#$NFT "add rule ip filter wan2wan ip saddr 192.168.1.32 ip daddr 2.3.4.5 tcp dport 80 log prefix \"ACCEPTED tcp 80 wan2wan from 192.168.1.32 to 2.3.4.5 : \" counter accept"
+
+
+#ENVIRONMENT
 #LO="127.0.0.1"
-#LANIF="ethX"
-#WANIF="ethX"
-#DMZIF="ethX"
-#VPNIF="tun+"
+#LANIF="ethX" -> LANIF_1 = first interfacein firewallo.conf, LANIF_2 = Second interface in firewallo.conf etc
+#WANIF="ethX" -> Like bottom
+#DMZIF="ethX" -> idem
+#VPNIF="tun+" -> idem
 #DNS1="192.168.xxx.xxx"
 #DNS2="192.168.xxx.xxx"
 #DNS3="151.99.125.1"
