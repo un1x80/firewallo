@@ -6,7 +6,7 @@ source $2
 for i in $TCPPORT ; do
 printf "."
  if [ "$NFT" != "" ]  ; then
-    $NFT "add rule ip filter fw2dmz tcp dport $i counter accept"; printf "tcp $i"
+    $NFT "add rule ip filter fw2dmz tcp dport $i log prefix \"ACCEPTED tcp $i fw2dmz : \" counter accept"; printf "tcp $i"
 elif [ "$IPT" != "" ] ; then 
     $IPT -t filter -A fw2dmz -p tcp --dport $i -j ACCEPT ; printf "tcp $i"
 fi
@@ -16,7 +16,7 @@ done
 for i in $UDPPORT ; do
 printf "."
  if [ "$NFT" != "" ]  ; then
-    $NFT "add rule ip filter fw2dmz udp dport $i counter accept"; printf "udp $i"
+    $NFT "add rule ip filter fw2dmz udp dport $i log prefix \"ACCEPTED udp $i fw2dmz : \" counter accept"; printf "udp $i"
 elif [ "$IPT" != "" ] ; then 
     $IPT -t filter -A fw2dmz -p udp --dport $i -j ACCEPT ; printf "udp $i"
 fi
