@@ -4,51 +4,59 @@ ORARIO=`date`
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
 #DIALOG=`which dialog`
-DIALOG="vi"
+DIALOG="nano"
 
 if [ "$DIALOG" = "" ] ; then
 	DIALOG="vi"
 	OPTS=""
+elif [ "$DIALOG" = "nano" ] ; then
+	DIALOG="nano"
+	OPTS=""
+elif [ "$DIALOG" = "dialog" ] ; then
+	DIALOG="nano"
+	OPTS=""
+
 elif [ "$DIALOG" != "" ] ; then
 	DIALOG="$DIALOG"
 	OPTS="0 0"
 fi
 
 networking () {
-        if [ "$DIALOG" = "vi" ] ; then
-                $DIALOG /etc/network/interfaces
-        else
+        if [ "$DIALOG" = "dialog" ] ; then
 		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/network/interfaces  $OPTS  2> .tmp
 	        RETVAL=$?
 		echo $RETVAL
                 if [ "$RETVAL" = "0" ]; then
 		cat .tmp >  /etc/network/interfaces ; rm .tmp
+                
+        else
+		$DIALOG /etc/network/interfaces
 		fi
 	fi
 }
 
 sysctl  () {
-if [ "$DIALOG" = "vi" ] ; then
-                $DIALOG /etc/sysctl.conf
-        else
-                $DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/sysctl.conf   $OPTS  2> .tmp
-                RETVAL=$?
-                if [ "$RETVAL" = "0" ]; then
-                cat .tmp >  /etc/sysctl.conf ; rm .tmp
-                fi
-        fi
+	if [ "$DIALOG" = "dialog" ] ; then
+ 		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/sysctl.conf   $OPTS  2> .tmp
+    	RETVAL=$?
+        if [ "$RETVAL" = "0" ]; then
+        	cat .tmp >  /etc/sysctl.conf ; rm .tmp
+        fi     
+    else
+    	$DIALOG /etc/sysctl.conf
+    fi
 }
 
 
 conf () {
-	if [ "$DIALOG" = "vi" ] ; then
-                $DIALOG $DIRCONF/firewallo.conf
-        else
-	$DIALOG --backtitle CONFIGURATION_EDIT --title firewallo.conf --editbox $DIRCONF/firewallo.conf  $OPTS  2> .tmp 
+	if [ "$DIALOG" = "dialog" ] ; then
+		$DIALOG --backtitle CONFIGURATION_EDIT --title firewallo.conf --editbox $DIRCONF/firewallo.conf  $OPTS  2> .tmp 
 		RETVAL=$?
-        	if [ "$RETVAL" = "0" ]; then
-		cat .tmp > $DIRCONF/firewallo.conf ; rm .tmp
-		fi
+       	if [ "$RETVAL" = "0" ]; then
+			cat .tmp > $DIRCONF/firewallo.conf ; rm .tmp
+		fi  
+    else
+  		$DIALOG $DIRCONF/firewallo.conf
 	fi
 }
 
@@ -65,52 +73,54 @@ select opt in $MENU ; do
 	if [ "$opt" = "exit" ] ; then
 		main 
 	else
-		if [ "$DIALOG" = "vi" ] ; then
-			$DIALOG $DIRCONF/filter/$opt 
-		else
+		if [ "$DIALOG" = "dialog" ] ; then
 			$DIALOG --backtitle FILTER_EDIT --title $opt --editbox $DIRCONF/filter/$opt 		$OPTS 2> .tmp 
-			 RETVAL=$?
-                        if [ "$RETVAL" = "0" ]; then
-			cat .tmp > $DIRCONF/filter/$opt ; rm .tmp
-			fi
+			RETVAL=$?
+           	if [ "$RETVAL" = "0" ]; then
+				cat .tmp > $DIRCONF/filter/$opt ; rm .tmp
+			fi			
+		else
+			$DIALOG $DIRCONF/filter/$opt 
 		fi
 	fi
 done
 }
 
 nat  () {
-	if [ "$DIALOG" = "vi" ] ; then
-		$DIALOG $DIRCONF/nat/firewallo.nat
-	else
-        	$DIALOG --backtitle NAT_EDIT --title firewallo.nat --editbox $DIRCONF/nat/firewallo.nat  	  $OPTS 2> .tmp
-		    	RETVAL=$?
-    			if [ "$RETVAL" = "0" ]; then
+	if [ "$DIALOG" = "dialog" ] ; then
+        $DIALOG --backtitle NAT_EDIT --title firewallo.nat --editbox $DIRCONF/nat/firewallo.nat  	  $OPTS 2> .tmp
+		RETVAL=$?
+    	if [ "$RETVAL" = "0" ]; then
 			cat .tmp > $DIRCONF/nat/firewallo.nat ; rm .tmp
-			fi
+		fi
+
+	else
+		$DIALOG $DIRCONF/nat/firewallo.nat
 	fi
 }
 
 mangle  () {
-	 if [ "$DIALOG" = "vi" ] ; then
-		$DIALOG	$DIRCONF/mangle/firewallo.mangle
-	 else
+	 if [ "$DIALOG" = "dialog" ] ; then
 		$DIALOG --backtitle MANGLE_EDIT --title firewallo.mangle --editbox $DIRCONF/mangle/firewallo.mangle $OPTS 2> .tmp
-	       	RETVAL=$?
-                if [ "$RETVAL" = "0" ]; then
-		cat .tmp > $DIRCONF/mangle/firewallo.mangle ; rm .tmp
-		fi
+	    RETVAL=$?
+        if [ "$RETVAL" = "0" ]; then
+			cat .tmp > $DIRCONF/mangle/firewallo.mangle ; rm .tmp
+		fi		
+    else
+		$DIALOG	$DIRCONF/mangle/firewallo.mangle
 	fi
 }
 
 route  () {
-	 if [ "$DIALOG" = "vi" ] ; then
- 		$DIALOG $DIRCONF/route/firewallo.route
-	 else
-        	$DIALOG --backtitle ROUTE_EDIT --title firewallo.route --editbox $DIRCONF/route/firewallo.route $OPTS 2> .tmp
+	if [ "$DIALOG" = "dialog" ] ; then
+        $DIALOG --backtitle ROUTE_EDIT --title firewallo.route --editbox $DIRCONF/route/firewallo.route $OPTS 2> .tmp
 		RETVAL=$?
-                if [ "$RETVAL" = "0" ]; then
+        if [ "$RETVAL" = "0" ]; then
 		cat .tmp > $DIRCONF/route/firewallo.route ; rm .tmp
 		fi
+
+	else
+ 		$DIALOG $DIRCONF/route/firewallo.route
 	fi
 }
 
@@ -204,7 +214,7 @@ done
 }
 main () {
 clear
-echo "FIREWALLO $VERS L'editor di default è $DIALOG BUON LAVORO"
+echo "FIREWALLO $VERS  DEFAULT EDITOR: $DIALOG "
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
 fi
