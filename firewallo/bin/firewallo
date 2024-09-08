@@ -214,19 +214,20 @@ done
 #!/bin/bash
 
 # Funzione per monitorare i log con Ctrl+C che uccide solo journalctl
-log_filter () { 
-    echo "SELECT chains do you want to view"
-    MENU=" EXIT	state icmp_good bad_tcp_flags		  \
-    fw2fw    fw2lan    fw2wan    fw2vpns    fw2dmz    \
-    lan2fw   lan2lan   lan2wan   lan2vpns   lan2dmz   \
-    wan2fw   wan2lan   wan2wan   wan2vpns   wan2dmz   \
-    vpns2fw  vpns2lan  vpns2wan  vpns2vpns  vpns2dmz  \
-    dmz2fw   dmz2lan   dmz2wan   dmz2vpns   dmz2dmz   \
-    nothing"
+# Definizione del menu come array
+    MENU=("EXIT" "state" "icmp_good" "bad_tcp_flags" "POSTROUTING" \
+          "fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" \
+          "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" \
+          "wan2fw" "wan2lan" "wan2wan" "wan2vpns" "wan2dmz" \
+          "vpns2fw" "vpns2lan" "vpns2wan" "vpns2vpns" "vpns2dmz" \
+          "dmz2fw" "dmz2lan" "dmz2wan" "dmz2vpns" "dmz2dmz" "nothing")
 
-    select opt in $MENU; do
-		if [ "$opt" = "EXIT" ] ; then
-			main
+    # Usa l'array con select
+    select opt in "${MENU[@]}"; do
+        if [ "$opt" = "EXIT" ]; then
+			
+			echo "Uscita dal log filter."
+			break
 
         elif [ "$opt" = "nothing" ] && [ "$1" = "live" ]; then	
             # Mostra tutti i log in modalità live
@@ -239,7 +240,7 @@ log_filter () {
             PID=$!  # Salva il PID
             trap "echo 'Exit From Log ...'; kill $PID" SIGINT  # Cattura Ctrl+C
             wait $PID  # Aspetta che il processo termini
-			main
+			break
         elif [ "$1" != "live" ] && [ "$opt" != "nothing" ]; then
             # Mostra i log dall'inizio di una determinata data
             journalctl -k --since "$1" | grep $opt | less

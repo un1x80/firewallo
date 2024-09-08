@@ -7,7 +7,9 @@ $NFT "add chain ip nat PREROUTING { type nat hook prerouting priority -100; poli
 $NFT "add chain ip nat INPUT { type nat hook input priority 100; policy accept; }"
 $NFT "add chain ip nat OUTPUT { type nat hook output priority -100; policy accept; }"
 $NFT "add chain ip nat POSTROUTING { type nat hook postrouting priority 100; policy accept; }"
-$NFT "add rule ip nat POSTROUTING oifname $WANIF ip saddr $LANRANGE counter masquerade"
+$NFT "add rule ip nat POSTROUTING oifname $WANIF ip saddr $LANRANGE \
+log prefix \"NAT POSTROUTING $LANRANGE ifout $WANIF: \"
+counter masquerade"
 
 
 elif [ "$IPT" != "" ] ; then 
