@@ -215,6 +215,11 @@ done
 main () {
 clear
 cat $DIRCONF/motd
+echo "
+###########################################
+DEFAULT EDITOR: $DIALOG 
+###########################################
+"
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
 fi
