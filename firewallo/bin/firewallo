@@ -183,8 +183,8 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/sbin/iptables-nft-restore < /etc/iptables/rules.v4
-#ExecStartPost=/sbin/ip6tables-nft-restore < /etc/iptables/rules.v6
+ExecStart=/bin/bash -c "/sbin/iptables-nft-restore < /etc/iptables/rules.v4"
+ExecStartPost=/bin/bash -c "/sbin/ip6tables-nft-restore < /etc/iptables/rules.v6"
 RemainAfterExit=yes
 
 [Install]
@@ -195,6 +195,7 @@ WantedBy=multi-user.target
 	systemctl enable  iptables-restore.service
 	if  [ ! -e /etc/iptables ]  ; then mkdir /etc/iptables/ ; fi
 	iptables-nft-save > /etc/iptables/rules.v4
+	chmod 644 /etc/iptables/rules.v4
 	echo "..OK"
 elif [ "$NFT" != ""  ] ; then
 	echo "Save Conf to /etc/nftables.conf and enable nftables at startup."
