@@ -174,90 +174,90 @@ $NFT "add rule ip filter icmp_good icmp type echo-reply counter accept"
 
 #FILTER CHAINS ATTRIBUTION IN FORWARD
 
-    $NFT "add rule ip filter FORWARD counter jump stato"
-    $NFT "add rule ip filter FORWARD counter jump dnserv"	    ###
-    $NFT "add rule ip filter FORWARD counter jump icmp_good"	###
-    $NFT "add rule ip filter FORWARD counter jump tcp_flags"	###
-    $NFT "add rule ip filter FORWARD iifname lo counter accept" ### Fire 2 All forward
+$NFT "add rule ip filter FORWARD log prefix "LOG FORWARD state : " 					counter jump stato"		###
+$NFT "add rule ip filter FORWARD log prefix "LOG FORWARD dnsserv : " 				counter jump dnserv"	###
+$NFT "add rule ip filter FORWARD log prefix "LOG FORWARD icmp_good : "	 			counter jump icmp_good"	###
+$NFT "add rule ip filter FORWARD log prefix "LOG FORWARD bad_tcp_flags : " 			counter jump tcp_flags"	###
+$NFT "add rule ip filter FORWARD iifname lo log prefix "LOG FORWARD localhost : " 	counter accept" ### Fire 2 All forward
 
 #LAN 2 -> XXX
     	for lanifs in ${LANIF[*]} ; do
 		for lanifs1 in ${LANIF[*]} ; do
-		$NFT "add rule ip filter FORWARD	iifname $lanifs 	oifname $lanifs1 	counter jump lan2lan"      ### Lan 2 Lan forward
+		$NFT "add rule ip filter FORWARD	iifname $lanifs 	oifname $lanifs1 	log prefix "LOG FORWARD lan2lan : "counter jump lan2lan"      ### Lan 2 Lan forward
     		done
 	done
 	 for lanifs in ${LANIF[*]} ; do
                 for wanifs in ${WANIF[*]} ; do
-                $NFT "add rule ip filter FORWARD	iifname $lanifs     oifname $wanifs     counter jump lan2wan"      ### Lan 2 Lan forward
+                $NFT "add rule ip filter FORWARD	iifname $lanifs     oifname $wanifs log prefix "LOG FORWARD lan2wan : "    counter jump lan2wan"      ### Lan 2 Lan forward
                 done
     	done
 	for lanifs in ${LANIF[*]} ; do
 		for dmzifs in ${DMZIF[*]} ; do
-		$NFT "add rule ip filter FORWARD	iifname $lanifs 	oifname $dmzifs 	counter jump lan2dmz"      ### Lan 2 Dmz forward
+		$NFT "add rule ip filter FORWARD	iifname $lanifs 	oifname $dmzifs log prefix "LOG FORWARD lan2dmz : "	counter jump lan2dmz"      ### Lan 2 Dmz forward
 		done
 	done
 #WAN 2 -> XXX
 	for wanifs in ${WANIF[*]} ; do
 		for lanifs in ${LANIF[*]} ; do
-		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $lanifs 	counter jump wan2lan"	### Wan 2 Lan forward
+		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $lanifs log prefix "LOG FORWARD wan2lan : "	counter jump wan2lan"	### Wan 2 Lan forward
 		done
 	done
 	 for wanifs in ${WANIF[*]} ; do
                 for dmzifs in ${DMZIF[*]} ; do
-    		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $dmzifs 	counter jump wan2dmz"      ### Wan 2 Dmz forward
+    		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $dmzifs log prefix "LOG FORWARD wan2dmz : "	counter jump wan2dmz"      ### Wan 2 Dmz forward
     		done
 	done
 	for wanifs in ${WANIF[*]} ; do
 		for wanifs1 in ${WANIF[*]} ; do
-		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $wanifs1	counter jump wan2wan"      ### Wan 2 Wmz forward
+		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $wanifs1 log prefix "LOG FORWARD wan2wan : "	counter jump wan2wan"      ### Wan 2 Wmz forward
 		done
 	done
 #DMZ 2 -> XXX
 	for dmzifs in ${DMZIF[*]} ; do
  		for lanifs in ${LANIF[*]} ; do
-  		$NFT "add rule ip filter FORWARD	iifname $dmzifs 	oifname $lanifs 	counter jump dmz2lan"	### Dmz 2 Lan forward
+  		$NFT "add rule ip filter FORWARD	iifname $dmzifs 	oifname $lanifs log prefix "LOG FORWARD dmz2lan : "	counter jump dmz2lan"	### Dmz 2 Lan forward
 		done
 	done
 	for dmzifs in ${DMZIF[*]} ; do
 		for dmzifs1 in ${DMZIF[*]} ; do
-		$NFT  "add rule ip filter FORWARD	iifname $dmzifs 	oifname $dmzifs1	counter jump dmz2dmz"      ### Dmz 2 Dmz forward
+		$NFT  "add rule ip filter FORWARD	iifname $dmzifs 	oifname $dmzifs1 log prefix "LOG FORWARD dmz2dmz : "	counter jump dmz2dmz"      ### Dmz 2 Dmz forward
     		done
 	done
 	for dmzifs in ${DMZIF[*]} ; do
 		for wanifs in ${WANIF[*]} ; do
-		$NFT "add rule ip filter FORWARD iifname $dmzifs 	oifname $wanifs 	counter jump  dmz2wan"      ### Dmz 2 Wan forward
+		$NFT "add rule ip filter FORWARD iifname $dmzifs 	oifname $wanifs log prefix "LOG FORWARD dmz2wan : "	counter jump  dmz2wan"      ### Dmz 2 Wan forward
 		done
 	done
 
 #FILTER CHAINS ATTRIBUTION IN INPUT
-    $NFT "add rule ip filter INPUT counter jump stato"
-    $NFT "add rule ip filter INPUT counter jump dnserv"
-    $NFT "add rule ip filter INPUT counter jump icmp_good"
-    $NFT "add rule ip filter INPUT counter jump tcp_flags"
-    $NFT "add rule ip filter INPUT iifname "lo" counter accept"
+    $NFT "add rule ip filter INPUT log prefix "LOG INPUT state : " 						counter jump stato"
+    $NFT "add rule ip filter INPUT log prefix "LOG INPUT dns_ok : " 					counter jump dnserv"
+    $NFT "add rule ip filter INPUT log prefix "LOG INPUT icmp_good : " 					counter jump icmp_good"
+    $NFT "add rule ip filter INPUT log prefix "LOG INPUT bad_tcp_flags : " 				counter jump tcp_flags"
+    $NFT "add rule ip filter INPUT iifname "lo" log prefix "LOG INPUT localhost : " 	counter accept"
     for lanifs in ${LANIF[*]} ; do
-	$NFT "add rule ip filter INPUT iifname $lanifs           counter jump  lan2fw"	### Lan input to firewall
+	$NFT "add rule ip filter INPUT iifname $lanifs  log prefix "LOG INPUT lan2wan : "         counter jump  lan2fw"	### Lan input to firewall
     done
     for wanifs in ${WANIF[*]} ; do
-	$NFT "add rule ip filter INPUT iifname $wanifs 			counter jump wan2fw"	### Wan input to firewall
+	$NFT "add rule ip filter INPUT iifname $wanifs 	log prefix "LOG INPUT wan2fw : "		counter jump wan2fw"	### Wan input to firewall
     done
     for dmzifs in ${DMZIF[*]} ; do
-    	$NFT "add rule ip filter INPUT iifname $dmzifs			counter jump dmz2fw"	### Dmz input to firewall
+    	$NFT "add rule ip filter INPUT iifname $dmzifs	log prefix "LOG INPUT dmz2fw : "		counter jump dmz2fw"	### Dmz input to firewall
     done
     #FILTER CHAINS ATTRIBUTION IN INPUT
-    $NFT "add rule ip filter OUTPUT counter jump stato"
-    $NFT "add rule ip filter OUTPUT counter jump dnserv"
-    $NFT "add rule ip filter OUTPUT counter jump icmp_good"
-    $NFT "add rule ip filter OUTPUT counter jump tcp_flags"
-    $NFT "add rule ip filter OUTPUT oifname "lo" counter accept"
+    $NFT "add rule ip filter OUTPUT log prefix "LOG OUTPUT state : " counter jump stato"
+    $NFT "add rule ip filter OUTPUT log prefix "LOG OUTPUT dns_ok : " counter jump dnserv"
+    $NFT "add rule ip filter OUTPUT log prefix "LOG OUTPUT icmp_good : " counter jump icmp_good"
+    $NFT "add rule ip filter OUTPUT log prefix "LOG OUTPUT bad_tcp_flags : " counter jump tcp_flags"
+    $NFT "add rule ip filter OUTPUT oifname "lo" log prefix "LOG OUTPUT localhost : " counter accept"
     for dmzifs in ${DMZIF[*]} ; do
-	$NFT "add rule ip filter OUTPUT oifname $dmzifs			counter jump fw2dmz"     	### Fire output to dmz
+	$NFT "add rule ip filter OUTPUT oifname $dmzifs	log prefix "LOG OUTPUT fw2dmz : "		counter jump fw2dmz"     	### Fire output to dmz
     done
     for lanifs in ${LANIF[*]} ; do
-	$NFT "add rule ip filter OUTPUT oifname $lanifs			counter jump fw2lan"    	### Fire output to lan
+	$NFT "add rule ip filter OUTPUT oifname $lanifs	log prefix "LOG OUTPUT fw2lan : "		counter jump fw2lan"    	### Fire output to lan
     done
     for wanifs in ${WANIF[*]} ; do
-    	$NFT "add rule ip filter OUTPUT oifname $WANIF			counter jump fw2wan"     	### Fire output to wan
+    	$NFT "add rule ip filter OUTPUT oifname $WANIF	log prefix "LOG OUTPUT fw2wan : "		counter jump fw2wan"     	### Fire output to wan
     done
 
     #VPN CHAINS ATTRIBUTION
@@ -265,30 +265,30 @@ $NFT "add rule ip filter icmp_good icmp type echo-reply counter accept"
     #XXX 2 -> VPN
     for lanifs in ${LANIF[*]} ; do
     	for vpnsif in $VPNIF ; do
-    	$NFT "add rule ip filter FORWARD iifname $lanifs       oifname $vpnsif 	counter jump lan2vpns"	###
-    	$NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $lanifs 	counter jump vpns2lan"	###
+    	$NFT "add rule ip filter FORWARD iifname $lanifs       oifname $vpnsif 	log prefix "LOG FORWARD lan2vpns : " counter jump lan2vpns"	###
+    	$NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $lanifs 	log prefix "LOG FORWARD vpns2lan : " counter jump vpns2lan"	###
 	done
     done
     for dmzifs in ${DMZIF[*]} ; do
 	for vpnsif in $VPNIF ; do
-	$NFT "add rule ip filter FORWARD iifname $dmzifs       oifname $vpnsif 	counter jump dmz2vpns"	###
-        $NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $dmzifs 	counter jump vpns2dmz"	###
+		$NFT "add rule ip filter FORWARD iifname $dmzifs       oifname $vpnsif 	log prefix "LOG FORWARD dmz2vpns : " counter jump dmz2vpns"	###
+        $NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $dmzifs 	log prefix "LOG FORWARD vpns2dmz : " counter jump vpns2dmz"	###
 	done
     done
     for wanifs in ${WANIF[*]} ; do
 	for vpnsif in $VPNIF ; do
-    	$NFT "add rule ip filter FORWARD iifname $wanifs       oifname $vpnsif 	counter jump wan2vpns"	###
-    	$NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $wanifs 	counter jump vpns2wan"	###
+    	$NFT "add rule ip filter FORWARD iifname $wanifs       oifname $vpnsif 	log prefix "LOG FORWARD wan2vpns : " counter jump wan2vpns"	###
+    	$NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $wanifs 	log prefix "LOG FORWARD vpns2wan : " counter jump vpns2wan"	###
 	done
     done
 
     for vpnsif in $VPNIF ; do
-    	$NFT "add rule ip filter INPUT       iifname $vpnsif	counter jump vpns2fw"	###
-	$NFT "add rule ip filter OUTPUT      oifname $vpnsif	counter jump fw2vpns"	###
+    	$NFT "add rule ip filter INPUT       iifname $vpnsif	log prefix "LOG INPUT  vpns2fw : " counter jump vpns2fw"	###
+		$NFT "add rule ip filter OUTPUT      oifname $vpnsif	log prefix "LOG OUTPUT fw2vpns : " counter jump fw2vpns"	###
     done
     for vpnsif in $VPNIF ; do
     	for vpnsif1 in $VPNIF ; do
-    	$NFT  "add rule ip filter FORWARD 	iifname $vpnsif1        oifname $vpnsif 	counter jump vpns2vpns"	###
+    	$NFT  "add rule ip filter FORWARD 	iifname $vpnsif1        oifname $vpnsif log prefix "LOG FORWARD vpns2vpns : "	counter jump vpns2vpns"	###
        	done
     done
 #done  #FORSE
