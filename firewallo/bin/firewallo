@@ -218,6 +218,7 @@ select opt1 in $MENU1 ; do
         if [ "$opt1" = "live" ] ; then
 			journalctl -f 
 		fi
+done
 }
 
 
