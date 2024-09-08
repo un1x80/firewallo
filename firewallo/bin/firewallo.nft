@@ -230,10 +230,10 @@ $NFT "add rule ip filter FORWARD iifname lo log prefix \"ACCEPTED FORWARD localh
 	done
 
 #FILTER CHAINS ATTRIBUTION IN INPUT
-    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT state : " 						counter jump stato"
-    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT dns_ok : " 					    counter jump dnserv"
-    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT icmp_good : " 					counter jump icmp_good"
-    $NFT "add rule ip filter INPUT log prefix \"DROPPED INPUT bad_tcp_flags : " 				counter jump tcp_flags"
+    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT state : \" 						counter jump stato"
+    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT dns_ok : \" 					    counter jump dnserv"
+    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT icmp_good : \" 					counter jump icmp_good"
+    $NFT "add rule ip filter INPUT log prefix \"DROPPED INPUT bad_tcp_flags : \" 				counter jump tcp_flags"
     $NFT "add rule ip filter INPUT iifname \"lo\" log prefix \"ACCEPTED INPUT localhost : \" 	counter accept"
     for lanifs in ${LANIF[*]} ; do
 	$NFT "add rule ip filter INPUT iifname $lanifs  log prefix \"LOG INPUT insert in lan2wan : \"         counter jump  lan2fw"	### Lan input to firewall
