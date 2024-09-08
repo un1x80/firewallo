@@ -233,7 +233,7 @@ if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
 fi
 
-MENU="networking sysctl conf filter nat mangle start stop restart route status rulesview saveconf nft-iptables exit"
+MENU="networking sysctl conf filter nat mangle start stop restart route status rulesview saveconf nft-iptables logs exit"
 select opt in $MENU ; do
 	if [ "$opt" = "networking" ] ; then
 		networking ;  main
