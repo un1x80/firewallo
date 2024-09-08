@@ -224,7 +224,7 @@ fi
 MENU="networking sysctl conf filter nat mangle start stop restart route status rulesview saveconf nft-iptables exit"
 select opt in $MENU ; do
 	if [ "$opt" = "networking" ] ; then
-		networking ; main
+		networking ;  main
 	elif [ "$opt" = "conf" ] ; then
 		conf ; main
 	elif [ "$opt" = "sysctl" ] ; then
@@ -236,11 +236,11 @@ select opt in $MENU ; do
 	elif [ "$opt" = "mangle" ] ; then
         mangle ; main
 	elif [ "$opt" = "start" ] ; then
-        start ; main
+        start ; echo "PRESS ENTER" read INVIO >> /dev/null 2>&1 ;main
 	elif [ "$opt" = "stop" ] ; then
-        stop ; main
+        stop ; echo "PRESS ENTER" read INVIO >> /dev/null 2>&1 ;main
 	elif [ "$opt" = "restart" ] ; then
-        restart ; main
+        restart ; echo "PRESS ENTER" read INVIO >> /dev/null 2>&1 ;main
 	elif [ "$opt" = "route" ] ; then
         route ; main
 	elif [ "$opt" = "status" ] ; then
