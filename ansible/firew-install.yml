@@ -7,6 +7,18 @@
         name: git
         state: present
       become: yes
+
+    - name: Assicurati che iptables sia installato
+      apt:
+        name: iptables
+        state: present
+      become: yes
+
+    - name: Assicurati che nftables sia installato
+      apt:
+        name: nftables
+        state: present
+      become: yes
     
     - name: Assicurati che la directory /opt/firewallo esista
       file:
