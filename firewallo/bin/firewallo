@@ -226,8 +226,7 @@ if [ "$opt" = "nothing" ] && [ "$1" = live ] ; then
 	journalctl -k -f | less
 
 elif [ "$1" = "live" ] && [ "$opt" != "nothing" ]; then
-	journalctl -k -f | grep $opt
-
+	journalctl -k -f | grep $opt | less
 
 elif [ "$1" != "live" ] && [ "$opt" != "nothing" ]; then
 	journalctl -k -f --since $1 | grep $opt | less
