@@ -222,7 +222,7 @@ dmz2fw	dmz2lan		dmz2wan		dmz2vpns 	dmz2dmz 	\
 nothing"
 
 select opt in $MENU ; do
-if [ "$opt" = "nothing"] && [ "$1" = live ] ; then	
+if [ "$opt" = "nothing" ] && [ "$1" = live ] ; then	
 	journalctl -k -f | less
 
 elif [ "$1" = "live" ] && [ "$opt" != "nothing" ]; then
