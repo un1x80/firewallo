@@ -11,7 +11,6 @@ elif [ "$IPT" != "" ] ; then
     $IPT -t filter -A dmz2dmz -p tcp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED tcp $i dmz2dmz :"
     $IPT -t filter -A dmz2dmz -p tcp --dport $i -j ACCEPT ; printf "tcp $i"
 fi
-
 printf "."
 done
 

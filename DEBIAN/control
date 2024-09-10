@@ -1,0 +1,8 @@
+Package: firewallo
+Version: 24.9.1
+Section: utils
+Priority: optional
+Architecture: all
+Mainteiner: Matteo Fioriti <fioritim@gmail.com>
+Description: Firewallo is a firewall manager for Debian GNU/Linux that user iptables or nftables.
+
