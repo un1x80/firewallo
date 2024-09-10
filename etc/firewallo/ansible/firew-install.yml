@@ -60,3 +60,7 @@
     - name: Notify user that package was created
       debug:
         msg: "The .deb package has been successfully built: /opt/firewallo.deb"
+
+    - name: Install the .deb package
+      apt:
+        deb: /opt/firewallo.deb
