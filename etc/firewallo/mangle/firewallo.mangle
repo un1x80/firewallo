@@ -2,7 +2,8 @@
 #iptables -t mangle -A OUTPUT -j NFQUEUE --queue-num 2 
 #Example
 #$IPT -t mangle -A PREROUTING -s 192.168.1.100 -j mark --set-mark 0x03
-
+#Example
+#$NFT "add rule ip mangle PREROUTING iifname 'wanif0' ip daddr 192.168.1.1 tcp dport 1090 counter meta mark set 0x3"
 
 #Layer7
 #gnutella mark=3
