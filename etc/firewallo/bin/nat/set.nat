@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #NAT
 source /etc/firewallo/firewallo.conf
 if [ "$NFT" != "" ] ; then 

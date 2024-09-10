@@ -96,6 +96,11 @@ for CAT in $CHAINS ; do
     $NFT "add chain ip filter $CAT" ;
 done
 
+#Setup Chain and conf in nat and mangle tables
+/bin/bash $DIRCONF/bin/mangle/set.mangle
+/bin/bash $DIRCONF/bin/nat/set.nat
+
+#Setup rules in nat and mangle tables
 /bin/bash $DIRCONF/mangle/firewallo.mangle
 /bin/bash $DIRCONF/nat/firewallo.nat
 
