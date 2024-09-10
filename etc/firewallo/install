@@ -2,10 +2,10 @@
 
 if [ ! -e /etc/firewallo ] ; then
 mkdir /etc/firewallo/
-cp -rf firewallo/* /etc/firewallo
-cp /etc/firewallo/bin/firewallo.iptables /etc/init.d/firewallo.iptables
-cp /etc/firewallo/bin/firewallo.nft /etc/init.d/firewallo.nft
-cp /etc/firewallo/bin/firewallo /usr/sbin/
+cp -rf ./* /etc/firewallo
+cp ../init.d/firewallo.iptables /etc/init.d/firewallo.iptables
+cp ../init.d/firewallo.nft /etc/init.d/firewallo.nft
+cp ../../usr/sbin/firewallo /usr/sbin/
 
 chmod +x /etc/init.d/firewallo.*
 chmod +x /usr/sbin/firewallo
