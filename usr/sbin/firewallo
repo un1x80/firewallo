@@ -274,7 +274,7 @@ log_filter () {
 # Funzione per selezionare il tipo di log
 logs () {
     echo "SELECT log type"
-    MENU1=("live" "1 week ago" "1 day ago" "1 hour ago" "1 minute ago" "EXIT")
+    MENU1=("EXIT" "live" "1 week ago" "1 day ago" "1 hour ago" "1 minute ago" )
     
     select opt1 in "${MENU1[@]}"; do
 		if [ "$opt1" = "EXIT" ] ; then
