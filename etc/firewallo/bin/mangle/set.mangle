@@ -8,8 +8,7 @@ $NFT "add chain ip mangle PREROUTING { type nat hook prerouting priority -100; p
 $NFT "add chain ip mangle INPUT { type nat hook input priority 100; policy accept; }"
 $NFT "add chain ip mangle OUTPUT { type nat hook output priority -100; policy accept; }"
 $NFT "add chain ip mangle POSTROUTING { type nat hook postrouting priority 100; policy accept; }"
-#Example
-#$NFT "add rule ip mangle PREROUTING iifname 'wanif0' ip daddr 192.168.1.1 tcp dport 1090 counter meta mark set 0x3"
+
 fi
 
 
