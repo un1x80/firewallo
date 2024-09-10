@@ -1,3 +1,10 @@
+#EXAMPLES
+#MASQUERADE
+#iptables -t nat -A POSTROUTING -s 192.168.1.1 -o ens21 -j SNAT --to-source 1.1.1.1
+#nft add rule ip nat POSTROUTING oif "ens21" ip saddr 192.168.1.1  
+#nft "add rule ip nat POSTROUTING oifname $WANIF_1 ip saddr $LANRANGE log prefix \"NAT POSTROUTING $LANRANGE ifout $WANIF_1: \" counter masquerade"
+#nft add rule ip nat PREROUTING iif "ens21" ip daddr 10.50.50.1 ip saddr 10.20.30.1 tcp dport 80 dnat to 10.40.40.10:8080
+
 #Thanks to nftables Maps, if you have a previous iptables NAT (destination NAT) ruleset like this:
 
 #--------------------
