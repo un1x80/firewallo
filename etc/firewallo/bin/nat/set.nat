@@ -16,5 +16,10 @@ for range in ${LANRANGE[*]}; do
 done
 
 elif [ "$IPT" != "" ] ; then 
-	$IPT -t nat -A POSTROUTING -s $LANRANGE -o $WANIF -j MASQUERADE
+for range in ${LANRANGE[*]}; do
+	 for wanif in ${WANIF[*]} ; do
+     $IPT -t nat -A POSTROUTING -s $range -o $wanif -j MASQUERADE
+	done
+done
+	
 fi
