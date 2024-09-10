@@ -27,7 +27,20 @@
         mode: '0755'
         owner: root
         group: root
+    
+    - name: Enable sparse checkout
+      command: git config core.sparseCheckout true
+      args:
+        chdir: /opt/firewallo
 
+    - name: Set sparse checkout patterns (exclude README and LICENSE)
+      copy:
+        content: |
+          /*                   # Clone
+          !/README             # Exclude README
+          !/LICENSE            # Exclude LICENSE
+        dest: /opt/firewallo/.git/info/sparse-checkout
+        
     - name: Clone repository firewallo in /opt/firewallo
       git:
         repo: 'https://github.com/un1x80/firewallo.git'
