@@ -100,62 +100,53 @@ done
 /bin/bash $DIRCONF/nat/firewallo.nat
 
 ############################
-$NFT "add rule ip filter stato ct state related,established counter accept"
-$NFT "add rule ip filter stato ct state related counter accept"
-$NFT "add rule ip filter stato ct state established counter accept"
+$NFT "add rule ip filter stato ct state related,established 									log prefix \"ACCEPT related-established:\"	counter accept"
+$NFT "add rule ip filter stato ct state related 												log prefix \"ACCEPT related :\"          	counter accept"
+$NFT "add rule ip filter stato ct state established 											log prefix \"ACCEPT established:\" 			counter accept"
 
-$NFT "add rule ip filter tcp_flags tcp flags fin,psh,urg / fin,syn,rst,psh,ack,urg counter drop"
-$NFT "add rule ip filter tcp_flags tcp flags fin,psh,urg / fin,syn,rst,psh,ack,urg counter log prefix \"PortScanX-mas:\""
-$NFT "add rule ip filter tcp_flags tcp flags fin,syn,rst,ack,urg / fin,syn,rst,psh,ack,urg counter drop"
-$NFT "add rule ip filter tcp_flags tcp flags fin,syn,rst,ack,urg / fin,syn,rst,psh,ack,urg counter log prefix \"PortScanX-mas:\""
-$NFT "add rule ip filter tcp_flags tcp flags fin,syn,rst,psh,ack,urg / fin,syn,rst,psh,ack,urg counter drop"
-$NFT "add rule ip filter tcp_flags tcp flags fin,syn,rst,psh,ack,urg / fin,syn,rst,psh,ack,urg counter log prefix \"PortScanX-mas:\""
-$NFT "add rule ip filter tcp_flags tcp flags fin / fin,syn,rst,psh,ack,urg counter log prefix \"PortScan:\""
-$NFT "add rule ip filter tcp_flags tcp flags fin / fin,syn,rst,psh,ack,urg counter drop"
-$NFT "add rule ip filter tcp_flags tcp flags syn,rst / syn,rst counter log prefix \"PortScanX-mas:\""
-$NFT "add rule ip filter tcp_flags tcp flags syn,rst / syn,rst counter drop"
-$NFT "add rule ip filter tcp_flags tcp flags fin,syn / fin,syn counter log prefix \"PortScanX-mas:\""
-$NFT "add rule ip filter tcp_flags tcp flags fin,syn / fin,syn counter drop"
-$NFT "add rule ip filter tcp_flags tcp flags 0x0 / fin,syn,rst,psh,ack,urg counter log prefix \"PortScanX-mas:\""
-$NFT "add rule ip filter tcp_flags tcp flags 0x0 / fin,syn,rst,psh,ack,urg counter drop"
+$NFT "add rule ip filter tcp_flags tcp flags fin,psh,urg / fin,syn,rst,psh,ack,urg 				log prefix \"DROP PortScanX-mas:\" 			counter drop "
+$NFT "add rule ip filter tcp_flags tcp flags fin,syn,rst,ack,urg / fin,syn,rst,psh,ack,urg 		log prefix \"DROP PortScanX-mas:\" 			counter drop"
+$NFT "add rule ip filter tcp_flags tcp flags fin,syn,rst,psh,ack,urg / fin,syn,rst,psh,ack,urg 	log prefix \"DROP PortScanX-mas:\" 			counter drop"
+$NFT "add rule ip filter tcp_flags tcp flags fin / fin,syn,rst,psh,ack,urg 						log prefix \"DROP PortScan:\" 				counter drop"
+$NFT "add rule ip filter tcp_flags tcp flags syn,rst / syn,rst 									log prefix \"DROP PortScanX-mas:\" 			counter drop"
+$NFT "add rule ip filter tcp_flags tcp flags fin,syn / fin,syn 									log prefix \"DROP PortScanX-mas:\" 			counter drop"
+$NFT "add rule ip filter tcp_flags tcp flags 0x0 / fin,syn,rst,psh,ack,urg 						log prefix \"DROP PortScanX-mas:\" 			counter drop"
 
-$NFT "add rule ip filter dnserv ip daddr 192.112.36.4 tcp dport 53 counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS1 tcp dport 53 									log prefix \"ACCEPT dnserv $DNS1 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS2 tcp dport 53 									log prefix \"ACCEPT dnserv $DNS2 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS3 tcp dport 53 									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS4 tcp dport 53 									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
 
-$NFT "add rule ip filter dnserv ip daddr $DNS1 tcp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS2 tcp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS3 tcp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS4 tcp dport 53 counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS1 udp dport 53 									log prefix \"ACCEPT dnserv $DNS1 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS2 udp dport 53 									log prefix \"ACCEPT dnserv $DNS2 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS3 udp dport 53 									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS4 udp dport 53  									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
 
-$NFT "add rule ip filter dnserv ip daddr $DNS1 udp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS2 udp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS3 udp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS4 udp dport 53 counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS1 tcp sport 53  									log prefix \"ACCEPT dnserv $DNS1 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS2 tcp sport 53  									log prefix \"ACCEPT dnserv $DNS2 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS3 tcp sport 53  									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS4 tcp sport 53  									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
 
-$NFT "add rule ip filter dnserv ip daddr $DNS1 tcp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS2 tcp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS3 tcp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS4 tcp sport 53 counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS1 udp sport 53  									log prefix \"ACCEPT dnserv $DNS1 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS2 udp sport 53  									log prefix \"ACCEPT dnserv $DNS2 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS3 udp sport 53  									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $DNS4 udp sport 53  									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
 
-$NFT "add rule ip filter dnserv ip daddr $DNS1 udp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS2 udp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS3 udp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS4 udp sport 53 counter accept"
+$NFT "add rule ip filter dnserv ip $LO  tcp dport 53  											log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
+$NFT "add rule ip filter dnserv ip $LO  tcp uport 53  											log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
 
-$NFT "add rule ip filter dnserv ip $LO  tcp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip $LO  tcp uport 53 counter accept"
-
-ROOTSERV="198.41.0.4 128.9.0.107 192.33.4.12 128.8.10.90 192.203.230.10 192.5.5.241 192.112.36.4 128.63.2.53 \
-192.36.148.17 198.41.0.10 193.0.14.129 198.32.64.12 202.12.27.33"
+#ELENCO CONTROLLATO IL 10/09/2024
+ROOTSERV="198.41.0.4 199.9.14.201 192.33.4.12 199.7.91.13 192.203.230.10 192.5.5.241 192.112.36.4 198.97.190.53 192.36.148.17 192.58.128.30 193.0.14.129 199.7.83.42 202.12.27.33"
 for i in $ROOTSERV ; do
-$NFT "add rule ip filter dnserv ip saddr $i tcp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $i tcp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip saddr $i udp dport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $i udp dport 53 counter accept"
+$NFT "add rule ip filter dnserv ip saddr $i tcp dport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $i tcp dport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip saddr $i udp dport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $i udp dport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
 
-$NFT "add rule ip filter dnserv ip saddr $i tcp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $i tcp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip saddr $i udp sport 53 counter accept"
-$NFT "add rule ip filter dnserv ip daddr $i udp sport 53 counter accept"
+$NFT "add rule ip filter dnserv ip saddr $i tcp sport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $i tcp sport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip saddr $i udp sport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $i udp sport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
 done
 
 #####################
@@ -164,100 +155,100 @@ done
 ICMPaccept="destination-unreachable source-quench time-exceeded parameter-problem"
 
 for ICMP in $ICMPaccept ; do
-$NFT "add rule ip filter icmp_good icmp type $ICMP counter accept"
+$NFT "add rule ip filter icmp_good icmp type $ICMP   										log prefix \"ACCEPT icmp_good :\" 				counter accept" 
 done
 
-$NFT "add rule ip filter icmp_good icmp type echo-request counter accept"
-$NFT "add rule ip filter icmp_good icmp type echo-reply counter accept"
+$NFT "add rule ip filter icmp_good icmp type echo-request   								log prefix \"ACCEPT icmp_good :\" 				counter accept"
+$NFT "add rule ip filter icmp_good icmp type echo-reply    									log prefix \"ACCEPT icmp_good :\" 				counter accept"
 #limit rate 90/minute burst 5 packets counter accept
 
 
 #FILTER CHAINS ATTRIBUTION IN FORWARD
 
-$NFT "add rule ip filter FORWARD log prefix \"ACCEPTED FORWARD state : \" 					counter jump stato"		###
-$NFT "add rule ip filter FORWARD log prefix \"ACCEPTED FORWARD dnsserv : \" 				counter jump dnserv"	###
-$NFT "add rule ip filter FORWARD log prefix \"ACCEPTED FORWARD icmp_good : \"	 			counter jump icmp_good"	###
-$NFT "add rule ip filter FORWARD log prefix \"DROPPED FORWARD bad_tcp_flags : \" 			counter jump tcp_flags"	###
+$NFT "add rule ip filter FORWARD counter jump stato"		###
+$NFT "add rule ip filter FORWARD counter jump dnserv"		###
+$NFT "add rule ip filter FORWARD counter jump icmp_good"	###
+$NFT "add rule ip filter FORWARD counter jump tcp_flags"	###
 $NFT "add rule ip filter FORWARD iifname lo log prefix \"ACCEPTED FORWARD localhost : \" 	counter accept" ### Fire 2 All forward
 
 #LAN 2 -> XXX
     	for lanifs in ${LANIF[*]} ; do
 		for lanifs1 in ${LANIF[*]} ; do
-		$NFT "add rule ip filter FORWARD	iifname $lanifs 	oifname $lanifs1 	log prefix \"LOG FORWARD insert in lan2lan : \" counter jump lan2lan"      ### Lan 2 Lan forward
+		$NFT "add rule ip filter FORWARD	iifname $lanifs 	oifname $lanifs1 	counter jump lan2lan"      ### Lan 2 Lan forward
     		done
 	done
 	 for lanifs in ${LANIF[*]} ; do
                 for wanifs in ${WANIF[*]} ; do
-                $NFT "add rule ip filter FORWARD	iifname $lanifs     oifname $wanifs log prefix \"LOG FORWARD insert in lan2wan : \"    counter jump lan2wan"      ### Lan 2 Lan forward
+                $NFT "add rule ip filter FORWARD	iifname $lanifs     oifname $wanifs    counter jump lan2wan"      ### Lan 2 Lan forward
                 done
     	done
 	for lanifs in ${LANIF[*]} ; do
 		for dmzifs in ${DMZIF[*]} ; do
-		$NFT "add rule ip filter FORWARD	iifname $lanifs 	oifname $dmzifs log prefix \"LOG FORWARD insert in lan2dmz : \"	counter jump lan2dmz"      ### Lan 2 Dmz forward
+		$NFT "add rule ip filter FORWARD	iifname $lanifs 	oifname $dmzifs 	counter jump lan2dmz"      ### Lan 2 Dmz forward
 		done
 	done
 #WAN 2 -> XXX
 	for wanifs in ${WANIF[*]} ; do
 		for lanifs in ${LANIF[*]} ; do
-		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $lanifs log prefix \"LOG FORWARD insert in wan2lan : \"	counter jump wan2lan"	### Wan 2 Lan forward
+		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $lanifs 	counter jump wan2lan"	### Wan 2 Lan forward
 		done
 	done
 	 for wanifs in ${WANIF[*]} ; do
                 for dmzifs in ${DMZIF[*]} ; do
-    		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $dmzifs log prefix \"LOG FORWARD insert in wan2dmz : \"	counter jump wan2dmz"      ### Wan 2 Dmz forward
+    		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $dmzifs 	counter jump wan2dmz"      ### Wan 2 Dmz forward
     		done
 	done
 	for wanifs in ${WANIF[*]} ; do
 		for wanifs1 in ${WANIF[*]} ; do
-		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $wanifs1 log prefix \"LOG FORWARD insert in wan2wan : \"	counter jump wan2wan"      ### Wan 2 Wmz forward
+		$NFT "add rule ip filter FORWARD	iifname $wanifs 	oifname $wanifs1 	counter jump wan2wan"      ### Wan 2 Wmz forward
 		done
 	done
 #DMZ 2 -> XXX
 	for dmzifs in ${DMZIF[*]} ; do
  		for lanifs in ${LANIF[*]} ; do
-  		$NFT "add rule ip filter FORWARD	iifname $dmzifs 	oifname $lanifs log prefix \"LOG FORWARD insert in dmz2lan : \"	counter jump dmz2lan"	### Dmz 2 Lan forward
+  		$NFT "add rule ip filter FORWARD	iifname $dmzifs 	oifname $lanifs 	counter jump dmz2lan"	### Dmz 2 Lan forward
 		done
 	done
 	for dmzifs in ${DMZIF[*]} ; do
 		for dmzifs1 in ${DMZIF[*]} ; do
-		$NFT  "add rule ip filter FORWARD	iifname $dmzifs 	oifname $dmzifs1 log prefix \"LOG FORWARD insert in dmz2dmz : \"	counter jump dmz2dmz"      ### Dmz 2 Dmz forward
+		$NFT  "add rule ip filter FORWARD	iifname $dmzifs 	oifname $dmzifs1 	counter jump dmz2dmz"      ### Dmz 2 Dmz forward
     		done
 	done
 	for dmzifs in ${DMZIF[*]} ; do
 		for wanifs in ${WANIF[*]} ; do
-		$NFT "add rule ip filter FORWARD iifname $dmzifs 	oifname $wanifs log prefix \"LOG FORWARD insert in dmz2wan : \"	counter jump  dmz2wan"      ### Dmz 2 Wan forward
+		$NFT "add rule ip filter FORWARD iifname $dmzifs 	oifname $wanifs 	counter jump  dmz2wan"      ### Dmz 2 Wan forward
 		done
 	done
 
 #FILTER CHAINS ATTRIBUTION IN INPUT
-    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT state : \" 						counter jump stato"
-    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT dns_ok : \" 					    counter jump dnserv"
-    $NFT "add rule ip filter INPUT log prefix \"ACCEPTED INPUT icmp_good : \" 					counter jump icmp_good"
-    $NFT "add rule ip filter INPUT log prefix \"DROPPED INPUT bad_tcp_flags : \" 				counter jump tcp_flags"
-    $NFT "add rule ip filter INPUT iifname \"lo\" log prefix \"ACCEPTED INPUT localhost : \" 	counter accept"
+    $NFT "add rule ip filter INPUT 	counter jump stato"
+    $NFT "add rule ip filter INPUT  counter jump dnserv"
+    $NFT "add rule ip filter INPUT 	counter jump icmp_good"
+    $NFT "add rule ip filter INPUT 	counter jump tcp_flags"
+    $NFT "add rule ip filter INPUT iifname \"lo\" log prefix \"ACCEPT INPUT localhost : \" 	counter accept"
     for lanifs in ${LANIF[*]} ; do
-	$NFT "add rule ip filter INPUT iifname $lanifs  log prefix \"LOG INPUT insert in lan2wan : \"         counter jump  lan2fw"	### Lan input to firewall
+	$NFT "add rule ip filter INPUT iifname $lanifs      counter jump  lan2fw"	### Lan input to firewall
     done
     for wanifs in ${WANIF[*]} ; do
-	$NFT "add rule ip filter INPUT iifname $wanifs 	log prefix \"LOG INPUT insert in wan2fw : \"		counter jump wan2fw"	### Wan input to firewall
+	$NFT "add rule ip filter INPUT iifname $wanifs 		counter jump wan2fw"	### Wan input to firewall
     done
     for dmzifs in ${DMZIF[*]} ; do
-    	$NFT "add rule ip filter INPUT iifname $dmzifs	log prefix \"LOG INPUT insert in dmz2fw : \"		counter jump dmz2fw"	### Dmz input to firewall
+    	$NFT "add rule ip filter INPUT iifname $dmzifs	counter jump dmz2fw"	### Dmz input to firewall
     done
     #FILTER CHAINS ATTRIBUTION IN INPUT
-    $NFT "add rule ip filter OUTPUT log prefix \"ACCEPTED OUTPUT state : \" counter jump stato"
-    $NFT "add rule ip filter OUTPUT log prefix \"ACCEPTED OUTPUT dns_ok : \" counter jump dnserv"
-    $NFT "add rule ip filter OUTPUT log prefix \"ACCEPTED OUTPUT icmp_good : \" counter jump icmp_good"
-    $NFT "add rule ip filter OUTPUT log prefix \"DROPPED OUTPUT bad_tcp_flags : \" counter jump tcp_flags"
+    $NFT "add rule ip filter OUTPUT counter jump stato"
+    $NFT "add rule ip filter OUTPUT counter jump dnserv"
+    $NFT "add rule ip filter OUTPUT counter jump icmp_good"
+    $NFT "add rule ip filter OUTPUT counter jump tcp_flags"
     $NFT "add rule ip filter OUTPUT oifname \"lo\" log prefix \"ACCEPTED OUTPUT localhost : \" counter accept"
     for dmzifs in ${DMZIF[*]} ; do
-	$NFT "add rule ip filter OUTPUT oifname $dmzifs	log prefix \"LOG OUTPUT insert in fw2dmz : \"		counter jump fw2dmz"     	### Fire output to dmz
+	$NFT "add rule ip filter OUTPUT oifname $dmzifs	counter jump fw2dmz"     	### Fire output to dmz
     done
     for lanifs in ${LANIF[*]} ; do
-	$NFT "add rule ip filter OUTPUT oifname $lanifs	log prefix \"LOG OUTPUT insert in fw2lan : \"		counter jump fw2lan"    	### Fire output to lan
+	$NFT "add rule ip filter OUTPUT oifname $lanifs	counter jump fw2lan"    	### Fire output to lan
     done
     for wanifs in ${WANIF[*]} ; do
-    	$NFT "add rule ip filter OUTPUT oifname $WANIF	log prefix \"LOG OUTPUT insert in fw2wan : \"		counter jump fw2wan"     	### Fire output to wan
+    	$NFT "add rule ip filter OUTPUT oifname $WANIF	counter jump fw2wan"     	### Fire output to wan
     done
 
     #VPN CHAINS ATTRIBUTION
@@ -265,33 +256,33 @@ $NFT "add rule ip filter FORWARD iifname lo log prefix \"ACCEPTED FORWARD localh
     #XXX 2 -> VPN
     for lanifs in ${LANIF[*]} ; do
     	for vpnsif in $VPNIF ; do
-    	$NFT "add rule ip filter FORWARD iifname $lanifs       oifname $vpnsif 	log prefix \"LOG FORWARD insert in lan2vpns : \" counter jump lan2vpns"	###
-    	$NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $lanifs 	log prefix \"LOG FORWARD insert in vpns2lan : \" counter jump vpns2lan"	###
+    	$NFT "add rule ip filter FORWARD iifname $lanifs       oifname $vpnsif 	 counter jump lan2vpns"	###
+    	$NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $lanifs 	 counter jump vpns2lan"	###
 	done
     done
     for dmzifs in ${DMZIF[*]} ; do
 	for vpnsif in $VPNIF ; do
-		$NFT "add rule ip filter FORWARD iifname $dmzifs       oifname $vpnsif 	log prefix \"LOG FORWARD insert in dmz2vpns : \" counter jump dmz2vpns"	###
-        $NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $dmzifs 	log prefix \"LOG FORWARD insert in vpns2dmz : \" counter jump vpns2dmz"	###
+		$NFT "add rule ip filter FORWARD iifname $dmzifs       oifname $vpnsif 	 counter jump dmz2vpns"	###
+        $NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $dmzifs 	 counter jump vpns2dmz"	###
 	done
     done
     for wanifs in ${WANIF[*]} ; do
 	for vpnsif in $VPNIF ; do
-    	$NFT "add rule ip filter FORWARD iifname $wanifs       oifname $vpnsif 	log prefix \"LOG FORWARD insert in wan2vpns : \" counter jump wan2vpns"	###
-    	$NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $wanifs 	log prefix \"LOG FORWARD insert in vpns2wan : \" counter jump vpns2wan"	###
+    	$NFT "add rule ip filter FORWARD iifname $wanifs       oifname $vpnsif 	 counter jump wan2vpns"	###
+    	$NFT "add rule ip filter FORWARD iifname $vpnsif       oifname $wanifs 	 counter jump vpns2wan"	###
 	done
     done
 
     for vpnsif in $VPNIF ; do
-    	$NFT "add rule ip filter INPUT       iifname $vpnsif	log prefix \"LOG INPUT  insert in vpns2fw : \" counter jump vpns2fw"	###
-		$NFT "add rule ip filter OUTPUT      oifname $vpnsif	log prefix \"LOG OUTPUT insert in fw2vpns : \" counter jump fw2vpns"	###
+    	$NFT "add rule ip filter INPUT       iifname $vpnsif	 counter jump vpns2fw"	###
+		$NFT "add rule ip filter OUTPUT      oifname $vpnsif	 counter jump fw2vpns"	###
     done
     for vpnsif in $VPNIF ; do
     	for vpnsif1 in $VPNIF ; do
-    	$NFT  "add rule ip filter FORWARD 	iifname $vpnsif1        oifname $vpnsif log prefix \"LOG FORWARD insert in vpns2vpns : \"	counter jump vpns2vpns"	###
+    	$NFT  "add rule ip filter FORWARD 	iifname $vpnsif1        oifname $vpnsif counter jump vpns2vpns"	###
        	done
     done
-#done  #FORSE
+	
 
 #STAR DELLE REGOLE
 CHAINS0="lan2wan lan2dmz lan2lan lan2vpns lan2fw \
@@ -303,11 +294,11 @@ vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw     ";
 for CAT0 in $CHAINS0 ; do
 /bin/bash $DIRCONF/bin/filter/$CAT0  "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf"
 done
-
-$NFT "add rule ip filter INPUT log prefix \"INPUT_DROP: \" flags all"
-$NFT "add rule ip filter FORWARD log prefix \"FORWARD_DROP: \" flags all"
-$NFT "add rule ip filter OUTPUT log prefix \"OUTPUT_DROP: \" flags all"
-
+###LOG DROP BY POLICY
+$NFT "add rule ip filter INPUT 		log prefix \"INPUT_DROP : \" 	flags all"
+$NFT "add rule ip filter FORWARD 	log prefix \"FORWARD_DROP : \" 	flags all"
+$NFT "add rule ip filter OUTPUT 	log prefix \"OUTPUT_DROP : \" 	flags all"
+###LOG DROP BY POLICY
 echo "Firewall setting are finish...                                  ...OK"
 }
 
