@@ -36,13 +36,13 @@
       register: result_git
 
     - name: Esegui lo script di disinstallazione
-      command: ./uninstall
+      command: ./etc/firewallo/uninstall
       args:
         chdir: /opt/firewallo
       register: uninstall  
 
     - name: Esegui lo script di installazione
-      command: ./install
+      command: ./etc/firewallo/install
       args:
         chdir: /opt/firewallo
       when: uninstall.changed  # Esegui solo se il repository è stato clonato o aggiornato
@@ -53,6 +53,6 @@
     #    name: nftables
     #    state: restarted
     #  when: result_git.changed  # Esegui solo se il repository è stato clonato o aggiornato  
-    #- name: Esegui lo script di restart
-    #  command: /etc/init.d/firewallo.nft restart
-    #  when: install.changed  # Esegui solo se firewallo è stato installato
+    - name: Esegui lo script di restart
+      command: /etc/init.d/firewallo.nft restart
+      when: install.changed  # Esegui solo se firewallo è stato installato
