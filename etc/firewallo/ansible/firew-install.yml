@@ -2,25 +2,25 @@
 - hosts: firewallo
   become: yes
   tasks:
-    - name: Assicurati che Git sia installato
+    - name: Check if Git is installed
       apt:
         name: git
         state: present
       become: yes
 
-    - name: Assicurati che iptables sia installato
+    - name: Check if iptables is installed
       apt:
         name: iptables
         state: present
       become: yes
 
-    - name: Assicurati che nftables sia installato
+    - name: Check if nftables is installed
       apt:
         name: nftables
         state: present
       become: yes
     
-    - name: Assicurati che la directory /opt/firewallo esista
+    - name: check if directory /opt/firewallo exist
       file:
         path: /opt/firewallo
         state: directory
@@ -28,31 +28,35 @@
         owner: root
         group: root
 
-    - name: Clona il repository firewallo in /opt/firewallo
+    - name: Clone repository firewallo in /opt/firewallo
       git:
         repo: 'https://github.com/un1x80/firewallo.git'
         dest: /opt/firewallo
         version: main
       register: result_git
-
-    - name: Esegui lo script di disinstallazione
-      command: ./etc/firewallo/uninstall
-      args:
-        chdir: /opt/firewallo
-      register: uninstall  
-
-    - name: Esegui lo script di installazione
-      command: ./etc/firewallo/install
-      args:
-        chdir: /opt/firewallo
-      when: uninstall.changed  # Esegui solo se il repository è stato clonato o aggiornato
-      register: install 
     
-    #- name: Riavvia il servizio firewallo
-    #  systemd:
-    #    name: nftables
-    #    state: restarted
-    #  when: result_git.changed  # Esegui solo se il repository è stato clonato o aggiornato  
-    - name: Esegui lo script di restart
-      command: /etc/init.d/firewallo.nft restart
-      when: install.changed  # Esegui solo se firewallo è stato installato
+    - name: Ensure dpkg-dev is installed
+      apt:
+        name: dpkg-dev
+        state: present
+        update_cache: yes
+      become: yes
+
+    - name: Build the .deb package
+      command: dpkg-deb --build /opt/firewallo
+      args:
+        chdir: /opt/
+    
+    - name: Ensure the package was created
+      stat:
+        path: /opt/firewallo.deb
+      register: package_stat
+
+    - name: Fail if package was not created
+      fail:
+        msg: "The .deb package was not created!"
+      when: not package_stat.stat.exists
+
+    - name: Notify user that package was created
+      debug:
+        msg: "The .deb package has been successfully built: /opt/firewallo.deb"
