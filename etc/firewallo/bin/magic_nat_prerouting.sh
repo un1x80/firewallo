@@ -59,8 +59,8 @@ configure_nftables_prerouting() {
     local comment="$7"
 
     # Configurazione della regola DNAT in nftables
-    echo "nft \"add rule ip nat PREROUTING ip saddr \"$srcip_mask\" iif \"$iif\" $protocol dport \"$dport\" log prefix \"DNAT $comment : \" counter dnat to \"$to_dest_ip:$to_dest_port\""
-    echo "nft \"add rule ip nat PREROUTING ip saddr \"$srcip_mask\" iif \"$iif\" $protocol dport \"$dport\" log prefix \"DNAT $comment : \" counter dnat to \"$to_dest_ip:$to_dest_port\""\
+    echo "nft add rule ip nat PREROUTING ip saddr $srcip_mask iif $iif $protocol dport $dport log prefix \"DNAT $comment : \" counter dnat to $to_dest_ip:$to_dest_port"
+    echo "nft add rule ip nat PREROUTING ip saddr $srcip_mask iif $iif $protocol dport $dport log prefix \"DNAT $comment : \" counter dnat to $to_dest_ip:$to_dest_port"\
     | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
     
     if [ $? -ne 0 ]; then
