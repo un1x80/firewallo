@@ -14,6 +14,12 @@ load_translations() {
     fi
 }
 
+handle_error() {
+    echo "$1" 1>&2
+    echo "$INVALID_SELECTION_MSG"
+}
+
+
 # Funzione per visualizzare le catene disponibili e permettere la selezione
 select_chain() {
     echo "$SELECT_CHAIN_PROMPT"
