@@ -31,7 +31,9 @@ configure_iptables_prerouting() {
     local comment="$7"
 
     # Configurazione della regola DNAT in iptables
-
+    echo "
+    iptables -t nat -A PREROUTING -s \"$srcip_mask\" -i \"$iif\" -p \"$protocol\" --dport \"$dport\" -j LOG --log-prefix \"DNAT $comment\"
+    iptables -t nat -A PREROUTING -s \"$srcip_mask\" -i \"$iif\" -p \"$protocol\" --dport \"$dport\" -j DNAT --to-destination \"$to_dest_ip:$to_dest_port\""
     echo "
     iptables -t nat -A PREROUTING -s \"$srcip_mask\" -i \"$iif\" -p \"$protocol\" --dport \"$dport\" -j LOG --log-prefix \"DNAT $comment\"
     iptables -t nat -A PREROUTING -s \"$srcip_mask\" -i \"$iif\" -p \"$protocol\" --dport \"$dport\" -j DNAT --to-destination \"$to_dest_ip:$to_dest_port\""\
@@ -57,6 +59,7 @@ configure_nftables_prerouting() {
     local comment="$7"
 
     # Configurazione della regola DNAT in nftables
+    echo "nft \"add rule ip nat PREROUTING ip saddr \"$srcip_mask\" iif \"$iif\" $protocol dport \"$dport\" log prefix \"DNAT $comment : \" counter dnat to \"$to_dest_ip:$to_dest_port\""
     echo "nft \"add rule ip nat PREROUTING ip saddr \"$srcip_mask\" iif \"$iif\" $protocol dport \"$dport\" log prefix \"DNAT $comment : \" counter dnat to \"$to_dest_ip:$to_dest_port\""\
     | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
     
@@ -77,7 +80,7 @@ ask_for_parameters() {
         if [[ "$srcip_mask" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$ ]]; then
             break
         else
-            handle_error "Indirizzo IP di origine o maschera non valido."
+            handle_error "$INVALID_SADDR"
         fi
     done
 
@@ -86,7 +89,7 @@ ask_for_parameters() {
         if [[ "$iif" =~ ^[a-zA-Z0-9]+$ ]]; then
             break
         else
-            handle_error "Nome dell'interfaccia non valido."
+            handle_error "$INVALID_INTERFACE"
         fi
     done
 
@@ -96,7 +99,7 @@ ask_for_parameters() {
         echo "$PROTOCOL_PROMPT"
         echo "$TCP_OPTION"
         echo "$UDP_OPTION"
-        read -e -p "Inserisci il numero corrispondente (1 o 2): " protocol_choice
+        read -e -p "$CHOICE_PROMPT" protocol_choice
 
         case $protocol_choice in
             1)
@@ -108,7 +111,7 @@ ask_for_parameters() {
                 break
                 ;;
             *)
-                handle_error "Scelta non valida. Per favore, inserisci 1 per TCP o 2 per UDP."
+                handle_error "$INVALID_TCP_UDP_CHOICE"
                 ;;
         esac
     done
