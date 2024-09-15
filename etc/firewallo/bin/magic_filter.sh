@@ -4,12 +4,12 @@
 select_chain() {
     echo "Seleziona la catena dalla seguente lista:"
     CHAINS=(
-fw2fw	fw2lan		fw2wan		fw2vpns		fw2dmz		\
-lan2fw	lan2lan		lan2wan		lan2vpns 	lan2dmz  	\
-wan2fw	wan2lan		wan2wan		wan2vpns 	wan2dmz   	\
-vpns2fw	vpns2lan	vpns2wan	vpns2vpns 	vpns2dmz 	\
-dmz2fw	dmz2lan		dmz2wan		dmz2vpns 	dmz2dmz 	\
-exit
+        fw2fw	fw2lan	fw2wan	fw2vpns	fw2dmz \
+        lan2fw	lan2lan	lan2wan	lan2vpns	lan2dmz \
+        wan2fw	wan2lan	wan2wan	wan2vpns	wan2dmz \
+        vpns2fw	vpns2lan	vpns2wan	vpns2vpns	vpns2dmz \
+        dmz2fw	dmz2lan	dmz2wan	dmz2vpns	dmz2dmz \
+        exit
     )
 
     # Mostra le catene all'utente
@@ -35,6 +35,7 @@ parse_port_range() {
         echo "$port_range"
     fi
 }
+
 # Funzione per adattare i valori 'any' e 'range' per iptables e nftables
 parse_port_range_nft() {
     local port_range="$1"
@@ -44,28 +45,6 @@ parse_port_range_nft() {
         echo "$port_range"
     else
         echo "$port_range"
-    fi
-}
-# Funzione per analizzare l'input
-parse_input() {
-    local input="$1"
-    
-    # Usa un'espressione regolare per estrarre i dettagli
-    if [[ "$input" =~ ^([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+)\ (tcp|udp)\ (any|[0-9:]+)\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+)\ (any|[0-9:]+)\ (ACCEPT|DROP|REJECT)$ ]]; then
-        SRC_ADDR="${BASH_REMATCH[1]}"
-        PROTOCOL="${BASH_REMATCH[2]}"
-        SRC_PORT="${BASH_REMATCH[3]}"
-        DST_ADDR="${BASH_REMATCH[4]}"
-        DST_PORT="${BASH_REMATCH[5]}"
-        ACTION="${BASH_REMATCH[6]}"
-    else
-        echo "Formato di input non valido. Verifica la sintassi seguente:"
-        echo "Sintassi corretta:"
-        echo "<srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
-        echo ""
-        echo "Esempio:"
-        echo "192.168.1.1/32 tcp any 192.168.10.1/32 80 ACCEPT"
-        exit 1
     fi
 }
 
@@ -88,18 +67,26 @@ translate_action() {
     esac
 }
 
-
 # Seleziona la catena
 select_chain
-# Mostra la sintassi all'utente
 
-echo "Sintassi del comando:"
-echo "<srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
-# Chiedi all'utente di inserire i parametri
-read  -e -p "Inserisci i parametri (esempio: 192.168.1.1/32 tcp any 192.168.10.1/32 80 ACCEPT): " user_input
+# Chiedi i dettagli uno per uno all'utente
+read -e -p "Inserisci l'indirizzo sorgente (es. 192.168.1.1/32): " SRC_ADDR
+read -e -p "Inserisci il protocollo (tcp o udp): " PROTOCOL
 
-# Analizza l'input
-parse_input "$user_input"
+# Chiedi la porta sorgente (usa 'any' come predefinito)
+read -e -p "Inserisci la porta sorgente (es. 80 o 'any'): " SRC_PORT
+SRC_PORT=${SRC_PORT:-any}
+
+# Chiedi l'indirizzo di destinazione
+read -e -p "Inserisci l'indirizzo di destinazione (es. 192.168.10.1/32): " DST_ADDR
+
+# Chiedi la porta di destinazione (usa 'any' come predefinito)
+read -e -p "Inserisci la porta di destinazione (es. 80 o 'any'): " DST_PORT
+DST_PORT=${DST_PORT:-any}
+
+# Chiedi l'azione (ACCEPT, DROP, REJECT)
+read -e -p "Inserisci l'azione (ACCEPT, DROP, REJECT): " ACTION
 
 # Adatta le porte per iptables e nftables
 SRC_PORT_OPTION_IPT=$(parse_port_range "$SRC_PORT")
@@ -108,7 +95,7 @@ DST_PORT_OPTION_IPT=$(parse_port_range "$DST_PORT")
 DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
 
 # Aggiungi la regola in iptables
-iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION -d $DST_ADDR --dport $DST_PORT_OPTION -j $ACTION"
+iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION_IPT -d $DST_ADDR --dport $DST_PORT_OPTION_IPT -j $ACTION"
 echo "Regola iptables:"
 echo "$iptables_cmd"
 
