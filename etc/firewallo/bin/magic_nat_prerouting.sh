@@ -31,11 +31,14 @@ configure_iptables_prerouting() {
     local comment="$7"
 
     # Configurazione della regola DNAT in iptables
+
     echo "
     iptables -t nat -A PREROUTING -s \"$srcip_mask\" -i \"$iif\" -p \"$protocol\" --dport \"$dport\" -j LOG --log-prefix \"DNAT $comment\"
     iptables -t nat -A PREROUTING -s \"$srcip_mask\" -i \"$iif\" -p \"$protocol\" --dport \"$dport\" -j DNAT --to-destination \"$to_dest_ip:$to_dest_port\""\
     | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat 
     
+
+
     if [ $? -ne 0 ]; then
         handle_error "$DNAT_CONFIG_ERROR"
     else
@@ -146,11 +149,15 @@ ask_for_parameters() {
         fi
     done
 
-    # Applicare la configurazione in iptables
-    configure_iptables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port" "$comment"
-
-    # Applicare la configurazione in nftables
-    configure_nftables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port" "$comment"
+    if [ "$IPT" != "" ]; then
+     # Applicare la configurazione in iptables
+     configure_iptables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port" "$comment"
+    elif [ "$NFT" != "" ]; then
+     # Applicare la configurazione in nftables
+     configure_nftables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port" "$comment"
+    else
+     echo $INT_ERROR_MSG
+    fi
 }
 
 # Carica le traduzioni
