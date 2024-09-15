@@ -1,9 +1,22 @@
 #!/bin/bash
+
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
+
+# Carica il file di traduzione
+load_translations() {
+    local lang_file="$DIRCONF/firewallo.lang"
+    if [[ -f "$lang_file" ]]; then
+        source "$lang_file"
+    else
+        echo "LANG_NOT_FOUND"
+        exit 1
+    fi
+}
+
 # Funzione per visualizzare le catene disponibili e permettere la selezione
 select_chain() {
-    echo "Seleziona la catena dalla seguente lista:"
+    echo "$SELECT_CHAIN_PROMPT"
     CHAINS=(
         fw2fw	fw2lan	fw2wan	fw2vpns	fw2dmz \
         lan2fw	lan2lan	lan2wan	lan2vpns	lan2dmz \
@@ -16,11 +29,11 @@ select_chain() {
     # Mostra le catene all'utente
     select chain in "${CHAINS[@]}"; do
         if [[ " ${CHAINS[@]} " =~ " $chain " ]]; then
-            echo "Hai selezionato la catena: $chain"
+            echo "$(printf "$CHAIN_SELECTED_MSG" "$chain")"
             CHAIN_SELECTED=$chain
             break
         else
-            echo "Selezione non valida. Riprova."
+            echo "$INVALID_SELECTION_MSG"
         fi
     done
 }
@@ -68,45 +81,39 @@ translate_action() {
     esac
 }
 
+# Carica le traduzioni
+load_translations
+
 # Seleziona la catena
 select_chain
 
 # Chiedi i dettagli uno per uno all'utente
-read -e -p "Inserisci l'indirizzo sorgente (es. 192.168.1.1/32): " SRC_ADDR
-read -e -p "Inserisci il protocollo (tcp o udp): " PROTOCOL
-
-# Chiedi la porta sorgente (usa 'any' come predefinito)
-read -e -p "Inserisci la porta sorgente (es. 80 o 'any'): " SRC_PORT
+read -e -p "$SOURCE_ADDR_PROMPT" SRC_ADDR
+read -e -p "$PROTOCOL_PROMPT" PROTOCOL
+read -e -p "$SRC_PORT_PROMPT" SRC_PORT
 SRC_PORT=${SRC_PORT:-any}
-
-# Chiedi l'indirizzo di destinazione
-read -e -p "Inserisci l'indirizzo di destinazione (es. 192.168.10.1/32): " DST_ADDR
-
-# Chiedi la porta di destinazione (usa 'any' come predefinito)
-read -e -p "Inserisci la porta di destinazione (es. 80 o 'any'): " DST_PORT
+read -e -p "$DST_ADDR_PROMPT" DST_ADDR
+read -e -p "$DST_PORT_PROMPT" DST_PORT
 DST_PORT=${DST_PORT:-any}
-
-# Chiedi l'azione (ACCEPT, DROP, REJECT)
-read -e -p "Inserisci l'azione (ACCEPT, DROP, REJECT): " ACTION
-
+read -e -p "$ACTION_PROMPT" ACTION
 
 if [ "$IPT" != "" ] ; then
-# Adatta le porte per iptables e nftables
-SRC_PORT_OPTION_IPT=$(parse_port_range "$SRC_PORT")
-DST_PORT_OPTION_IPT=$(parse_port_range "$DST_PORT")
-# Aggiungi la regola in iptables
-iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION_IPT -d $DST_ADDR --dport $DST_PORT_OPTION_IPT -j $ACTION"
-echo "Regola iptables:"
-echo "$iptables_cmd"
+    # Adatta le porte per iptables e nftables
+    SRC_PORT_OPTION_IPT=$(parse_port_range "$SRC_PORT")
+    DST_PORT_OPTION_IPT=$(parse_port_range "$DST_PORT")
+    # Aggiungi la regola in iptables
+    iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION_IPT -d $DST_ADDR --dport $DST_PORT_OPTION_IPT -j $ACTION"
+    echo "$IPT_RULE_MSG"
+    echo "$iptables_cmd"
 
 elif [ "$NFT" != "" ]; then
-SRC_PORT_OPTION_NFT=$(parse_port_range_nft "$SRC_PORT")
-DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
-# Aggiungi la regola in nftables
-nft_action=$(translate_action "$ACTION")
-nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
-echo "Regola nftables:"
-echo "$nft_cmd" | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
+    SRC_PORT_OPTION_NFT=$(parse_port_range_nft "$SRC_PORT")
+    DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
+    # Aggiungi la regola in nftables
+    nft_action=$(translate_action "$ACTION")
+    nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
+    echo "$NFT_RULE_MSG"
+    echo "$nft_cmd" | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
 else
-echo "Intenarl Error NFT or IPT are not set!"
+    echo "$INT_ERROR_MSG"
 fi
