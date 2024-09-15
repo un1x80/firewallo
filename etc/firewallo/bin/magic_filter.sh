@@ -1,5 +1,6 @@
 #!/bin/bash
-
+DIRCONF="/etc/firewallo"
+source $DIRCONF/firewallo.conf
 # Funzione per visualizzare le catene disponibili e permettere la selezione
 select_chain() {
     echo "Seleziona la catena dalla seguente lista:"
