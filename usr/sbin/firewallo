@@ -285,6 +285,63 @@ logs () {
     done
 }
 
+show_wizard () {
+function show_menu {
+    clear
+    echo "======================================"
+    echo "          FIREWALL WIZARD MENU        "
+    echo "======================================"
+    echo "1) Filter Wizard"
+    echo "2) Nat Prerouting Wizard"
+    echo "3) Nat Postrouting Wizard"
+    echo "4) Exit"
+    echo "======================================"
+    echo -n "Select an option: "
+}
+
+# Funzioni per le diverse opzioni
+function filter_wizard {
+    /etc/firewallo/bin/magic_filter.sh
+}
+
+function nat_prerouting_wizard {
+	/etc/firewallo/bin/magic_nat_prerouting.sh
+}
+
+function nat_postrouting_wizard {
+    /etc/firewallo/bin/magic_nat_postrouting.sh
+}
+
+# Ciclo principale del menu
+while true
+do
+    show_menu
+    read option
+
+    case $option in
+        1)
+            filter_wizard
+            ;;
+        2)
+            nat_prerouting_wizard
+            ;;
+        3)
+            nat_postrouting_wizard
+            ;;
+        4)
+            echo "Exit"
+            exit 0
+            ;;
+        *)
+            echo "Select right Option!."
+            ;;
+    esac
+
+    # Pausa per permettere la lettura del messaggio
+    echo -n "Press Enter to continue..."
+    read
+done
+}
 
 
 main () {
@@ -298,7 +355,7 @@ if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
 fi
 
-MENU="networking sysctl conf filter nat mangle start stop restart route status rulesview saveconf nft-iptables logs exit"
+MENU="networking sysctl conf filter nat mangle start stop restart route wizard status rulesview saveconf nft-iptables logs exit"
 select opt in $MENU ; do
 	if [ "$opt" = "networking" ] ; then
 		networking ;  main
@@ -330,6 +387,8 @@ select opt in $MENU ; do
         nftiptables ; main
 	elif [ "$opt" = "logs" ] ; then
         logs ;
+	elif [ "$opt" = "wizard" ] ; then
+		show_wizard ;
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
