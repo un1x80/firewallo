@@ -289,7 +289,7 @@ show_wizard () {
 function show_menu {
     clear
     echo "======================================"
-    echo "          FIREWALL WIZARD MENU        "
+    echo "         FIREWALLO WIZARD MENU        "
     echo "======================================"
     echo "1) Filter Wizard"
     echo "2) Nat Prerouting Wizard"
@@ -364,7 +364,7 @@ select opt in $MENU ; do
 	elif [ "$opt" = "sysctl" ] ; then
         sysctl ; main
 	elif [ "$opt" = "filter" ] ; then
-        filter ;
+        filter ; main
     elif [ "$opt" = "nat" ] ; then
         nat ; main
 	elif [ "$opt" = "mangle" ] ; then
@@ -386,9 +386,9 @@ select opt in $MENU ; do
     elif [ "$opt" = "nft-iptables" ] ; then
         nftiptables ; main
 	elif [ "$opt" = "logs" ] ; then
-        logs ;
+        logs ; main
 	elif [ "$opt" = "wizard" ] ; then
-		show_wizard ;
+		show_wizard ; main
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
