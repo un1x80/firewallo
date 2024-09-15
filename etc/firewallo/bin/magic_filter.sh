@@ -34,7 +34,6 @@ parse_input() {
         DEST_PORT="${BASH_REMATCH[5]}"
         ACTION="${BASH_REMATCH[6]}"
     else
-
         echo "Formato di input non valido. Verifica la sintassi seguente:"
         echo "Sintassi corretta:"
         echo "srcip <IP_sorgente/CIDR> <tcp|udp> sport <porta_sorgente|range|any> dstip <IP_destinazione/CIDR> <porta_destinazione|range|any> <ACCEPT|DROP|REJECT>"
@@ -72,9 +71,21 @@ parse_input() {
 parse_port() {
     local port="$1"
     if [[ "$port" == "any" ]]; then
-        echo "1:65535"
+        echo ""
     else
-        echo "--dport $port"
+        echo "$port"
+    fi
+}
+
+# Funzione per convertire il range di porte in formato nftables
+parse_port_range() {
+    local port_range="$1"
+    if [[ "$port_range" == "any" ]]; then
+        echo ""
+    elif [[ "$port_range" =~ ^([0-9]+):([0-9]+)$ ]]; then
+        echo "$port_range"
+    else
+        echo "$port_range"
     fi
 }
 
@@ -92,23 +103,49 @@ read -p "Inserisci il comando in formato meta linguaggio: " user_input
 parse_input "$user_input"
 
 # Adatta la porta sorgente e destinazione
-SOURCE_PORT_OPTION=$(parse_port "$SOURCE_PORT")
-DEST_PORT_OPTION=$(parse_port "$DEST_PORT")
+SOURCE_PORT_OPTION=$(parse_port_range "$SOURCE_PORT")
+DEST_PORT_OPTION=$(parse_port_range "$DEST_PORT")
 
 # Aggiungi la regola in iptables per la catena selezionata
-echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP --sport $SOURCE_PORT $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
+if [[ "$SOURCE_PORT_OPTION" == "" ]]; then
+    SOURCE_PORT_OPTION=""
+else
+    SOURCE_PORT_OPTION="--sport $SOURCE_PORT_OPTION"
+fi
+
+if [[ "$DEST_PORT_OPTION" == "" ]]; then
+    DEST_PORT_OPTION=""
+else
+    DEST_PORT_OPTION="--dport $DEST_PORT_OPTION"
+fi
+
+echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP $SOURCE_PORT_OPTION $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
 
 # Aggiungi la regola in nftables per la catena selezionata
-echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP ip daddr $DEST_IP $PROTOCOL sport $SOURCE_PORT dport $DEST_PORT $ACTION"
+echo "nft add table inet filter"
+echo "nft add chain inet filter $CHAIN_SELECTED { type filter hook forward priority 0 \; }"
+if [[ "$SOURCE_PORT_OPTION" == "" ]]; then
+    SOURCE_PORT_NFT=""
+else
+    SOURCE_PORT_NFT="sport $SOURCE_PORT_OPTION"
+fi
+
+if [[ "$DEST_PORT_OPTION" == "" ]]; then
+    DEST_PORT_NFT=""
+else
+    DEST_PORT_NFT="dport $DEST_PORT_OPTION"
+fi
+
+echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP ip daddr $DEST_IP $PROTOCOL $SOURCE_PORT_NFT $DEST_PORT_NFT $ACTION"
 
 # Output delle regole finali
 echo ""
 echo "Regole iptables:"
-echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP --sport $SOURCE_PORT_OPTION -d $DEST_IP $DEST_PORT_OPTION -j $ACTION"
+echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP $SOURCE_PORT_OPTION $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
 
 echo ""
 echo "Regole nftables:"
-echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP ip daddr $DEST_IP $PROTOCOL sport $SOURCE_PORT dport $DEST_PORT $ACTION"
+echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP ip daddr $DEST_IP $PROTOCOL $SOURCE_PORT_NFT $DEST_PORT_NFT $ACTION"
 
 echo ""
 echo "Regola aggiunta nella catena '$CHAIN_SELECTED': $PROTOCOL da $SOURCE_IP:$SOURCE_PORT a $DEST_IP:$DEST_PORT ($ACTION)"
