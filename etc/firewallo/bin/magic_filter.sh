@@ -32,7 +32,17 @@ parse_port_range() {
         echo "$port_range"
     fi
 }
-
+# Funzione per adattare i valori 'any' e 'range' per iptables e nftables
+parse_port_range_nft() {
+    local port_range="$1"
+    if [[ "$port_range" == "any" ]]; then
+        echo "1-65535"
+    elif [[ "$port_range" =~ ^([0-9]+):([0-9]+)$ ]]; then
+        echo "$port_range"
+    else
+        echo "$port_range"
+    fi
+}
 # Funzione per analizzare l'input
 parse_input() {
     local input="$1"
@@ -90,7 +100,8 @@ parse_input "$user_input"
 
 # Adatta le porte per iptables e nftables
 SRC_PORT_OPTION=$(parse_port_range "$SRC_PORT")
-DST_PORT_OPTION=$(parse_port_range "$DST_PORT")
+DST_PORT_OPTION_IPT=$(parse_port_range "$DST_PORT")
+DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
 
 # Aggiungi la regola in iptables
 iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION -d $DST_ADDR --dport $DST_PORT_OPTION -j $ACTION"
@@ -99,7 +110,7 @@ echo "$iptables_cmd"
 
 # Aggiungi la regola in nftables
 nft_action=$(translate_action "$ACTION")
-nft_cmd="nft add rule inet filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION $nft_action"
+nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
 
