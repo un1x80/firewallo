@@ -9,7 +9,7 @@ lan2fw	lan2lan		lan2wan		lan2vpns 	lan2dmz  	\
 wan2fw	wan2lan		wan2wan		wan2vpns 	wan2dmz   	\
 vpns2fw	vpns2lan	vpns2wan	vpns2vpns 	vpns2dmz 	\
 dmz2fw	dmz2lan		dmz2wan		dmz2vpns 	dmz2dmz 	\
-exit"
+exit
     )
 
     # Mostra le catene all'utente
