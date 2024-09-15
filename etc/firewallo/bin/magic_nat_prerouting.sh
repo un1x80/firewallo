@@ -100,8 +100,8 @@ ask_for_parameters() {
     done
 
     while true; do
-        read -p "Inserisci l'indirizzo IP e la maschera per il DNAT (es. 192.168.10.10/32): " to_dest_ip
-        if [[ "$to_dest_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?$ ]]; then
+        read -p "Inserisci l'indirizzo IP e la maschera per il DNAT (es. 192.168.10.10): " to_dest_ip
+        if [[ "$to_dest_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             break
         else
             handle_error "Indirizzo IP di destinazione non valido."
