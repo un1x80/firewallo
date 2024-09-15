@@ -1,74 +1,138 @@
 #!/bin/bash
 
-# Funzione per mostrare un messaggio di errore
+# Funzione per mostrare un messaggio di errore e continuare
 handle_error() {
     echo "$1" 1>&2
+    echo "Prova a reinserire i parametri correttamente."
 }
 
-# Funzione per analizzare l'input
-parse_input() {
-    local input="$1"
-    if [[ "$input" =~ ^src\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?)\ dest\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?)\ iif\ ([a-zA-Z0-9]+)\ redirect\ port\ (tcp|udp)\ ([0-9]+)\ to\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)\ ([0-9]+)$ ]]; then
-        SOURCE_IP="${BASH_REMATCH[1]}"
-        DEST_IP="${BASH_REMATCH[3]}"
-        INTERFACE="${BASH_REMATCH[5]}"
-        PROTOCOL="${BASH_REMATCH[6]}"
-        SOURCE_PORT="${BASH_REMATCH[7]}"
-        REDIRECT_IP="${BASH_REMATCH[8]}"
-        REDIRECT_PORT="${BASH_REMATCH[9]}"
-        return 0
+# Funzione per configurare le regole PREROUTING in iptables
+configure_iptables_prerouting() {
+    local srcip_mask="$1"
+    local iif="$2"
+    local protocol="$3"
+    local dport="$4"
+    local to_dest_ip="$5"
+    local to_dest_port="$6"
+
+    # Configurazione della regola DNAT in iptables
+    iptables -t nat -A PREROUTING -s "$srcip_mask" -i "$iif" -p "$protocol" --dport "$dport" -j DNAT --to-destination "$to_dest_ip:$to_dest_port"
+    
+    if [ $? -ne 0 ]; then
+        handle_error "Errore nella configurazione del DNAT in iptables."
     else
-        return 1
+        echo "Configurazione DNAT in iptables completata con successo."
+    fi
+}
+
+# Funzione per configurare le regole PREROUTING in nftables
+configure_nftables_prerouting() {
+    local srcip_mask="$1"
+    local iif="$2"
+    local protocol="$3"
+    local dport="$4"
+    local to_dest_ip="$5"
+    local to_dest_port="$6"
+
+    # Configurazione della regola DNAT in nftables
+    nft add rule ip nat PREROUTING ip saddr "$srcip_mask" iif "$iif" $protocol dport "$dport" dnat to "$to_dest_ip:$to_dest_port"
+    
+    if [ $? -ne 0 ]; then
+        handle_error "Errore nella configurazione del DNAT in nftables."
+    else
+        echo "Configurazione DNAT in nftables completata con successo."
     fi
 }
 
 # Funzione per chiedere i parametri all'utente
 ask_for_parameters() {
-    while true; do
-        echo "Sintassi del comando:"
-        echo "src <IP_sorgente>/<maschera> dest <IP_destinazione>/<maschera> iif <interfaccia> redirect port <tcp|udp> <porta_sorgente> to <IP_redirect> <porta_redirect>"
+    echo "Configurazione PREROUTING con iptables e nftables"
+    echo ""
 
-        read -p "Inserisci il comando in formato meta linguaggio: " user_input
-        
-        if parse_input "$user_input"; then
+    while true; do
+        read -p "Inserisci l'indirizzo IP di origine (srcip) e la maschera (es. 192.168.1.0/24): " srcip_mask
+        if [[ "$srcip_mask" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$ ]]; then
             break
         else
-            handle_error "Formato di input non valido. Verifica la sintassi e riprova."
+            handle_error "Indirizzo IP di origine o maschera non valido."
         fi
     done
+
+    while true; do
+        read -p "Inserisci l'interfaccia di ingresso (iif) (es. eth0): " iif
+        if [[ "$iif" =~ ^[a-zA-Z0-9]+$ ]]; then
+            break
+        else
+            handle_error "Nome dell'interfaccia non valido."
+        fi
+    done
+
+    # Mostra il menu per la scelta del protocollo (tcp o udp)
+    while true; do
+        echo ""
+        echo "Scegli il protocollo:"
+        echo "1) TCP"
+        echo "2) UDP"
+        read -p "Inserisci il numero corrispondente (1 o 2): " protocol_choice
+
+        case $protocol_choice in
+            1)
+                protocol="tcp"
+                break
+                ;;
+            2)
+                protocol="udp"
+                break
+                ;;
+            *)
+                handle_error "Scelta non valida. Per favore, inserisci 1 per TCP o 2 per UDP."
+                ;;
+        esac
+    done
+
+    while true; do
+        read -p "Inserisci la porta di destinazione (dport) (es. 80): " dport
+        if [[ "$dport" =~ ^[0-9]+$ ]] && [ "$dport" -ge 1 ] && [ "$dport" -le 65535 ]; then
+            break
+        else
+            handle_error "Numero di porta non valido."
+        fi
+    done
+
+    while true; do
+        read -p "Inserisci l'indirizzo IP e la maschera per il DNAT (es. 192.168.10.10/32): " to_dest_ip
+        if [[ "$to_dest_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?$ ]]; then
+            break
+        else
+            handle_error "Indirizzo IP di destinazione non valido."
+        fi
+    done
+
+    while true; do
+        read -p "Inserisci la porta di destinazione finale (es. 8080): " to_dest_port
+        if [[ "$to_dest_port" =~ ^[0-9]+$ ]] && [ "$to_dest_port" -ge 1 ] && [ "$to_dest_port" -le 65535 ]; then
+            break
+        else
+            handle_error "Numero di porta di destinazione non valido."
+        fi
+    done
+
+    # Applicare la configurazione in iptables
+    configure_iptables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port"
+
+    # Applicare la configurazione in nftables
+    configure_nftables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port"
 }
 
-# Funzione per applicare le regole
-apply_rules() {
-    # Aggiungi la regola NAT in PREROUTING per il port forwarding in iptables
-    echo "iptables -t nat -A PREROUTING -p $PROTOCOL -i $INTERFACE -s $SOURCE_IP --dport $SOURCE_PORT -j DNAT --to-destination $REDIRECT_IP:$REDIRECT_PORT"
-
-    # Aggiungi una regola di POSTROUTING in iptables per permettere il forwarding
-    echo "iptables -t nat -A POSTROUTING -p $PROTOCOL -d $REDIRECT_IP --dport $REDIRECT_PORT -j MASQUERADE"
-
-    # Aggiungi le regole in nftables per il port forwarding
-    echo "nft add rule ip nat PREROUTING iif $INTERFACE ip saddr $SOURCE_IP ip daddr $DEST_IP $PROTOCOL dport $SOURCE_PORT dnat to $REDIRECT_IP:$REDIRECT_PORT"
-
-    # Aggiungi una regola di POSTROUTING in nftables per permettere il forwarding
-    echo "nft add rule ip nat POSTROUTING ip saddr $SOURCE_IP ip daddr $REDIRECT_IP $PROTOCOL dport $REDIRECT_PORT masquerade"
-}
-
-# Mostra la sintassi e chiede i parametri
+# Eseguire la funzione per chiedere i parametri
 ask_for_parameters
 
-# Applicare le regole
-apply_rules
-
-# Output delle regole finali
+# Mostrare le regole applicate in iptables
 echo ""
-echo "Regole iptables:"
-echo "iptables -t nat -A PREROUTING -p $PROTOCOL -i $INTERFACE -s $SOURCE_IP --dport $SOURCE_PORT -j DNAT --to-destination $REDIRECT_IP:$REDIRECT_PORT"
-echo "iptables -t nat -A POSTROUTING -p $PROTOCOL -d $REDIRECT_IP --dport $REDIRECT_PORT -j MASQUERADE"
+echo "Le regole iptables PREROUTING sono:"
+iptables -t nat -L PREROUTING -v -n
 
+# Mostrare le regole applicate in nftables
 echo ""
-echo "Regole nftables:"
-echo "nft add rule ip nat PREROUTING iif $INTERFACE ip saddr $SOURCE_IP ip daddr $DEST_IP $PROTOCOL dport $SOURCE_PORT dnat to $REDIRECT_IP:$REDIRECT_PORT"
-echo "nft add rule ip nat POSTROUTING ip saddr $SOURCE_IP ip daddr $REDIRECT_IP $PROTOCOL dport $REDIRECT_PORT masquerade"
-
-echo ""
-echo "Regola NAT aggiunta: $PROTOCOL porta $SOURCE_PORT -> $REDIRECT_IP:$REDIRECT_PORT (origine: $SOURCE_IP su interfaccia $INTERFACE)"
+echo "Le regole nftables PREROUTING sono:"
+nft list table ip nat
