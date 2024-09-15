@@ -99,7 +99,8 @@ read -p "Inserisci i parametri (esempio: 192.168.1.1/32 tcp any 192.168.10.1/32 
 parse_input "$user_input"
 
 # Adatta le porte per iptables e nftables
-SRC_PORT_OPTION=$(parse_port_range "$SRC_PORT")
+SRC_PORT_OPTION_IPT=$(parse_port_range "$SRC_PORT")
+SRC_PORT_OPTION_NFT=$(parse_port_range_nft "$SRC_PORT")
 DST_PORT_OPTION_IPT=$(parse_port_range "$DST_PORT")
 DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
 
@@ -110,7 +111,7 @@ echo "$iptables_cmd"
 
 # Aggiungi la regola in nftables
 nft_action=$(translate_action "$ACTION")
-nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
+nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
 
