@@ -85,13 +85,13 @@ translate_action() {
     esac
 }
 
-# Mostra la sintassi all'utente
-echo "Sintassi del comando:"
-echo "<srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
 
 # Seleziona la catena
 select_chain
+# Mostra la sintassi all'utente
 
+echo "Sintassi del comando:"
+echo "<srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
 # Chiedi all'utente di inserire i parametri
 read -p "Inserisci i parametri (esempio: 192.168.1.1/32 tcp any 192.168.10.1/32 80 ACCEPT): " user_input
 
@@ -114,5 +114,3 @@ nft_action=$(translate_action "$ACTION")
 nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
-
-

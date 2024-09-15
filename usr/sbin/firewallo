@@ -330,7 +330,7 @@ do
             ;;
         4)
             echo "Exit"
-            exit 0
+            break
             ;;
         *)
             echo "Select right Option!."
