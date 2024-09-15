@@ -49,8 +49,8 @@ ask_for_parameters() {
     echo "Configurazione POSTROUTING con iptables"
     echo ""
 
-    read -p "Inserisci l'indirizzo IP di origine (srcip) e la maschera (mask) (es. 192.168.1.0/24): " srcip_mask
-    read -p "Inserisci l'interfaccia di uscita (oif) (es. eth0): " oif
+    read -e -p "Inserisci l'indirizzo IP di origine (srcip) e la maschera (mask) (es. 192.168.1.0/24): " srcip_mask
+    read -e -p "Inserisci l'interfaccia di uscita (oif) (es. eth0): " oif
 
     # Mostra il menu per la scelta del tipo di masquerading
     while true; do
@@ -75,11 +75,11 @@ ask_for_parameters() {
         esac
     done
 
-    read -p "Inserisci la porta di destinazione (dport) (lascia vuoto se non applicabile): " dport
+    read -e -p "Inserisci la porta di destinazione (dport) (lascia vuoto se non applicabile): " dport
 
     if [ "$type" == "SNAT" ]; then
         while true; do
-            read -p "Inserisci l'indirizzo IP e la maschera per SNAT (es. 192.168.1.1/24): " to_source_ip_mask
+            read -e -p "Inserisci l'indirizzo IP e la maschera per SNAT (es. 192.168.1.1/24): " to_source_ip_mask
             # Verifica la validità dell'indirizzo IP e maschera
             if [[ "$to_source_ip_mask" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$ ]]; then
                 break

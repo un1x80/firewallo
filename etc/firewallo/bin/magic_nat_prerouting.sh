@@ -52,7 +52,7 @@ ask_for_parameters() {
     echo ""
 
     while true; do
-        read -p "Inserisci l'indirizzo IP di origine (srcip) e la maschera (es. 192.168.1.0/24): " srcip_mask
+        read -e -p "Inserisci l'indirizzo IP di origine (srcip) e la maschera (es. 192.168.1.0/24): " srcip_mask
         if [[ "$srcip_mask" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$ ]]; then
             break
         else
@@ -61,7 +61,7 @@ ask_for_parameters() {
     done
 
     while true; do
-        read -p "Inserisci l'interfaccia di ingresso (iif) (es. eth0): " iif
+        read -e -p "Inserisci l'interfaccia di ingresso (iif) (es. eth0): " iif
         if [[ "$iif" =~ ^[a-zA-Z0-9]+$ ]]; then
             break
         else
@@ -75,7 +75,7 @@ ask_for_parameters() {
         echo "Scegli il protocollo:"
         echo "1) TCP"
         echo "2) UDP"
-        read -p "Inserisci il numero corrispondente (1 o 2): " protocol_choice
+        read -e -p "Inserisci il numero corrispondente (1 o 2): " protocol_choice
 
         case $protocol_choice in
             1)
@@ -93,7 +93,7 @@ ask_for_parameters() {
     done
 
     while true; do
-        read -p "Inserisci la porta di destinazione (dport) (es. 80): " dport
+        read -e -p "Inserisci la porta di destinazione (dport) (es. 80): " dport
         if [[ "$dport" =~ ^[0-9]+$ ]] && [ "$dport" -ge 1 ] && [ "$dport" -le 65535 ]; then
             break
         else
@@ -102,7 +102,7 @@ ask_for_parameters() {
     done
 
     while true; do
-        read -p "Inserisci l'indirizzo IP e la maschera per il DNAT (es. 192.168.10.10): " to_dest_ip
+        read -e -p "Inserisci l'indirizzo IP e la maschera per il DNAT (es. 192.168.10.10): " to_dest_ip
         if [[ "$to_dest_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             break
         else
@@ -111,7 +111,7 @@ ask_for_parameters() {
     done
 
     while true; do
-        read -p "Inserisci la porta di destinazione finale (es. 8080): " to_dest_port
+        read -e -p "Inserisci la porta di destinazione finale (es. 8080): " to_dest_port
         if [[ "$to_dest_port" =~ ^[0-9]+$ ]] && [ "$to_dest_port" -ge 1 ] && [ "$to_dest_port" -le 65535 ]; then
             break
         else
@@ -120,7 +120,7 @@ ask_for_parameters() {
     done
 
     while true; do
-        read -p "Inserisci il commento alla regola: " comment
+        read -e -p "Inserisci il commento alla regola: " comment
         if [[ "$comment" =~ ^[a-zA-Z0-9]+$ ]]; then
             break
         else

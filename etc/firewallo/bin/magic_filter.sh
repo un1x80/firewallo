@@ -96,7 +96,7 @@ select_chain
 echo "Sintassi del comando:"
 echo "<srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
 # Chiedi all'utente di inserire i parametri
-read -p "Inserisci i parametri (esempio: 192.168.1.1/32 tcp any 192.168.10.1/32 80 ACCEPT): " user_input
+read  -e -p "Inserisci i parametri (esempio: 192.168.1.1/32 tcp any 192.168.10.1/32 80 ACCEPT): " user_input
 
 # Analizza l'input
 parse_input "$user_input"
