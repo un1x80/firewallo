@@ -109,7 +109,8 @@ else
     DEST_PORT_OPTION="--dport $DEST_PORT_OPTION"
 fi
 
-echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP $SOURCE_PORT_OPTION $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
+# Correggi il formato per iptables
+echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP $SOURCE_PORT_OPTION --dport $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
 
 # Aggiungi la regola in nftables per la catena selezionata
 echo "nft add table inet filter"
@@ -126,7 +127,7 @@ else
     DEST_PORT_NFT="dport $DEST_PORT_OPTION"
 fi
 
-# Converti gli indirizzi IP in formato nftables
+# Rimuovi la notazione CIDR dagli indirizzi IP per nftables
 SOURCE_IP_NFT=$(echo "$SOURCE_IP" | sed 's/\/[0-9]\+//')
 DEST_IP_NFT=$(echo "$DEST_IP" | sed 's/\/[0-9]\+//')
 
@@ -136,7 +137,7 @@ echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP_NFT ip daddr 
 # Output delle regole finali
 echo ""
 echo "Regole iptables:"
-echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP $SOURCE_PORT_OPTION $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
+echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP $SOURCE_PORT_OPTION --dport $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
 
 echo ""
 echo "Regole nftables:"
