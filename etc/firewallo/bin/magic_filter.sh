@@ -110,7 +110,7 @@ echo "$iptables_cmd"
 
 # Aggiungi la regola in nftables
 nft_action=$(translate_action "$ACTION")
-nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION $nft_action"
+nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
 
