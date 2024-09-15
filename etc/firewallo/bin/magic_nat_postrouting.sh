@@ -68,17 +68,17 @@ configure_postrouting() {
     if [ "$type" == "MASQUERADE" ]; then
         if [ -z "$dport" ]; then
             if [ "$IPT" != "" ]; then
-                $IPT -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -j MASQUERADE\
+                echo "$IPT -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j MASQUERADE"\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             elif [ "$NFT" != "" ]; then
-                $NFT "add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" masquerade"\
+                echo "$NFT \"add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" masquerade\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             else
                 echo $INT_ERROR_MSG
             fi
         else
             if [ "$IPT" != "" ]; then
-                $IPT -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -p tcp --dport "$dport" -j MASQUERADE\
+                echo "$IPT -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j MASQUERADE"\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             elif [ "$NFT" != "" ]; then
                 echo "$NFT \"add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" masquerade\"" \
@@ -97,10 +97,10 @@ configure_postrouting() {
     # Configurazione del SNAT
     if [ "$type" == "SNAT" ]; then
         if [ -z "$dport" ]; then
-            iptables -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -j SNAT --to-source "$to_source_ip_mask"\
+            echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j SNAT --to-source \"$to_source_ip_mask\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
         else
-            iptables -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -p tcp --dport "$dport" -j SNAT --to-source "$to_source_ip_mask"\
+            echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip_mask\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
         fi
         if [ $? -ne 0 ]; then
