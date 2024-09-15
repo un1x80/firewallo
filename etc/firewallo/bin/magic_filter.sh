@@ -127,14 +127,28 @@ while true; do
     fi
 done
 
-while true; do
-    read -e -p "$PROTOCOL_PROMPT" PROTOCOL
-    if validate_protocol "$PROTOCOL"; then
-        break
-    else
-        echo "$INVALID_PROTO"
-    fi
-done
+ # Mostra il menu per la scelta del protocollo (tcp o udp)
+    while true; do
+        echo ""
+        echo "$PROTOCOL_PROMPT"
+        echo "$TCP_OPTION"
+        echo "$UDP_OPTION"
+        read -e -p "$CHOICE_PROMPT" protocol_choice
+
+        case $protocol_choice in
+            1)
+                PROTOCOL="tcp"
+                break
+                ;;
+            2)
+                PROTOCOL="udp"
+                break
+                ;;
+            *)
+                handle_error "$INVALID_PROTOCOL"
+                ;;
+        esac
+    done
 
 while true; do
     read -e -p "$SRC_PORT_PROMPT" SRC_PORT
