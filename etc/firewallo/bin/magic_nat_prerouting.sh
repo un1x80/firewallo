@@ -5,7 +5,7 @@ source $DIRCONF/firewallo.conf
 
 # Carica il file di traduzione
 load_translations() {
-    local lang_file="$DIRCONF/lang/firewallo.lang"
+    local lang_file="$DIRCONF/lang/firewallo.lang.$LANG"
     if [[ -f "$lang_file" ]]; then
         source "$lang_file"
     else
