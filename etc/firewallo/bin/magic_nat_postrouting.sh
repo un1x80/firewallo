@@ -62,16 +62,16 @@ configure_postrouting() {
     local dport="$5"
     local comment="$6"
 
-    echo "$POSTROUTING_CONFIG_PROMPT"
-    echo ""
 
     # Configurazione del MASQUERADE
     if [ "$type" == "MASQUERADE" ]; then
         if [ -z "$dport" ]; then
             if [ "$IPT" != "" ]; then
+                echo "$IPT -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j MASQUERADE"
                 echo "$IPT -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j MASQUERADE"\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             elif [ "$NFT" != "" ]; then
+                echo "$NFT \"add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" log prefix \\\" POSTROUTING $comment : \\\" counter masquerade\""
                 echo "$NFT \"add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" log prefix \\\" POSTROUTING $comment : \\\" counter masquerade\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             else
@@ -79,9 +79,11 @@ configure_postrouting() {
             fi
         else
             if [ "$IPT" != "" ]; then
+                echo "$IPT -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j MASQUERADE"
                 echo "$IPT -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j MASQUERADE"\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             elif [ "$NFT" != "" ]; then
+                echo "$NFT \"add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" log prefix \\\" POSTROUTING $comment : \\\" counter masquerade\""
                 echo "$NFT \"add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" log prefix \\\" POSTROUTING $comment : \\\" counter masquerade\"" \
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             else
@@ -99,9 +101,11 @@ configure_postrouting() {
     if [ "$type" == "SNAT" ]; then
         if [ -z "$dport" ]; then
           if [ "$IPT" != "" ]; then
+            echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j SNAT --to-source \"$to_source_ip_mask\""
             echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j SNAT --to-source \"$to_source_ip_mask\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
            elif [ "$NFT" != "" ]; then
+            echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"$to_source_ip_mask\""
             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"$to_source_ip_mask\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
            else
@@ -109,9 +113,11 @@ configure_postrouting() {
           fi
         else
             if [ "$IPT" != "" ]; then
+            echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip_mask\""
              echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip_mask\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             elif [ "$NFT" != "" ]; then
+             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"to_source_ip_mask\""
              echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"to_source_ip_mask\""\
               | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             else
