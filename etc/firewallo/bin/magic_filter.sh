@@ -88,19 +88,24 @@ DST_PORT=${DST_PORT:-any}
 # Chiedi l'azione (ACCEPT, DROP, REJECT)
 read -e -p "Inserisci l'azione (ACCEPT, DROP, REJECT): " ACTION
 
+
+if [ "$IPT" != "" ] ; then
 # Adatta le porte per iptables e nftables
 SRC_PORT_OPTION_IPT=$(parse_port_range "$SRC_PORT")
-SRC_PORT_OPTION_NFT=$(parse_port_range_nft "$SRC_PORT")
 DST_PORT_OPTION_IPT=$(parse_port_range "$DST_PORT")
-DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
-
 # Aggiungi la regola in iptables
 iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION_IPT -d $DST_ADDR --dport $DST_PORT_OPTION_IPT -j $ACTION"
 echo "Regola iptables:"
 echo "$iptables_cmd"
 
+elif [ "$NFT" != "" ]; then
+SRC_PORT_OPTION_NFT=$(parse_port_range_nft "$SRC_PORT")
+DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
 # Aggiungi la regola in nftables
 nft_action=$(translate_action "$ACTION")
 nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
 echo "Regola nftables:"
-echo "$nft_cmd"
+echo "$nft_cmd" | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
+else
+echo "Intenarl Error NFT or IPT are not set!"
+fi
