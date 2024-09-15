@@ -21,57 +21,11 @@ select_chain() {
     done
 }
 
-# Funzione per analizzare l'input
-parse_input() {
-    local input="$1"
-    
-    # Usa un'espressione regolare per estrarre i dettagli
-    if [[ "$input" =~ ^srcip\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?)\ (tcp|udp)\ sport\ ([0-9:|any]+)\ dstip\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?)\ ([0-9:|any]+)\ (ACCEPT|DROP|REJECT)$ ]]; then
-        SOURCE_IP="${BASH_REMATCH[1]}"
-        PROTOCOL="${BASH_REMATCH[2]}"
-        SOURCE_PORT="${BASH_REMATCH[3]}"
-        DEST_IP="${BASH_REMATCH[4]}"
-        DEST_PORT="${BASH_REMATCH[5]}"
-        ACTION="${BASH_REMATCH[6]}"
-    else
-        echo "Formato di input non valido. Verifica la sintassi seguente:"
-        echo "Sintassi corretta:"
-        echo "srcip <IP_sorgente/CIDR> <tcp|udp> sport <porta_sorgente|range|any> dstip <IP_destinazione/CIDR> <porta_destinazione|range|any> <ACCEPT|DROP|REJECT>"
-        echo ""
-        echo "Esempio:"
-        echo "srcip 192.168.10.0/24 tcp sport 1024:1028|80|any dstip 192.168.20.1/32 80 ACCEPT"
-        echo ""
-        echo "Dettagli degli errori:"
-        
-        # Verifica specifica per ciascun campo
-        if [[ ! "$input" =~ srcip\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?) ]]; then
-            echo " - Errore nel campo 'srcip': Deve essere un IP con eventuale maschera."
-        fi
-        if [[ ! "$input" =~ (tcp|udp) ]]; then
-            echo " - Errore nel campo 'protocollo': Deve essere 'tcp' o 'udp'."
-        fi
-        if [[ ! "$input" =~ sport\ ([0-9:|any]+) ]]; then
-            echo " - Errore nel campo 'sport': Deve essere un numero di porta, un range o 'any'."
-        fi
-        if [[ ! "$input" =~ dstip\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+(/[0-9]+)?) ]]; then
-            echo " - Errore nel campo 'dstip': Deve essere un IP con eventuale maschera."
-        fi
-        if [[ ! "$input" =~ ([0-9:|any]+) ]]; then
-            echo " - Errore nel campo 'dport': Deve essere un numero di porta, un range o 'any'."
-        fi
-        if [[ ! "$input" =~ (ACCEPT|DROP|REJECT)$ ]]; then
-            echo " - Errore nell'azione: Deve essere 'ACCEPT', 'DROP' o 'REJECT'."
-        fi
-        
-        exit 1
-    fi
-}
-
-# Funzione per adattare i valori 'any' e 'range' per nftables
+# Funzione per adattare i valori 'any' e 'range' per iptables e nftables
 parse_port_range() {
     local port_range="$1"
     if [[ "$port_range" == "any" ]]; then
-        echo ""
+        echo "1:65535"
     elif [[ "$port_range" =~ ^([0-9]+):([0-9]+)$ ]]; then
         echo "$port_range"
     else
@@ -79,69 +33,52 @@ parse_port_range() {
     fi
 }
 
+# Funzione per analizzare l'input
+parse_input() {
+    local input="$1"
+    
+    # Usa un'espressione regolare per estrarre i dettagli
+    if [[ "$input" =~ ^([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+)\ (tcp|udp)\ (any|[0-9:]+)\ ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+)\ (any|[0-9:]+)\ (ACCEPT|DROP|REJECT)$ ]]; then
+        SRC_ADDR="${BASH_REMATCH[1]}"
+        PROTOCOL="${BASH_REMATCH[2]}"
+        SRC_PORT="${BASH_REMATCH[3]}"
+        DST_ADDR="${BASH_REMATCH[4]}"
+        DST_PORT="${BASH_REMATCH[5]}"
+        ACTION="${BASH_REMATCH[6]}"
+    else
+        echo "Formato di input non valido. Verifica la sintassi seguente:"
+        echo "Sintassi corretta:"
+        echo "<srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
+        echo ""
+        echo "Esempio:"
+        echo "192.168.1.1/32 tcp any 192.168.10.1/32 80 ACCEPT"
+        exit 1
+    fi
+}
+
 # Mostra la sintassi all'utente
 echo "Sintassi del comando:"
-echo "srcip <IP_sorgente/CIDR> <tcp|udp> sport <porta_sorgente|range|any> dstip <IP_destinazione/CIDR> <porta_destinazione|range|any> <ACCEPT|DROP|REJECT>"
+echo "<srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
 
 # Seleziona la catena
 select_chain
 
-# Chiedi all'utente di inserire il comando in formato meta linguaggio
-read -p "Inserisci il comando in formato meta linguaggio: " user_input
+# Chiedi all'utente di inserire i parametri
+read -p "Inserisci i parametri (esempio: 192.168.1.1/32 tcp any 192.168.10.1/32 80 ACCEPT): " user_input
 
 # Analizza l'input
 parse_input "$user_input"
 
-# Adatta la porta sorgente e destinazione
-SOURCE_PORT_OPTION=$(parse_port_range "$SOURCE_PORT")
-DEST_PORT_OPTION=$(parse_port_range "$DEST_PORT")
+# Adatta le porte per iptables e nftables
+SRC_PORT_OPTION=$(parse_port_range "$SRC_PORT")
+DST_PORT_OPTION=$(parse_port_range "$DST_PORT")
 
-# Aggiungi la regola in iptables per la catena selezionata
-if [[ "$SOURCE_PORT_OPTION" == "" ]]; then
-    SOURCE_PORT_OPTION=""
-else
-    SOURCE_PORT_OPTION="--sport $SOURCE_PORT_OPTION"
-fi
+# Aggiungi la regola in iptables
+iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION -d $DST_ADDR --dport $DST_PORT_OPTION -j $ACTION"
+echo "Regola iptables:"
+echo "$iptables_cmd"
 
-if [[ "$DEST_PORT_OPTION" == "" ]]; then
-    DEST_PORT_OPTION=""
-else
-    DEST_PORT_OPTION="--dport $DEST_PORT_OPTION"
-fi
-
-# Correggi il formato per iptables
-echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP $SOURCE_PORT_OPTION --dport $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
-
-# Aggiungi la regola in nftables per la catena selezionata
-echo "nft add table inet filter"
-echo "nft add chain inet filter $CHAIN_SELECTED { type filter hook forward priority 0 \; }"
-if [[ "$SOURCE_PORT_OPTION" == "" ]]; then
-    SOURCE_PORT_NFT=""
-else
-    SOURCE_PORT_NFT="sport $SOURCE_PORT_OPTION"
-fi
-
-if [[ "$DEST_PORT_OPTION" == "" ]]; then
-    DEST_PORT_NFT=""
-else
-    DEST_PORT_NFT="dport $DEST_PORT_OPTION"
-fi
-
-# Rimuovi la notazione CIDR dagli indirizzi IP per nftables
-SOURCE_IP_NFT=$(echo "$SOURCE_IP" | sed 's/\/[0-9]\+//')
-DEST_IP_NFT=$(echo "$DEST_IP" | sed 's/\/[0-9]\+//')
-
-# Stampa la regola nftables
-echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP_NFT ip daddr $DEST_IP_NFT $PROTOCOL $SOURCE_PORT_NFT $DEST_PORT_NFT $ACTION"
-
-# Output delle regole finali
-echo ""
-echo "Regole iptables:"
-echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP $SOURCE_PORT_OPTION --dport $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
-
-echo ""
-echo "Regole nftables:"
-echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP_NFT ip daddr $DEST_IP_NFT $PROTOCOL $SOURCE_PORT_NFT $DEST_PORT_NFT $ACTION"
-
-echo ""
-echo "Regola aggiunta nella catena '$CHAIN_SELECTED': $PROTOCOL da $SOURCE_IP:$SOURCE_PORT a $DEST_IP:$DEST_PORT ($ACTION)"
+# Aggiungi la regola in nftables
+nft_cmd="nft add rule inet filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION dport $DST_PORT_OPTION $ACTION"
+echo "Regola nftables:"
+echo "$nft_cmd"
