@@ -33,7 +33,9 @@
       git:
         repo: 'https://github.com/un1x80/firewallo.git'
         dest: /opt/firewallo
-        version: main
+        version: test
+        update: yes  # Aggiorna il repository se già esistente
+        force: yes  # Ignora modifiche locali
       register: result_git
     
     - name: Ensure dpkg-dev is installed
