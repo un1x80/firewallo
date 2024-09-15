@@ -180,8 +180,8 @@ if [ "$IPT" != "" ] ; then
     DST_PORT_OPTION_IPT=$(parse_port_range "$DST_PORT")
     # Aggiungi la regola in iptables
     iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION_IPT -d $DST_ADDR --dport $DST_PORT_OPTION_IPT -j $ACTION"
-    echo "$IPT_RULE_MSG"
-    echo "$iptables_cmd"
+    echo "$IPT_RULE_MSG" ; echo "$iptables_cmd"
+    echo "$iptables_cmd"| cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
 
 elif [ "$NFT" != "" ]; then
     # Adatta le porte per nftables
@@ -190,7 +190,7 @@ elif [ "$NFT" != "" ]; then
     # Traduci l'azione in nftables
     nft_action=$(translate_action "$ACTION")
     nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
-    echo "$NFT_RULE_MSG"
+    echo "$NFT_RULE_MSG"; echo "$nft_cmd"
     echo "$nft_cmd" | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
 else
     echo "$INT_ERROR_MSG"
