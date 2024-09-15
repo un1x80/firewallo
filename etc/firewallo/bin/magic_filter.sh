@@ -56,6 +56,25 @@ parse_input() {
     fi
 }
 
+# Funzione per tradurre le azioni in nftables
+translate_action() {
+    case "$1" in
+        ACCEPT)
+            echo "counter accept"
+            ;;
+        DROP)
+            echo "counter drop"
+            ;;
+        REJECT)
+            echo "counter reject"
+            ;;
+        *)
+            echo "Azione non valida"
+            exit 1
+            ;;
+    esac
+}
+
 # Mostra la sintassi all'utente
 echo "Sintassi del comando:"
 echo "<srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
@@ -79,6 +98,9 @@ echo "Regola iptables:"
 echo "$iptables_cmd"
 
 # Aggiungi la regola in nftables
-nft_cmd="nft add rule inet filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION dport $DST_PORT_OPTION $ACTION"
+nft_action=$(translate_action "$ACTION")
+nft_cmd="nft add rule inet filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION dport $DST_PORT_OPTION $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
+
+
