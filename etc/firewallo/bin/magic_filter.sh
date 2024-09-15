@@ -71,7 +71,7 @@ parse_input() {
 parse_port() {
     local port="$1"
     if [[ "$port" == "any" ]]; then
-        echo ""
+        echo "1:65535"
     else
         echo "--dport $port"
     fi
@@ -98,8 +98,6 @@ DEST_PORT_OPTION=$(parse_port "$DEST_PORT")
 echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP --sport $SOURCE_PORT $DEST_PORT_OPTION -d $DEST_IP -j $ACTION"
 
 # Aggiungi la regola in nftables per la catena selezionata
-echo "nft add table inet filter"
-echo "nft add chain inet filter $CHAIN_SELECTED { type filter hook forward priority 0 \; }"
 echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP ip daddr $DEST_IP $PROTOCOL sport $SOURCE_PORT dport $DEST_PORT $ACTION"
 
 # Output delle regole finali
@@ -109,8 +107,6 @@ echo "iptables -A $CHAIN_SELECTED -p $PROTOCOL -s $SOURCE_IP --sport $SOURCE_POR
 
 echo ""
 echo "Regole nftables:"
-echo "nft add table inet filter"
-echo "nft add chain inet filter $CHAIN_SELECTED { type filter hook forward priority 0 \; }"
 echo "nft add rule inet filter $CHAIN_SELECTED ip saddr $SOURCE_IP ip daddr $DEST_IP $PROTOCOL sport $SOURCE_PORT dport $DEST_PORT $ACTION"
 
 echo ""
