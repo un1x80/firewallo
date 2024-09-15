@@ -14,9 +14,14 @@ configure_postrouting() {
     local to_source_ip_mask="$4"
     local dport="$5"
 
+    echo "Configurazione di tipo: $type"
     # Configurazione del MASQUERADE
     if [ "$type" == "MASQUERADE" ]; then
-        iptables -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -p tcp --dport "$dport" -j MASQUERADE
+        if [ -z "$dport" ]; then
+            iptables -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -j MASQUERADE
+        else
+            iptables -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -p tcp --dport "$dport" -j MASQUERADE
+        fi
         if [ $? -ne 0 ]; then
             handle_error "Errore nella configurazione MASQUERADE."
         else
@@ -26,7 +31,11 @@ configure_postrouting() {
 
     # Configurazione del SNAT
     if [ "$type" == "SNAT" ]; then
-        iptables -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -p tcp --dport "$dport" -j SNAT --to-source "$to_source_ip_mask"
+        if [ -z "$dport" ]; then
+            iptables -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -j SNAT --to-source "$to_source_ip_mask"
+        else
+            iptables -t nat -A POSTROUTING -s "$srcip_mask" -o "$oif" -p tcp --dport "$dport" -j SNAT --to-source "$to_source_ip_mask"
+        fi
         if [ $? -ne 0 ]; then
             handle_error "Errore nella configurazione SNAT."
         else
@@ -38,25 +47,40 @@ configure_postrouting() {
 # Funzione per chiedere i parametri all'utente
 ask_for_parameters() {
     echo "Configurazione POSTROUTING con iptables"
+    echo ""
 
+    read -p "Inserisci l'indirizzo IP di origine (srcip) e la maschera (mask) (es. 192.168.1.0/24): " srcip_mask
+    read -p "Inserisci l'interfaccia di uscita (oif) (es. eth0): " oif
+
+    # Mostra il menu per la scelta del tipo di masquerading
     while true; do
-        read -p "Inserisci l'indirizzo IP di origine (srcip) e la maschera (mask) (es. 192.168.1.0/24): " srcip_mask
-        read -p "Inserisci l'interfaccia di uscita (oif) (es. eth0): " oif
-        read -p "Scegli il tipo di masquerading (MASQUERADE o SNAT): " type
+        echo ""
+        echo "Scegli il tipo di masquerading:"
+        echo "1) MASQUERADE"
+        echo "2) SNAT"
+        read -p "Inserisci il numero corrispondente (1 o 2): " choice
 
-        if [ "$type" == "MASQUERADE" ] || [ "$type" == "SNAT" ]; then
-            break
-        else
-            handle_error "Tipo di masquerading non valido. Usa MASQUERADE o SNAT."
-        fi
+        case $choice in
+            1)
+                type="MASQUERADE"
+                break
+                ;;
+            2)
+                type="SNAT"
+                break
+                ;;
+            *)
+                handle_error "Scelta non valida. Per favore, inserisci 1 per MASQUERADE o 2 per SNAT."
+                ;;
+        esac
     done
 
-    read -p "Inserisci la porta di destinazione (dport) (es. 80): " dport
+    read -p "Inserisci la porta di destinazione (dport) (lascia vuoto se non applicabile): " dport
 
     if [ "$type" == "SNAT" ]; then
         while true; do
             read -p "Inserisci l'indirizzo IP e la maschera per SNAT (es. 192.168.1.1/24): " to_source_ip_mask
-            # Verifica la validità dell'indirizzo IP e maschera (opzionale, può essere personalizzato)
+            # Verifica la validità dell'indirizzo IP e maschera
             if [[ "$to_source_ip_mask" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$ ]]; then
                 break
             else
@@ -75,5 +99,6 @@ ask_for_parameters() {
 ask_for_parameters
 
 # Mostrare le regole applicate
+echo ""
 echo "Le regole iptables POSTROUTING sono:"
 iptables -t nat -L POSTROUTING -v -n
