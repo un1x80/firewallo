@@ -97,11 +97,25 @@ configure_postrouting() {
     # Configurazione del SNAT
     if [ "$type" == "SNAT" ]; then
         if [ -z "$dport" ]; then
+          if [ "$IPT" != "" ]; then
             echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j SNAT --to-source \"$to_source_ip_mask\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
-        else
-            echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip_mask\""\
+           elif [ "$NFT" != "" ]; then
+            echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" snat to \"$to_source_ip_mask\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
+           else
+            echo $INT_ERROR_MSG
+          fi
+        else
+            if [ "$IPT" != "" ]; then
+             echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip_mask\""\
+                | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
+            elif [ "$NFT" != "" ]; then
+             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" snat to \"$to_source_ip_mask\""\
+              | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
+            else
+            echo $INT_ERROR_MSG
+          fi
         fi
         if [ $? -ne 0 ]; then
             handle_error "$SNAT_CONFIG_ERROR"
