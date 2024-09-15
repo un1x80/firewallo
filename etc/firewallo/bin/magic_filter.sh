@@ -9,7 +9,7 @@ load_translations() {
     if [[ -f "$lang_file" ]]; then
         source "$lang_file"
     else
-        echo "LANG_NOT_FOUND"
+        echo "$LANG_NOT_FOUND"
         exit 1
     fi
 }
@@ -38,6 +38,36 @@ select_chain() {
     done
 }
 
+# Funzione per controllare la validità dell'indirizzo IP
+validate_ip() {
+    local ip="$1"
+    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Funzione per controllare la validità del protocollo
+validate_protocol() {
+    local protocol="$1"
+    if [[ "$protocol" == "tcp" || "$protocol" == "udp" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Funzione per controllare la validità della porta
+validate_port() {
+    local port="$1"
+    if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Funzione per adattare i valori 'any' e 'range' per iptables e nftables
 parse_port_range() {
     local port_range="$1"
@@ -50,7 +80,7 @@ parse_port_range() {
     fi
 }
 
-# Funzione per adattare i valori 'any' e 'range' per iptables e nftables
+# Funzione per adattare i valori 'any' e 'range' per nftables
 parse_port_range_nft() {
     local port_range="$1"
     if [[ "$port_range" == "any" ]]; then
@@ -75,7 +105,7 @@ translate_action() {
             echo "counter reject"
             ;;
         *)
-            echo "Azione non valida"
+            echo "Invalid action"
             exit 1
             ;;
     esac
@@ -87,18 +117,65 @@ load_translations
 # Seleziona la catena
 select_chain
 
-# Chiedi i dettagli uno per uno all'utente
-read -e -p "$SOURCE_ADDR_PROMPT" SRC_ADDR
-read -e -p "$PROTOCOL_PROMPT" PROTOCOL
-read -e -p "$SRC_PORT_PROMPT" SRC_PORT
-SRC_PORT=${SRC_PORT:-any}
-read -e -p "$DST_ADDR_PROMPT" DST_ADDR
-read -e -p "$DST_PORT_PROMPT" DST_PORT
-DST_PORT=${DST_PORT:-any}
-read -e -p "$ACTION_PROMPT" ACTION
+# Chiedi i dettagli uno per uno all'utente con controlli
+while true; do
+    read -e -p "$SOURCE_ADDR_PROMPT" SRC_ADDR
+    if validate_ip "$SRC_ADDR"; then
+        break
+    else
+        echo "$INVALID_SADDR"
+    fi
+done
+
+while true; do
+    read -e -p "$PROTOCOL_PROMPT" PROTOCOL
+    if validate_protocol "$PROTOCOL"; then
+        break
+    else
+        echo "$INVALID_PROTO"
+    fi
+done
+
+while true; do
+    read -e -p "$SRC_PORT_PROMPT" SRC_PORT
+    SRC_PORT=${SRC_PORT:-any}
+    if validate_port "$SRC_PORT"; then
+        break
+    else
+        echo "$INVALID_SPORT"
+    fi
+done
+
+while true; do
+    read -e -p "$DST_ADDR_PROMPT" DST_ADDR
+    if validate_ip "$DST_ADDR"; then
+        break
+    else
+        echo "$INVALID_DADDR"
+    fi
+done
+
+while true; do
+    read -e -p "$DST_PORT_PROMPT" DST_PORT
+    DST_PORT=${DST_PORT:-any}
+    if validate_port "$DST_PORT"; then
+        break
+    else
+        echo "$INVALID_DPORT"
+    fi
+done
+
+while true; do
+    read -e -p "$ACTION_PROMPT" ACTION
+    if [[ "$ACTION" =~ ^(ACCEPT|DROP|REJECT)$ ]]; then
+        break
+    else
+        echo "$ERROR_INVALID_ACTION"
+    fi
+done
 
 if [ "$IPT" != "" ] ; then
-    # Adatta le porte per iptables e nftables
+    # Adatta le porte per iptables
     SRC_PORT_OPTION_IPT=$(parse_port_range "$SRC_PORT")
     DST_PORT_OPTION_IPT=$(parse_port_range "$DST_PORT")
     # Aggiungi la regola in iptables
@@ -107,9 +184,10 @@ if [ "$IPT" != "" ] ; then
     echo "$iptables_cmd"
 
 elif [ "$NFT" != "" ]; then
+    # Adatta le porte per nftables
     SRC_PORT_OPTION_NFT=$(parse_port_range_nft "$SRC_PORT")
     DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
-    # Aggiungi la regola in nftables
+    # Traduci l'azione in nftables
     nft_action=$(translate_action "$ACTION")
     nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
     echo "$NFT_RULE_MSG"
