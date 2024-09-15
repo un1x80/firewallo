@@ -14,9 +14,10 @@ configure_iptables_prerouting() {
     local dport="$4"
     local to_dest_ip="$5"
     local to_dest_port="$6"
-
+    local comment="$7"
     # Configurazione della regola DNAT in iptables
-    iptables -t nat -A PREROUTING -s "$srcip_mask" -i "$iif" -p "$protocol" --dport "$dport" -j DNAT --to-destination "$to_dest_ip:$to_dest_port"
+    iptables -t nat -A PREROUTING -s "$srcip_mask" -i "$iif" -p "$protocol" --dport "$dport" -j LOG --log-prefix "DNAT $comment"
+    iptables -t nat -A PREROUTING -s "$srcip_mask" -i "$iif" -p "$protocol" --dport "$dport" -j DNAT --to-destination "$to_dest_ip:$to_dest_port" 
     
     if [ $? -ne 0 ]; then
         handle_error "Errore nella configurazione del DNAT in iptables."
@@ -33,9 +34,10 @@ configure_nftables_prerouting() {
     local dport="$4"
     local to_dest_ip="$5"
     local to_dest_port="$6"
+    local comment="$7"
 
     # Configurazione della regola DNAT in nftables
-    nft add rule ip nat PREROUTING ip saddr "$srcip_mask" iif "$iif" $protocol dport "$dport" dnat to "$to_dest_ip:$to_dest_port"
+    nft "add rule ip nat PREROUTING ip saddr \"$srcip_mask\" iif \"$iif\" $protocol dport \"$dport\" log prefix \"DNAT $comment : \" counter dnat to \"$to_dest_ip:$to_dest_port\""
     
     if [ $? -ne 0 ]; then
         handle_error "Errore nella configurazione del DNAT in nftables."
@@ -117,11 +119,19 @@ ask_for_parameters() {
         fi
     done
 
+    while true; do
+        read -p "Inserisci il commento alla regola: " comment
+        if [[ "$comment" =~ ^[a-zA-Z0-9]+$ ]]; then
+            break
+        else
+            echo "La stringa contiene caratteri non validi."
+        fi
+    done
     # Applicare la configurazione in iptables
-    configure_iptables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port"
+    configure_iptables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port" "$comment"
 
     # Applicare la configurazione in nftables
-    configure_nftables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port"
+    configure_nftables_prerouting "$srcip_mask" "$iif" "$protocol" "$dport" "$to_dest_ip" "$to_dest_port" "$comment"
 }
 
 # Eseguire la funzione per chiedere i parametri
