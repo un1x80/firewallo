@@ -210,7 +210,7 @@ elif [ "$NFT" != "" ]; then
     DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
     # Traduci l'azione in nftables
     nft_action=$(translate_action "$ACTION")
-    nft_cmd="nft \"add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT log prefix \\"$CHAIN_SELECTED $comment : \\" $nft_action\""
+    nft_cmd="nft \"add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT log prefix \\\"$CHAIN_SELECTED $comment : \\\" $nft_action\""
     echo "$NFT_RULE_MSG"; echo "$nft_cmd"
     echo $nft_cmd | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
 else
