@@ -31,7 +31,6 @@ ERROR_HANDLER_MASQ="Invalid selection. Please enter 1 for MASQUERADE or 2 for SN
 PREROUTING_CONFIG_PROMPT="PREROUTING configuration with iptables and nftables"
 SRCIP_MASK_PREROUTING_PROMPT="Enter the source IP address (srcip) and mask (e.g., 192.168.1.0/24):"
 IIF_PROMPT="Enter the input interface (iif) (e.g., eth0):"
-PROTOCOL_PROMPT="Select the protocol:"
 TCP_OPTION="1) TCP"
 UDP_OPTION="2) UDP"
 PORT_DEST_PROMPT="Enter the destination port (dport) (e.g., 80):"

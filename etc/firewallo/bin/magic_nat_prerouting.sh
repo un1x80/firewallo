@@ -57,7 +57,7 @@ configure_nftables_prerouting() {
     local comment="$7"
 
     # Configurazione della regola DNAT in nftables
-    echo "nft \"add rule ip nat PREROUTING ip saddr \"$srcip_mask\" iif \"$iif\" $protocol dport \"$dport\" log prefix \"DNAT $comment : \" counter dnat to \"$to_dest_ip:$to_dest_port\"\""\
+    echo "nft \"add rule ip nat PREROUTING ip saddr \"$srcip_mask\" iif \"$iif\" $protocol dport \"$dport\" log prefix \"DNAT $comment : \" counter dnat to \"$to_dest_ip:$to_dest_port\""\
     | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
     
     if [ $? -ne 0 ]; then
@@ -142,7 +142,7 @@ ask_for_parameters() {
 
     while true; do
         read -e -p "$COMMENT_PROMPT" comment
-        if [[ "$comment" =~ ^[a-zA-Z0-9]+$ ]]; then
+        if [[ "$comment" =~ ^[a-zA-Z0-9_]+$ ]]; then
             break
         else
             handle_error "$INVALID_COMMENT_FORMAT"
