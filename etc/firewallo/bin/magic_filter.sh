@@ -187,7 +187,14 @@ while true; do
         echo "$ERROR_INVALID_ACTION"
     fi
 done
-
+while true; do
+    read -e -p "$COMMENT_PROMPT" comment
+    if [[ "$comment" =~ ^[a-zA-Z0-9_]+$ ]]; then
+        break
+    else
+        handle_error "$INVALID_COMMENT_FORMAT"
+    fi
+done
 if [ "$IPT" != "" ] ; then
     # Adatta le porte per iptables
     SRC_PORT_OPTION_IPT=$(parse_port_range "$SRC_PORT")
@@ -203,7 +210,7 @@ elif [ "$NFT" != "" ]; then
     DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
     # Traduci l'azione in nftables
     nft_action=$(translate_action "$ACTION")
-    nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT $nft_action"
+    nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT log prefix \\"$CHAIN_SELECTED $comment\\" $nft_action"
     echo "$NFT_RULE_MSG"; echo "$nft_cmd"
     echo "$nft_cmd" | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
 else
