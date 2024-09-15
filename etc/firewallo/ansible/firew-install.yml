@@ -33,7 +33,7 @@
       git:
         repo: 'https://github.com/un1x80/firewallo.git'
         dest: /opt/firewallo
-        version: main
+        version: test
       register: result_git
     
     - name: Ensure dpkg-dev is installed
