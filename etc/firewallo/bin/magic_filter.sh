@@ -31,9 +31,10 @@ parse_input() {
         PROTOCOL="${BASH_REMATCH[2]}"
         SOURCE_PORT="${BASH_REMATCH[3]}"
         DEST_IP="${BASH_REMATCH[4]}"
-        DEST_PORT="${BASH_REMATCH[6]}"
-        ACTION="${BASH_REMATCH[7]}"
+        DEST_PORT="${BASH_REMATCH[5]}"
+        ACTION="${BASH_REMATCH[6]}"
     else
+
         echo "Formato di input non valido. Verifica la sintassi seguente:"
         echo "Sintassi corretta:"
         echo "srcip <IP_sorgente/CIDR> <tcp|udp> sport <porta_sorgente|range|any> dstip <IP_destinazione/CIDR> <porta_destinazione|range|any> <ACCEPT|DROP|REJECT>"
