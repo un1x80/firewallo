@@ -1,10 +1,13 @@
 #!/bin/bash
+#Decommenta per Debug
 #set -x
+
+#Setup preliminare
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
-#DIALOG=`which dialog`
-DIALOG="nano"
+
+DIALOG="nano" #setta qui l'editor vi , dialog o nano se è vuoto usa vi
 
 if [ "$DIALOG" = "" ] ; then
 	DIALOG="vi"
@@ -13,14 +16,15 @@ elif [ "$DIALOG" = "nano" ] ; then
 	DIALOG="nano"
 	OPTS=""
 elif [ "$DIALOG" = "dialog" ] ; then
-	DIALOG="nano"
-	OPTS=""
-
-elif [ "$DIALOG" != "" ] ; then
-	DIALOG="$DIALOG"
+	DIALOG="dialog"
 	OPTS="0 0"
+
+elif [ "$DIALOG" = "vi" ] ; then
+	DIALOG="vi"
+	OPTS=""
 fi
 
+#Funzione che apre in editor il contenuto di /etc/network/interfaces 
 networking () {
     if [ "$DIALOG" = "dialog" ] ; then
 		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/network/interfaces  $OPTS  2> .tmp
@@ -33,6 +37,7 @@ networking () {
 	fi
 }
 
+#Funziona che apre in editor il file /etc/sysctl.conf
 sysctl  () {
 	if [ "$DIALOG" = "dialog" ] ; then
  		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/sysctl.conf   $OPTS  2> .tmp
@@ -45,7 +50,7 @@ sysctl  () {
     fi
 }
 
-
+#Funzione che apre in editor il file di conf fi firewallo
 conf () {
 	if [ "$DIALOG" = "dialog" ] ; then
 		$DIALOG --backtitle CONFIGURATION_EDIT --title firewallo.conf --editbox $DIRCONF/firewallo.conf  $OPTS  2> .tmp 
@@ -58,6 +63,7 @@ conf () {
 	fi
 }
 
+#Funzione di editing del table Filter
 filter () {
 MENU="
 fw2fw	fw2lan		fw2wan		fw2vpns		fw2dmz		\
@@ -84,6 +90,7 @@ select opt in $MENU ; do
 done
 }
 
+#Funzione di editing manuale del table Nat
 nat  () {
 	if [ "$DIALOG" = "dialog" ] ; then
         $DIALOG --backtitle NAT_EDIT --title firewallo.nat --editbox $DIRCONF/nat/firewallo.nat  	  $OPTS 2> .tmp
@@ -96,7 +103,7 @@ nat  () {
 		$DIALOG $DIRCONF/nat/firewallo.nat
 	fi
 }
-
+#Funzione di editing manuale del mangle
 mangle  () {
 	 if [ "$DIALOG" = "dialog" ] ; then
 		$DIALOG --backtitle MANGLE_EDIT --title firewallo.mangle --editbox $DIRCONF/mangle/firewallo.mangle $OPTS 2> .tmp
@@ -109,6 +116,7 @@ mangle  () {
 	fi
 }
 
+#Funzione di editing manuale del routing
 route  () {
 	if [ "$DIALOG" = "dialog" ] ; then
         $DIALOG --backtitle ROUTE_EDIT --title firewallo.route --editbox $DIRCONF/route/firewallo.route $OPTS 2> .tmp
@@ -122,16 +130,16 @@ route  () {
 	fi
 }
 
+#Funzione di start di Firewallo
 start () {
 if  [ "$NFT" != "" ] ; then
 /etc/init.d/firewallo.nft start
-
 elif [ "$IPT" != "" ]  ; then
-
 /etc/init.d/firewallo.iptables start
 fi
 }
 
+#Funzione di stop di Firewallo
 stop () {
 if  [ "$NFT" != "" ] ; then
 /etc/init.d/firewallo.nft stop
@@ -141,15 +149,18 @@ fi
 
 }
 
+#Funzione di restart 
 restart () {
 stop
 start
 }
 
+#Funzione di visualizzazione dello status
 status () {
 less $DIRCONF/status.log
 }
 
+#Funzione di list delle regole 
 rules () {
 if [ "$IPT" != "" ]  ;then
 	$IPT -t filter 	-L -vn > .filter
@@ -173,6 +184,8 @@ main
 
 #done
 }
+
+#Funzione di salvataggio della configurazione di iptables/nftables ed enable del servizio su systemd
 saveconf () {
 if [ "$IPT" != "" ] ; then
 	echo "Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable nftables at startup."
@@ -205,24 +218,26 @@ elif [ "$NFT" != ""  ] ; then
 	echo "..OK"
 fi
 }
+
+#Funzione di switch del backend nft/iptables
 nftiptables () {
 echo "SELECT IPTABLES OR NFTABLES"
 MENU1="iptables nftables"
 opt1=""
 select opt1 in $MENU1 ; do
-        if [ "$opt1" = "nftables" ] ; then
-                export IPT="";
-		export NFT="/usr/sbin/nft"
-		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf
-		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf
-		printf 'NFT=\"/usr/sbin/nft\"' >> $DIRCONF/firewallo.conf
+        if [ "$opt1" = "nftables" ] ; then #se selezioni nft
+        export IPT=""; #Svuoto IPT
+		export NFT="/usr/sbin/nft" #Setto NFT
+		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf #vuoto iptables in firewallo.conf
+		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf #vuoto anche nft 
+		printf 'NFT=\"/usr/sbin/nft\"' >> $DIRCONF/firewallo.conf #risetto nft
 		return
-        elif [ "$opt1" = "iptables" ] ; then
-                export NFT="";
-		export IPT="/sbin/iptables"
-		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf
-		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf
-                printf 'IPT=\"/sbin/iptables\"' >> $DIRCONF/firewallo.conf
+        elif [ "$opt1" = "iptables" ] ; then #Se selezioni iptables
+        export NFT=""; #Svuoto NFT
+		export IPT="/sbin/iptables" #Setto iptables
+		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf #Vuoto iptables e anche nft
+		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf #
+                printf 'IPT=\"/sbin/iptables\"' >> $DIRCONF/firewallo.conf #Setto iptables
 		return
         fi
 done
@@ -234,7 +249,6 @@ done
 log_filter () { 
     echo "SELECT chains do you want to view"
 
-    # Definizione del menu come array
     MENU=("EXIT" "state" "icmp_good" "bad_tcp_flags" "POSTROUTING" "PREROUTING" "DROP" "OUTPUT_DROP" "INPUT_DROP" "FORWARD_DROP"  \
           "fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" \
           "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" \
@@ -242,7 +256,7 @@ log_filter () {
           "vpns2fw" "vpns2lan" "vpns2wan" "vpns2vpns" "vpns2dmz" \
           "dmz2fw" "dmz2lan" "dmz2wan" "dmz2vpns" "dmz2dmz" "nothing")
 
-    # Usa l'array con select
+    
     select opt in "${MENU[@]}"; do
         if [ "$opt" = "EXIT" ]; then
             echo "Uscita dal log filter."
@@ -343,10 +357,10 @@ do
 done
 }
 
-
+#Funzione principale
 main () {
 clear
-cat $DIRCONF/motd
+cat $DIRCONF/motd #Visualizza il banner motd
 echo "
 DEFAULT EDITOR: $DIALOG 
 ###########################################
@@ -355,8 +369,9 @@ if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
 fi
 
+#Opzioni del menu
 MENU="networking sysctl conf filter nat mangle start stop restart route wizard status rulesview saveconf nft-iptables logs exit"
-select opt in $MENU ; do
+select opt in $MENU ; do 
 	if [ "$opt" = "networking" ] ; then
 		networking ;  main
 	elif [ "$opt" = "conf" ] ; then
@@ -370,11 +385,11 @@ select opt in $MENU ; do
 	elif [ "$opt" = "mangle" ] ; then
         mangle ; main
 	elif [ "$opt" = "start" ] ; then
-        start ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
+        start ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #starto attendo e leggo invio per tornare
 	elif [ "$opt" = "stop" ] ; then
-        stop ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
-	elif [ "$opt" = "restart" ] ; then
-        restart ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
+        stop ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #idem come sopra
+	elif [ "$opt" = "restart" ] ; then 
+        restart ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #idem come sopra
 	elif [ "$opt" = "route" ] ; then
         route ; main
 	elif [ "$opt" = "status" ] ; then
@@ -395,4 +410,5 @@ select opt in $MENU ; do
 	fi
 done
 }
+#LAncio finalmente il main in stile C
 main

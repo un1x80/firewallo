@@ -1,5 +1,6 @@
 # Italiano
 LANG=it
+#Magic_filter
 SELECT_CHAIN_PROMPT="Seleziona la catena dalla seguente lista:"
 CHAIN_SELECTED_MSG="Hai selezionato la catena: %s"
 LANG_NOT_FOUND="File di traduzione non trovato!"
@@ -13,6 +14,7 @@ ACTION_PROMPT="Inserisci l'azione (ACCEPT, DROP, REJECT):"
 IPT_RULE_MSG="Regola iptables:"
 NFT_RULE_MSG="Regola nftables:"
 INT_ERROR_MSG="Errore interno: NFT o IPT non sono impostati!"
+##Magic_nat_postrouting
 SRCIP_MASK_PROMPT="Inserisci l'indirizzo IP di origine (srcip) e la maschera (mask) (es. 192.168.1.0/24):"
 OIF_PROMPT="Inserisci l'interfaccia di uscita (oif) (es. eth0):"
 MASQUERADE_PROMPT="Scegli il tipo di masquerading:"
@@ -27,6 +29,7 @@ CONFIG_ERROR="Errore nella configurazione MASQUERADE."
 SNAT_CONFIG_SUCCESS="Configurazione SNAT completata con successo."
 SNAT_CONFIG_ERROR="Errore nella configurazione SNAT."
 ERROR_HANDLER_MASQ="Scelta non valida. Per favore, inserisci 1 per MASQUERADE o 2 per SNAT."
+#Magic_prerouting
 PREROUTING_CONFIG_PROMPT="Configurazione PREROUTING con iptables e nftables"
 SRCIP_MASK_PREROUTING_PROMPT="Inserisci l'indirizzo IP di origine (srcip) e la maschera (es. 192.168.1.0/24):"
 IIF_PROMPT="Inserisci l'interfaccia di ingresso (iif) (es. eth0):"

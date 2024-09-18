@@ -9,7 +9,7 @@ load_translations() {
     if [[ -f "$lang_file" ]]; then
         source "$lang_file"
     else
-        echo "$LANG_NOT_FOUND"
+        echo "LANG_NOT_FOUND"
         exit 1
     fi
 }

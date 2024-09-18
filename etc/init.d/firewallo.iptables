@@ -1,64 +1,53 @@
 #!/bin/bash
-### BEGIN INIT INFO
-# Provides:             fioribinix
-# Required-Start:
-# Required-Stop:
-# Default-Start:        2 3 4 5
-# Default-Stop:
-# Short-Description:    Firewall Rules
-### END INIT INFO
-
-#
-# Start/Stop/Restart Fiorbinix 2.0
-#
 
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
+
+#Dichiaro gli array delle varie interfacce
 ctrl_if(){
 #declare -p WANIF 2> /dev/null | grep -q 'declare \-a'
 #Vedo se la variabile è dichiarata come array e se no la dichiaro
 ARRAYTEST=`declare -p WANIF 2> /dev/null | grep  "declare \-a"`
 if [ "$ARRAYTEST" = "" ] ; then
-WANIF=($WANIF)
-echo Ho_dichiarato_array_WANIF
+    WANIF=($WANIF)
+    echo Ho_dichiarato_array_WANIF
 fi
 index=0
 for i in ${WANIF[*]} ; do
 	((index++))
-export 	WANIF_$index="$i"
-declare -p WANIF_$index 2> /dev/null 
+    export 	WANIF_$index="$i"
+    declare -p WANIF_$index 2> /dev/null 
 done
 echo "ci sono $index interfaccie WAN"
+
 ARRAYTEST=`declare -p DMZIF 2> /dev/null | grep  "declare \-a"`
 if [ "$ARRAYTEST" = "" ] ; then
-DMZIF=($DMZIF)
-echo Ho_dichiarato_array_DMZIF
+    DMZIF=($DMZIF)
+    echo Ho_dichiarato_array_DMZIF
 fi
 index=0
 for i in ${DMZIF[*]} ; do
         ((index++))
-export  DMZIF_$index="$i"
-declare -p DMZIF_$index 2> /dev/null 
-
+        export  DMZIF_$index="$i"
+        declare -p DMZIF_$index 2> /dev/null 
 done
 echo "ci sono $index interfaccie DMZ"
 
 ARRAYTEST=`declare -p LANIF 2> /dev/null | grep  "declare \-a"`
 if [ "$ARRAYTEST" = "" ] ; then
-LANIF=($LANIF)
-echo Ho_dichiarato_array_LANIF
+    LANIF=($LANIF)
+    echo Ho_dichiarato_array_LANIF
 fi
 index=0
 for i in ${LANIF[*]} ; do
         ((index++))
-export  LANIF_$index="$i"
-declare -p LANIF_$index 2> /dev/null 
-
+        export  LANIF_$index="$i"
+        declare -p LANIF_$index 2> /dev/null 
 done
 echo "ci sono $index interfaccie LAN"
 }
-
+#Starto subito la dichiarazione delle interfacce
 ctrl_if ""
 
 echo "LANIF = $LANIF"
@@ -68,6 +57,7 @@ echo "DMZIF = $DMZIF"
 start () {
 echo "### $ORARIO Start Firewall"
 
+#Avviamo le rotte
 /bin/bash 	$DIRCONF/route/firewallo.route
 
 
@@ -84,13 +74,14 @@ if [ -e /proc/sys/net/ipv4/conf/all/accept_source_route ] ; 	then
     echo 0 > /proc/sys/net/ipv4/conf/all/accept_source_route
 fi
 
-MODULI="ip_conntrack ipt_conntrack ip_conntrack_ftp 	ip_nat_ftp 	ipt_state iptable_filter iptable_nat \
-ip_nat_pptp ip_conntrack_pptp ip_nat_sip ip_conntrack_sip	ipt_MASQUERADE 		ipt_LOG      \
-ipt_limit ipt_multiport ip_conntrack_netlink"
+#Ormai inutili
+#MODULI="ip_conntrack ipt_conntrack ip_conntrack_ftp 	ip_nat_ftp 	ipt_state iptable_filter iptable_nat \
+#ip_nat_pptp ip_conntrack_pptp ip_nat_sip ip_conntrack_sip	ipt_MASQUERADE 		ipt_LOG      \
+#ipt_limit ipt_multiport ip_conntrack_netlink"
 
-for MOD in $MODULI ; do
-    /sbin/modprobe $MOD
-done
+#for MOD in $MODULI ; do
+#    /sbin/modprobe $MOD
+#done
 
 echo "Flushing policies and setting up new policies for chains...... "
 $IPT -F
