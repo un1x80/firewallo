@@ -2,137 +2,156 @@
 
 WG_CONFIG_DIR="/etc/wireguard"
 WG_INTERFACE="wg0"
+CLIENT_CONFIG_DIR="/etc/wireguard/clients"
+WG_CONFIG_FILE="$WG_CONFIG_DIR/$WG_INTERFACE.conf"
 
-# Funzione per generare le chiavi per WireGuard
-function generate_wireguard_keys() {
-    local privkey pubkey
-    privkey=$(wg genkey)
-    pubkey=$(echo "$privkey" | wg pubkey)
-    echo "$privkey" "$pubkey"
+# Funzione per generare chiavi WireGuard
+generate_wireguard_keys() {
+    local private_key public_key
+    private_key=$(wg genkey)
+    public_key=$(echo "$private_key" | wg pubkey)
+    echo "$private_key" "$public_key"
 }
 
-# Funzione per configurare un nuovo utente WireGuard
-function create_wireguard_user() {
-    echo "Creazione di un nuovo utente WireGuard..."
+# Funzione per creare la configurazione del server WireGuard
+configure_wireguard_server() {
+    # Chiedi l'IP pubblico e la porta del server
+    read -rp "Inserisci l'IP pubblico del server WireGuard: " server_ip
+    read -rp "Inserisci la porta da utilizzare per WireGuard (es. 51820): " server_port
 
-    # Genera le chiavi del client
-    client_keys=($(generate_wireguard_keys))
-    client_private_key=${client_keys[0]}
-    client_public_key=${client_keys[1]}
-    echo "Chiave privata del client: $client_private_key"
-    echo "Chiave pubblica del client: $client_public_key"
-
-    # Chiedi l'indirizzo IP del client
-    while true; do
-        read -p "Inserisci l'IP del client (ad esempio, 10.0.0.2): " client_ip
-        if [[ $client_ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-            break
-        else
-            echo "Indirizzo IP non valido, riprova."
-        fi
-    done
-
-    # Chiedi l'indirizzo IP pubblico del server
-    while true; do
-        read -p "Inserisci l'IP pubblico del server WireGuard: " server_ip
-        if [[ $server_ip =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-            break
-        else
-            echo "Indirizzo IP non valido, riprova."
-        fi
-    done
-
-    # Chiedi la porta WireGuard del server
-    while true; do
-        read -p "Inserisci la porta di WireGuard del server (default 51820): " server_port
-        if [[ $server_port =~ ^[0-9]+$ ]] && [[ $server_port -ge 1 ]] && [[ $server_port -le 65535 ]]; then
-            break
-        else
-            echo "Porta non valida, riprova."
-        fi
-    done
-
-    # Chiedi la chiave pubblica del server
-    read -p "Inserisci la chiave pubblica del server: " server_public_key
-
-    # Chiedi le risorse di rete che l'utente può accedere
-    read -p "Inserisci gli IP o le subnet a cui l'utente può accedere (es. 192.168.1.0/24, separati da virgola): " allowed_ips
-    if [[ -z "$allowed_ips" ]]; then
-        allowed_ips="0.0.0.0/0"  # Default: accesso a tutte le risorse
+    # Genera le chiavi del server se non esistono
+    if [[ ! -f "$WG_CONFIG_DIR/server_private.key" || ! -f "$WG_CONFIG_DIR/server_public.key" ]]; then
+        echo "Generazione delle chiavi del server..."
+        read server_private_key server_public_key < <(generate_wireguard_keys)
+        echo "$server_private_key" > "$WG_CONFIG_DIR/server_private.key"
+        echo "$server_public_key" > "$WG_CONFIG_DIR/server_public.key"
+    else
+        echo "Chiavi del server trovate, utilizzando quelle esistenti."
+        server_private_key=$(cat "$WG_CONFIG_DIR/server_private.key")
+        server_public_key=$(cat "$WG_CONFIG_DIR/server_public.key")
     fi
 
-    # Configura il file di configurazione del client
-    client_config_file="$WG_CONFIG_DIR/client-$client_ip.conf"
+    # Crea il file di configurazione del server
+    cat > "$WG_CONFIG_FILE" <<EOL
+[Interface]
+PrivateKey = $server_private_key
+Address = 10.0.0.1/24
+ListenPort = $server_port
+SaveConfig = true
+
+# Aggiungi qui i client tramite [Peer]
+EOL
+
+    echo "Configurazione del server salvata in $WG_CONFIG_FILE"
+
+    # Avvia e abilita WireGuard
+    wg-quick up "$WG_INTERFACE"
+    systemctl enable wg-quick@"$WG_INTERFACE"
+    echo "WireGuard server configurato e avviato su $server_ip:$server_port"
+}
+
+# Funzione per ottenere informazioni dal file di configurazione del server WireGuard
+get_server_info() {
+    local server_ip server_port server_pubkey
+
+    server_ip=$(grep 'Endpoint' "$WG_CONFIG_FILE" | awk '{print $3}' | cut -d: -f1)
+    server_port=$(grep 'ListenPort' "$WG_CONFIG_FILE" | awk '{print $3}')
+    server_pubkey=$(cat "$WG_CONFIG_DIR/server_public.key")
+    
+    echo "$server_ip" "$server_port" "$server_pubkey"
+}
+
+# Funzione per creare il file di configurazione del client
+create_wireguard_user() {
+    local client_ip="$1"
+    local allowed_ips="$2"
+
+    # Genera le chiavi del client
+    read private_key public_key < <(generate_wireguard_keys)
+
+    # Ottieni le informazioni del server
+    read server_ip server_port server_pubkey < <(get_server_info)
+
+    # Crea la directory dei client se non esiste
+    mkdir -p "$CLIENT_CONFIG_DIR"
+
+    # Crea il file di configurazione del client
+    local client_config_file="$CLIENT_CONFIG_DIR/client-$client_ip.conf"
     cat > "$client_config_file" <<EOL
 [Interface]
-PrivateKey = $client_private_key
+PrivateKey = $private_key
 Address = $client_ip/24
 DNS = 8.8.8.8
 
 [Peer]
-PublicKey = $server_public_key
+PublicKey = $server_pubkey
 Endpoint = $server_ip:$server_port
 AllowedIPs = $allowed_ips
 PersistentKeepalive = 25
-
 EOL
 
-    echo "Configurazione client generata: $client_config_file"
-    
-    # Aggiungi il peer al file di configurazione del server
-    echo "Aggiungo il client alla configurazione del server..."
-    cat >> "$WG_CONFIG_DIR/$WG_INTERFACE.conf" <<EOL
+    echo "Configurazione del client creata: $client_config_file"
+
+    # Aggiungi il peer al server
+    cat >> "$WG_CONFIG_FILE" <<EOL
+
 [Peer]
-PublicKey = $client_public_key
+PublicKey = $public_key
 AllowedIPs = $client_ip/32
-
 EOL
+
+    echo "Client $client_ip aggiunto alla configurazione del server."
 
     # Ricarica la configurazione di WireGuard
-    wg syncconf $WG_INTERFACE <(wg-quick strip $WG_INTERFACE)
-    
-    echo "Client $client_ip configurato correttamente."
-    echo "L'utente può accedere alle seguenti risorse di rete: $allowed_ips"
+    wg syncconf "$WG_INTERFACE" <(wg-quick strip "$WG_INTERFACE")
 }
 
-# Funzione per listare gli utenti WireGuard (client)
-function list_wireguard_users() {
-    echo "Lista degli utenti WireGuard:"
-    grep 'AllowedIPs' "$WG_CONFIG_DIR/$WG_INTERFACE.conf" | awk '{print $2}' | cut -d'/' -f1
+# Funzione per configurare il firewall con nftables
+configure_firewall() {
+    local client_ip="$1"
+    local allowed_ips="$2"
+
+    # Aggiungi regola di input per il client
+    nft add rule inet wireguard input ip saddr "$client_ip" oif "$WG_INTERFACE" accept
+
+    # Aggiungi regole di forward per gli AllowedIPs
+    IFS=',' read -ra ADDR <<< "$allowed_ips"
+    for ip in "${ADDR[@]}"; do
+        nft add rule inet wireguard forward ip saddr "$client_ip" ip daddr "$ip" accept
+    done
+
+    echo "Regole firewall configurate per l'utente $client_ip"
 }
 
-# Funzione per vedere se un utente è connesso
-function check_wireguard_user_status() {
-    echo "Verifica dello stato degli utenti WireGuard..."
-    wg show $WG_INTERFACE
+# Funzione principale del menu
+main_menu() {
+    while true; do
+        echo "Gestione WireGuard - Seleziona un'opzione:"
+        echo "1) Configura il server WireGuard"
+        echo "2) Crea un nuovo utente"
+        echo "3) Esci"
+        read -rp "Opzione: " option
+
+        case $option in
+            1)
+                configure_wireguard_server
+                ;;
+            2)
+                read -rp "Inserisci l'IP del client (es. 10.0.0.2): " client_ip
+                read -rp "Inserisci gli IP o le subnet a cui l'utente può accedere (separati da virgole): " allowed_ips
+
+                create_wireguard_user "$client_ip" "$allowed_ips"
+                configure_firewall "$client_ip" "$allowed_ips"
+                ;;
+            3)
+                echo "Uscita..."
+                exit 0
+                ;;
+            *)
+                echo "Opzione non valida, riprova."
+                ;;
+        esac
+    done
 }
 
-# Menu principale
-while true; do
-    echo "Gestione utenti WireGuard - Seleziona un'opzione:"
-    echo "1) Crea un nuovo utente"
-    echo "2) Lista degli utenti"
-    echo "3) Stato degli utenti (connessi)"
-    echo "4) Esci"
-
-    read -p "Seleziona un'opzione: " option
-
-    case $option in
-        1)
-            create_wireguard_user
-            ;;
-        2)
-            list_wireguard_users
-            ;;
-        3)
-            check_wireguard_user_status
-            ;;
-        4)
-            echo "Uscita dallo script."
-            exit 0
-            ;;
-        *)
-            echo "Opzione non valida, riprova."
-            ;;
-    esac
-done
+main_menu
