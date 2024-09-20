@@ -417,7 +417,6 @@ select opt in $MENU ; do
 		show_wizard ; main
 	elif [ "$opt" = "wg" ]; then
 		wg_menu ; main
-	fi
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
