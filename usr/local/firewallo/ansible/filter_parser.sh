@@ -1,5 +1,5 @@
 #!/bin/bash
-source /etc/firewallo/firewallo.conf
+
 # Elenco delle catene valide
 valid_chains=(
     "dmz2lan" "fw2dmz" "fw2vpns" "lan2fw" "lan2wan" "vpns2lan" "wan2dmz" "wan2vpns"
@@ -37,7 +37,7 @@ validate_ip_cidr() {
 parse_port_range() {
     local port_range="$1"
     if [[ "$port_range" == "any" ]]; then
-        echo "1:65535"
+        echo "1-65535"
     elif [[ "$port_range" =~ ^([0-9]+):([0-9]+)$ ]]; then
         echo "$port_range" | sed 's/:/-/' # Trasforma "100:200" in "100-200"
     else
@@ -58,17 +58,17 @@ translate_action() {
             echo "counter reject"
             ;;
         *)
-            echo "Azione non valida: utilizzare ACCEPT, DROP o REJECT."
+            echo "Errore: Azione non valida '$1'. Utilizzare ACCEPT, DROP o REJECT."
             return 1
             ;;
     esac
 }
 
 # Controllo che il numero di argomenti sia corretto
-if [ "$#" -ne 6 ]; then
+if [ "$#" -ne 7 ]; then
     echo "Errore: numero di argomenti non corretto."
-    echo "Uso: $0 <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
-    exit 1
+    echo "Uso: ./script.sh <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
+    exit 0  # Esce solo dal controllo ma non termina la shell
 fi
 
 # Assegna gli argomenti a variabili
@@ -83,24 +83,21 @@ ACTION="$7"
 # Verifica che la catena sia valida
 if [[ ! " ${valid_chains[@]} " =~ " ${CHAIN_SELECTED} " ]]; then
     echo "Errore: catena '$CHAIN_SELECTED' non valida. Le catene valide sono: ${valid_chains[*]}"
-    exit 1
+    exit 0  # Esce solo dal controllo ma non termina la shell
 fi
 
 # Validazione indirizzi IP CIDR
 if ! validate_ip_cidr "$SRC_ADDR"; then
     echo "Errore: indirizzo IP sorgente '$SRC_ADDR' non valido."
-    exit 1
 fi
 
 if ! validate_ip_cidr "$DST_ADDR"; then
     echo "Errore: indirizzo IP destinazione '$DST_ADDR' non valido."
-    exit 1
 fi
 
 # Verifica del protocollo
 if [[ "$PROTOCOL" != "tcp" && "$PROTOCOL" != "udp" ]]; then
-    echo "Errore: protocollo non valido. Deve essere 'tcp' o 'udp'."
-    exit 1
+    echo "Errore: protocollo '$PROTOCOL' non valido. Deve essere 'tcp' o 'udp'."
 fi
 
 # Converte sport e dport
@@ -110,7 +107,7 @@ DST_PORT_OPTION=$(parse_port_range "$DST_PORT")
 # Traduci l'azione per nftables
 nft_action=$(translate_action "$ACTION")
 if [ $? -ne 0 ]; then
-    exit 1
+    exit 0  # Esce solo dal controllo ma non termina la shell
 fi
 
 if [ "$IPT" != "" ]; then
