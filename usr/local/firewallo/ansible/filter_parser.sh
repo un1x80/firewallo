@@ -70,7 +70,7 @@ while true; do
     read -p "Inserisci il comando in formato: filter <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>: " CHAIN_SELECTED SRC_ADDR PROTOCOL SRC_PORT DST_ADDR DST_PORT ACTION
 
     # Verifica che il numero di argomenti sia esatto
-    if [ "$#" -ne 7 ]; then
+    if [ "$#" -ne 8 ]; then
         echo "Errore: numero di argomenti non corretto."
         continue
     fi
