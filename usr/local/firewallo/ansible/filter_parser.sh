@@ -37,7 +37,7 @@ validate_ip_cidr() {
 parse_port_range() {
     local port_range="$1"
     if [[ "$port_range" == "any" ]]; then
-        echo "1-65535"
+        echo "1:65535"
     elif [[ "$port_range" =~ ^([0-9]+):([0-9]+)$ ]]; then
         echo "$port_range" | sed 's/:/-/' # Trasforma "100:200" in "100-200"
     else
