@@ -13,10 +13,42 @@ generate_wireguard_keys() {
     echo "$private_key" "$public_key"
 }
 
+# Funzione per verificare se l'input è un IP valido
+validate_ip() {
+    local ip="$1"
+    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        for octet in $(echo "$ip" | tr "." " "); do
+            if [[ "$octet" -lt 0 || "$octet" -gt 255 ]]; then
+                return 1
+            fi
+        done
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Funzione per verificare che gli IP o subnet siano validi
+validate_allowed_ips() {
+    local allowed_ips="$1"
+    IFS=',' read -ra ADDR <<< "$allowed_ips"
+    for ip in "${ADDR[@]}"; do
+        ip=$(echo "$ip" | cut -d'/' -f1)  # Prendi solo la parte dell'IP, ignora il CIDR
+        if ! validate_ip "$ip"; then
+            return 1
+        fi
+    done
+    return 0
+}
+
 # Funzione per creare la configurazione del server WireGuard
 configure_wireguard_server() {
     # Chiedi l'IP pubblico e la porta del server
     read -rp "Inserisci l'IP pubblico del server WireGuard: " server_ip
+    if ! validate_ip "$server_ip"; then
+        echo "Errore: IP non valido. Riprova."
+        return 1
+    fi
     read -rp "Inserisci la porta da utilizzare per WireGuard (es. 51820): " server_port
 
     # Genera le chiavi del server se non esistono
@@ -54,7 +86,7 @@ EOL
 get_server_info() {
     local server_ip server_port server_pubkey
 
-    server_ip=$(grep 'Endpoint' "$WG_CONFIG_FILE" | awk '{print $3}' | cut -d: -f1)
+    server_ip=$(grep 'Address' "$WG_CONFIG_FILE" | awk '{print $3}' | cut -d/ -f1)
     server_port=$(grep 'ListenPort' "$WG_CONFIG_FILE" | awk '{print $3}')
     server_pubkey=$(cat "$WG_CONFIG_DIR/server_public.key")
     
@@ -65,6 +97,7 @@ get_server_info() {
 create_wireguard_user() {
     local client_ip="$1"
     local allowed_ips="$2"
+    local username="$3"
 
     # Genera le chiavi del client
     read private_key public_key < <(generate_wireguard_keys)
@@ -76,7 +109,7 @@ create_wireguard_user() {
     mkdir -p "$CLIENT_CONFIG_DIR"
 
     # Crea il file di configurazione del client
-    local client_config_file="$CLIENT_CONFIG_DIR/client-$client_ip.conf"
+    local client_config_file="$CLIENT_CONFIG_DIR/$username.conf"
     cat > "$client_config_file" <<EOL
 [Interface]
 PrivateKey = $private_key
@@ -123,13 +156,34 @@ configure_firewall() {
     echo "Regole firewall configurate per l'utente $client_ip"
 }
 
+# Funzione per elencare i client esistenti
+list_wireguard_users() {
+    echo "Client configurati:"
+    ls "$CLIENT_CONFIG_DIR"
+}
+
+# Funzione per controllare se un client è connesso
+check_wireguard_user_status() {
+    local username="$1"
+    local client_ip=$(grep 'Address' "$CLIENT_CONFIG_DIR/$username.conf" | awk '{print $3}' | cut -d/ -f1)
+
+    wg show "$WG_INTERFACE" | grep -q "$client_ip"
+    if [[ $? -eq 0 ]]; then
+        echo "L'utente $username è attualmente connesso."
+    else
+        echo "L'utente $username non è connesso."
+    fi
+}
+
 # Funzione principale del menu
 main_menu() {
     while true; do
         echo "Gestione WireGuard - Seleziona un'opzione:"
         echo "1) Configura il server WireGuard"
         echo "2) Crea un nuovo utente"
-        echo "3) Esci"
+        echo "3) Elenca gli utenti"
+        echo "4) Controlla lo stato di connessione di un utente"
+        echo "5) Esci"
         read -rp "Opzione: " option
 
         case $option in
@@ -138,12 +192,30 @@ main_menu() {
                 ;;
             2)
                 read -rp "Inserisci l'IP del client (es. 10.0.0.2): " client_ip
-                read -rp "Inserisci gli IP o le subnet a cui l'utente può accedere (separati da virgole): " allowed_ips
+                if ! validate_ip "$client_ip"; then
+                    echo "Errore: IP del client non valido."
+                    continue
+                fi
 
-                create_wireguard_user "$client_ip" "$allowed_ips"
+                read -rp "Inserisci gli IP o le subnet a cui l'utente può accedere (separati da virgole): " allowed_ips
+                if ! validate_allowed_ips "$allowed_ips"; then
+                    echo "Errore: uno o più AllowedIPs non validi."
+                    continue
+                fi
+
+                read -rp "Inserisci un nome per l'utente: " username
+
+                create_wireguard_user "$client_ip" "$allowed_ips" "$username"
                 configure_firewall "$client_ip" "$allowed_ips"
                 ;;
             3)
+                list_wireguard_users
+                ;;
+            4)
+                read -rp "Inserisci il nome dell'utente da controllare: " username
+                check_wireguard_user_status "$username"
+                ;;
+            5)
                 echo "Uscita..."
                 exit 0
                 ;;
