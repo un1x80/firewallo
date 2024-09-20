@@ -57,4 +57,4 @@ INVALID_INTERFACE="Invalid interface name."
 INVALID_TCP_UDP_CHOICE="Invalid Choice. Insert 1 for TCP or 2 for UDP."
 
 #firewallo
-$SAVECONF_IPT_NFT="Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable it at startup."
+SAVECONF_IPT_NFT="Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable it at startup."
