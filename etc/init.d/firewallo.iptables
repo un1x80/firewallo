@@ -2,6 +2,7 @@
 
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
+DIRBIN="/usr/local/firewallo/bin"
 source $DIRCONF/firewallo.conf
 
 #Dichiaro gli array delle varie interfacce
@@ -111,8 +112,8 @@ for CAT in $CHAINS ; do
 done
 
 #Setup Chain and conf in nat and mangle tables
-/bin/bash $DIRCONF/bin/mangle/set.mangle
-/bin/bash $DIRCONF/bin/nat/set.nat
+/bin/bash $DIRBIN/mangle/set.mangle
+/bin/bash $DIRBIN/nat/set.nat
 
 #Setup rules in nat and mangle tables
 /bin/bash $DIRCONF/mangle/firewallo.mangle
@@ -329,7 +330,7 @@ fw2wan fw2dmz fw2lan fw2vpns fw2fw               \
 vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw     ";
 
 for CAT0 in $CHAINS0 ; do
-/bin/bash $DIRCONF/bin/filter/$CAT0  "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf" 
+/bin/bash $DIRBIN/filter/$CAT0  "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf" 
 done
 
 echo "Firewall setting are finish...                                  ...OK"

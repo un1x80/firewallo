@@ -5,6 +5,7 @@
 #Setup preliminare
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
+DIRBIN="/usr/local/firewallo/bin/"
 source $DIRCONF/firewallo.conf
 
 DIALOG="nano" #setta qui l'editor vi , dialog o nano se è vuoto usa vi
@@ -319,23 +320,30 @@ function show_menu {
     echo "1) Filter Wizard"
     echo "2) Nat Prerouting Wizard"
     echo "3) Nat Postrouting Wizard"
-    echo "4) Exit"
+	echo "4) WireGuard" 
+    echo "5) Exit"
     echo "======================================"
     echo -n "Select an option: "
 }
 
 # Funzioni per le diverse opzioni
 function filter_wizard {
-    /etc/firewallo/bin/magic_filter.sh
+    $DIRBIN/wiz/magic_filter.sh
 }
 
 function nat_prerouting_wizard {
-	/etc/firewallo/bin/magic_nat_prerouting.sh
+	$DIRBIN/wiz/magic_nat_prerouting.sh
 }
 
 function nat_postrouting_wizard {
-    /etc/firewallo/bin/magic_nat_postrouting.sh
+    $DIRBIN/wiz/magic_nat_postrouting.sh
 }
+
+function wg_manager_wizard {
+    $DIRBIN/wiz/wg/wg_manager.sh
+}
+
+
 
 # Ciclo principale del menu
 while true
@@ -353,7 +361,10 @@ do
         3)
             nat_postrouting_wizard
             ;;
-        4)
+		4)
+            wg_manager_wizard
+            ;;
+        5)
             echo "Exit"
             break
             ;;
@@ -415,8 +426,6 @@ select opt in $MENU ; do
         logs ; main
 	elif [ "$opt" = "wizard" ] ; then
 		show_wizard ; main
-	elif [ "$opt" = "wg" ]; then
-		wg_menu ; main
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
