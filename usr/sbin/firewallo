@@ -24,6 +24,17 @@ elif [ "$DIALOG" = "vi" ] ; then
 	OPTS=""
 fi
 
+# Carica il file di traduzione
+load_translations() {
+    local lang_file="$DIRCONF/lang/firewallo.lang.$LANG"
+    if [[ -f "$lang_file" ]]; then
+        source "$lang_file"
+    else
+        echo "LANG_NOT_FOUND"
+        exit 1
+    fi
+}
+
 #Funzione che apre in editor il contenuto di /etc/network/interfaces 
 networking () {
     if [ "$DIALOG" = "dialog" ] ; then
@@ -188,7 +199,7 @@ main
 #Funzione di salvataggio della configurazione di iptables/nftables ed enable del servizio su systemd
 saveconf () {
 if [ "$IPT" != "" ] ; then
-	echo "Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable nftables at startup."
+	echo "$SAVECONF_IPT_NFT"
 	echo '
 [Unit]
 Description=Restore iptables rules
@@ -259,7 +270,7 @@ log_filter () {
     
     select opt in "${MENU[@]}"; do
         if [ "$opt" = "EXIT" ]; then
-            echo "Uscita dal log filter."
+            echo "Exit from filter."
             break  # Esci dal ciclo
 
         elif [ "$opt" = "nothing" ] && [ "$1" = "live" ]; then	
@@ -366,7 +377,7 @@ DEFAULT EDITOR: $DIALOG
 ###########################################
 "
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
-	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
+	echo "You must set Backend select iptables o nftables"
 fi
 
 #Opzioni del menu
@@ -410,5 +421,5 @@ select opt in $MENU ; do
 	fi
 done
 }
-#LAncio finalmente il main in stile C
+#Lancio finalmente il main in stile C
 main

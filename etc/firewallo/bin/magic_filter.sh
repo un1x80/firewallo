@@ -24,7 +24,7 @@ handle_error() {
 select_chain() {
     echo "$SELECT_CHAIN_PROMPT"
     CHAINS=(
-        fw2fw	fw2lan	fw2wan	fw2vpns	fw2dmz \
+        fw2fw	fw2lan	fw2wan	fw2vpns	    fw2dmz \
         lan2fw	lan2lan	lan2wan	lan2vpns	lan2dmz \
         wan2fw	wan2lan	wan2wan	wan2vpns	wan2dmz \
         vpns2fw	vpns2lan	vpns2wan	vpns2vpns	vpns2dmz \
@@ -37,7 +37,11 @@ select_chain() {
         if [[ " ${CHAINS[@]} " =~ " $chain " ]]; then
             echo "$(printf "$CHAIN_SELECTED_MSG" "$chain")"
             CHAIN_SELECTED=$chain
-            break
+            if [ "$chain" = "exit"] ; then
+                exit    
+            else
+                break
+            fi
         else
             echo "$INVALID_SELECTION_MSG"
         fi

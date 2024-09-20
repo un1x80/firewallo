@@ -1,5 +1,6 @@
 # English
 LANG=en
+#Magic_filter
 SELECT_CHAIN_PROMPT="Select the chain from the following list:"
 CHAIN_SELECTED_MSG="You have selected the chain: %s"
 LANG_NOT_FOUND="Translation file not found!"
@@ -13,7 +14,7 @@ ACTION_PROMPT="Enter the action (ACCEPT, DROP, REJECT):"
 IPT_RULE_MSG="iptables rule:"
 NFT_RULE_MSG="nftables rule:"
 INT_ERROR_MSG="Internal error: NFT or IPT not set!"
-POSTROUTING_CONFIG_PROMPT="POSTROUTING configuration with iptables"
+#Magic_nat_postrouting
 SRCIP_MASK_PROMPT="Enter the source IP address (srcip) and mask (e.g., 192.168.1.0/24):"
 OIF_PROMPT="Enter the output interface (oif) (e.g., eth0):"
 MASQUERADE_PROMPT="Select the type of masquerading:"
@@ -28,6 +29,7 @@ CONFIG_ERROR="Error in MASQUERADE configuration."
 SNAT_CONFIG_SUCCESS="SNAT configuration successfully completed."
 SNAT_CONFIG_ERROR="Error in SNAT configuration."
 ERROR_HANDLER_MASQ="Invalid selection. Please enter 1 for MASQUERADE or 2 for SNAT."
+#Magic_prerouting
 PREROUTING_CONFIG_PROMPT="PREROUTING configuration with iptables and nftables"
 SRCIP_MASK_PREROUTING_PROMPT="Enter the source IP address (srcip) and mask (e.g., 192.168.1.0/24):"
 IIF_PROMPT="Enter the input interface (iif) (e.g., eth0):"
@@ -53,3 +55,6 @@ INVALID_SPORT="Invalid source port. Please enter a valid port or 'any'."
 INVALID_PROTO="Invalid protocol. Please enter 'tcp' or 'udp'."
 INVALID_INTERFACE="Invalid interface name."
 INVALID_TCP_UDP_CHOICE="Invalid Choice. Insert 1 for TCP or 2 for UDP."
+
+#firewallo
+$SAVECONF_IPT_NFT="Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable it at startup."

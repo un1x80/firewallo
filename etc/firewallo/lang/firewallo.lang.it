@@ -14,6 +14,7 @@ ACTION_PROMPT="Inserisci l'azione (ACCEPT, DROP, REJECT):"
 IPT_RULE_MSG="Regola iptables:"
 NFT_RULE_MSG="Regola nftables:"
 INT_ERROR_MSG="Errore interno: NFT o IPT non sono impostati!"
+
 ##Magic_nat_postrouting
 SRCIP_MASK_PROMPT="Inserisci l'indirizzo IP di origine (srcip) e la maschera (mask) (es. 192.168.1.0/24):"
 OIF_PROMPT="Inserisci l'interfaccia di uscita (oif) (es. eth0):"
@@ -29,6 +30,7 @@ CONFIG_ERROR="Errore nella configurazione MASQUERADE."
 SNAT_CONFIG_SUCCESS="Configurazione SNAT completata con successo."
 SNAT_CONFIG_ERROR="Errore nella configurazione SNAT."
 ERROR_HANDLER_MASQ="Scelta non valida. Per favore, inserisci 1 per MASQUERADE o 2 per SNAT."
+
 #Magic_prerouting
 PREROUTING_CONFIG_PROMPT="Configurazione PREROUTING con iptables e nftables"
 SRCIP_MASK_PREROUTING_PROMPT="Inserisci l'indirizzo IP di origine (srcip) e la maschera (es. 192.168.1.0/24):"
@@ -55,3 +57,6 @@ INVALID_SPORT="Porta di origine non valida. Per favore inserisci una porta valid
 INVALID_PROTO="Protocollo non valido. Per favore inserisci 'tcp' o 'udp'."
 INVALID_INTERFACE="Nome dell'interfaccia non valido."
 INVALID_TCP_UDP_CHOICE="Scelta non valida. Per favore, inserisci 1 per TCP o 2 per UDP."
+
+#firewallo
+$SAVECONF_IPT_NFT="Salva la conf di iptables in /etc/iptables/rules.v4 e lo abilità in startup"
