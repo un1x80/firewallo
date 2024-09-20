@@ -37,7 +37,7 @@ select_chain() {
         if [[ " ${CHAINS[@]} " =~ " $chain " ]]; then
             echo "$(printf "$CHAIN_SELECTED_MSG" "$chain")"
             CHAIN_SELECTED=$chain
-            if [ "$chain" = "exit"] ; then
+            if [ "$chain" = "exit" ] ; then
                 exit    
             else
                 break
