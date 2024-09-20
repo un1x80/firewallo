@@ -175,6 +175,36 @@ check_wireguard_user_status() {
     fi
 }
 
+# Funzione per rimuovere un peer dalla configurazione WireGuard
+delete_wireguard_user() {
+    local username="$1"
+    local client_ip=$(grep 'Address' "$CLIENT_CONFIG_DIR/$username.conf" | awk '{print $3}' | cut -d/ -f1)
+
+    # Verifica che il file di configurazione del client esista
+    if [[ ! -f "$CLIENT_CONFIG_DIR/$username.conf" ]]; then
+        echo "Errore: L'utente $username non esiste."
+        return 1
+    fi
+
+    # Rimuovi il peer dal file di configurazione WireGuard
+    echo "Rimuovendo il peer $client_ip da WireGuard..."
+    sed -i "/$client_ip\/32/,+2d" "$WG_CONFIG_FILE"
+
+    # Ricarica la configurazione di WireGuard
+    wg syncconf "$WG_INTERFACE" <(wg-quick strip "$WG_INTERFACE")
+    
+    # Rimuovi il file di configurazione del client
+    echo "Eliminando il file di configurazione del client $CLIENT_CONFIG_DIR/$username.conf"
+    rm -f "$CLIENT_CONFIG_DIR/$username.conf"
+
+    # Rimuovi le regole del firewall associate all'utente
+    echo "Rimuovendo le regole firewall associate a $client_ip..."
+    nft delete rule inet wireguard input ip saddr "$client_ip"
+    nft delete rule inet wireguard forward ip saddr "$client_ip"
+
+    echo "L'utente $username è stato eliminato."
+}
+
 # Funzione principale del menu
 main_menu() {
     while true; do
@@ -183,8 +213,10 @@ main_menu() {
         echo "2) Crea un nuovo utente"
         echo "3) Elenca gli utenti"
         echo "4) Controlla lo stato di connessione di un utente"
-        echo "5) Esci"
+        echo "5) Elimina un utente"
+        echo "6) Esci"
         read -rp "Opzione: " option
+
 
         case $option in
             1)
@@ -216,6 +248,10 @@ main_menu() {
                 check_wireguard_user_status "$username"
                 ;;
             5)
+                read -rp "Inserisci il nome dell'utente da eliminare: " username
+                delete_wireguard_user "$username"
+                ;;
+            6)
                 echo "Uscita..."
                 exit 0
                 ;;
