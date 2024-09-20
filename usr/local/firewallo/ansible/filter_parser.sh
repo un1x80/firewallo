@@ -64,58 +64,66 @@ translate_action() {
     esac
 }
 
-# Loop per assicurarsi che gli input siano corretti
-while true; do
-    # Richiedi l'input all'utente
-    read -p "Inserisci il comando in formato: filter <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>: " CHAIN_SELECTED SRC_ADDR PROTOCOL SRC_PORT DST_ADDR DST_PORT ACTION
+# Controllo che il numero di argomenti sia corretto
+if [ "$#" -ne 7 ]; then
+    echo "Errore: numero di argomenti non corretto."
+    echo "Uso: ./script.sh <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
+    exit 1
+fi
 
-    # Verifica che il numero di argomenti sia esatto
-    if [ "$#" -ne 8 ]; then
-        echo "Errore: numero di argomenti non corretto."
-        continue
-    fi
+# Assegna gli argomenti a variabili
+CHAIN_SELECTED="$1"
+SRC_ADDR="$2"
+PROTOCOL="$3"
+SRC_PORT="$4"
+DST_ADDR="$5"
+DST_PORT="$6"
+ACTION="$7"
 
-    # Verifica che la catena sia valida
-    if [[ ! " ${valid_chains[@]} " =~ " ${CHAIN_SELECTED} " ]]; then
-        echo "Errore: catena '$CHAIN_SELECTED' non valida. Le catene valide sono: ${valid_chains[*]}"
-        continue
-    fi
+# Verifica che la catena sia valida
+if [[ ! " ${valid_chains[@]} " =~ " ${CHAIN_SELECTED} " ]]; then
+    echo "Errore: catena '$CHAIN_SELECTED' non valida. Le catene valide sono: ${valid_chains[*]}"
+    exit 1
+fi
 
-    # Validazione indirizzi IP CIDR
-    if ! validate_ip_cidr "$SRC_ADDR"; then
-        echo "Errore: indirizzo IP sorgente '$SRC_ADDR' non valido."
-        continue
-    fi
+# Validazione indirizzi IP CIDR
+if ! validate_ip_cidr "$SRC_ADDR"; then
+    echo "Errore: indirizzo IP sorgente '$SRC_ADDR' non valido."
+    exit 1
+fi
 
-    if ! validate_ip_cidr "$DST_ADDR"; then
-        echo "Errore: indirizzo IP destinazione '$DST_ADDR' non valido."
-        continue
-    fi
+if ! validate_ip_cidr "$DST_ADDR"; then
+    echo "Errore: indirizzo IP destinazione '$DST_ADDR' non valido."
+    exit 1
+fi
 
-    # Adatta le porte per iptables e nftables
-    SRC_PORT_OPTION=$(parse_port_range "$SRC_PORT")
-    DST_PORT_OPTION=$(parse_port_range "$DST_PORT")
+# Verifica del protocollo
+if [[ "$PROTOCOL" != "tcp" && "$PROTOCOL" != "udp" ]]; then
+    echo "Errore: protocollo non valido. Deve essere 'tcp' o 'udp'."
+    exit 1
+fi
 
-    # Traduzione azione per nftables
-    nft_action=$(translate_action "$ACTION")
-    if [ $? -ne 0 ]; then
-        continue
-    fi
+# Converte sport e dport
+SRC_PORT_OPTION=$(parse_port_range "$SRC_PORT")
+DST_PORT_OPTION=$(parse_port_range "$DST_PORT")
 
-    # Aggiungi la regola in iptables
-    iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION -d $DST_ADDR --dport $DST_PORT_OPTION -j $ACTION"
-    echo "Regola iptables:"
-    echo "$iptables_cmd"
+# Traduci l'azione per nftables
+nft_action=$(translate_action "$ACTION")
+if [ $? -ne 0 ]; then
+    exit 1
+fi
 
-    # Aggiungi la regola in nftables
-    nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION dport $DST_PORT_OPTION $nft_action"
-    echo "Regola nftables:"
-    echo "$nft_cmd"
+# Genera e mostra la regola iptables
+iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION -d $DST_ADDR --dport $DST_PORT_OPTION -j $ACTION"
+echo "Regola iptables:"
+echo "$iptables_cmd"
 
-    # Esegui i comandi (facoltativo, togliere i commenti per eseguire)
-    # eval "$iptables_cmd"
-    # eval "$nft_cmd"
+# Genera e mostra la regola nftables
+nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION $nft_action"
+echo "Regola nftables:"
+echo "$nft_cmd"
 
-    # Se tutto è andato a buon fine, esci dal loop
-    break
-done
+# Se vuoi applicare direttamente le regole, rimuovi i commenti dalle righe seguenti:
+# eval "$iptables_cmd"
+# eval "$nft_cmd"
+
