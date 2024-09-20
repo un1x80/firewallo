@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source /etc/firewallo/firewallo.conf
 # Elenco delle catene valide
 valid_chains=(
     "dmz2lan" "fw2dmz" "fw2vpns" "lan2fw" "lan2wan" "vpns2lan" "wan2dmz" "wan2vpns"
@@ -67,7 +67,7 @@ translate_action() {
 # Controllo che il numero di argomenti sia corretto
 if [ "$#" -ne 7 ]; then
     echo "Errore: numero di argomenti non corretto."
-    echo "Uso: ./script.sh <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
+    echo "Uso: $0 <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
     exit 0  # Esce solo dal controllo ma non termina la shell
 fi
 
