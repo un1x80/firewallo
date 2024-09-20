@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source /etc/firewallo/firewallo.conf
 # Elenco delle catene valide
 valid_chains=(
     "dmz2lan" "fw2dmz" "fw2vpns" "lan2fw" "lan2wan" "vpns2lan" "wan2dmz" "wan2vpns"
@@ -37,7 +37,7 @@ validate_ip_cidr() {
 parse_port_range() {
     local port_range="$1"
     if [[ "$port_range" == "any" ]]; then
-        echo "1-65535"
+        echo "1:65535"
     elif [[ "$port_range" =~ ^([0-9]+):([0-9]+)$ ]]; then
         echo "$port_range" | sed 's/:/-/' # Trasforma "100:200" in "100-200"
     else
@@ -65,9 +65,9 @@ translate_action() {
 }
 
 # Controllo che il numero di argomenti sia corretto
-if [ "$#" -ne 7 ]; then
+if [ "$#" -ne 6 ]; then
     echo "Errore: numero di argomenti non corretto."
-    echo "Uso: ./script.sh <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
+    echo "Uso: $0 <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
     exit 1
 fi
 
@@ -113,17 +113,24 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+if [ "$IPT" != "" ]; then
 # Genera e mostra la regola iptables
 iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION -d $DST_ADDR --dport $DST_PORT_OPTION -j $ACTION"
 echo "Regola iptables:"
-echo "$iptables_cmd"
+echo "$iptables_cmd" 
+echo "$iptables_cmd" >> /etc/firewallo/filter/$CHAIN_SELECTED 
 
+# applicare le regole ho scoperto eval :-)
+eval "$iptables_cmd"
+
+
+elif [ "$NFT" != "" ] ; then
 # Genera e mostra la regola nftables
 nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
+echo "$nft_cmd" >> /etc/firewallo/filter/$CHAIN_SELECTED 
 
-# Se vuoi applicare direttamente le regole, rimuovi i commenti dalle righe seguenti:
-# eval "$iptables_cmd"
-# eval "$nft_cmd"
-
+# applicare le regole ho scoperto eval :-)
+eval "$nft_cmd"
+fi
