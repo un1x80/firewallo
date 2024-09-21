@@ -199,6 +199,7 @@ main
 
 #Funzione di salvataggio della configurazione di iptables/nftables ed enable del servizio su systemd
 saveconf () {
+restart
 if [ "$IPT" != "" ] ; then
 	echo "$SAVECONF_IPT_NFT"
 	echo '
