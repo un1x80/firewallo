@@ -242,11 +242,11 @@ main_menu() {
                 configure_firewall "$client_ip" "$allowed_ips"
                 ;;
             3)
-                list_wireguard_users
+                clear ; list_wireguard_users
                 ;;
             4)
                 read -rp "Inserisci il nome dell'utente da controllare: " username
-                check_wireguard_user_status "$username"
+                clear ; check_wireguard_user_status "$username"
                 ;;
             5)
                 read -rp "Inserisci il nome dell'utente da eliminare: " username
