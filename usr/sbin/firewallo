@@ -208,8 +208,8 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c "/sbin/iptables-nft-restore < /etc/iptables/rules.v4"
-ExecStartPost=/bin/bash -c "/sbin/ip6tables-nft-restore < /etc/iptables/rules.v6"
+ExecStart=/bin/bash -c "/sbin/iptables-restore < /etc/iptables/rules.v4"
+#ExecStartPost=/bin/bash -c "/sbin/ip6tables-restore < /etc/iptables/rules.v6"
 RemainAfterExit=yes
 
 [Install]
@@ -219,7 +219,7 @@ WantedBy=multi-user.target
 	systemctl disable nftables.service
 	systemctl enable  iptables-restore.service
 	if  [ ! -e /etc/iptables ]  ; then mkdir /etc/iptables/ ; fi
-	iptables-nft-save > /etc/iptables/rules.v4
+	iptables-save > /etc/iptables/rules.v4
 	chmod 644 /etc/iptables/rules.v4
 	echo "..OK"
 elif [ "$NFT" != ""  ] ; then
@@ -243,13 +243,18 @@ select opt1 in $MENU1 ; do
 		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf #vuoto iptables in firewallo.conf
 		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf #vuoto anche nft 
 		printf 'NFT=\"/usr/sbin/nft\"' >> $DIRCONF/firewallo.conf #risetto nft
+		update-alternatives --set iptables /usr/sbin/iptables-nft
+		systemctl enable nftables.service
 		return
         elif [ "$opt1" = "iptables" ] ; then #Se selezioni iptables
         export NFT=""; #Svuoto NFT
 		export IPT="/sbin/iptables" #Setto iptables
 		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf #Vuoto iptables e anche nft
 		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf #
-                printf 'IPT=\"/sbin/iptables\"' >> $DIRCONF/firewallo.conf #Setto iptables
+        printf 'IPT=\"/sbin/iptables\"' >> $DIRCONF/firewallo.conf #Setto iptables
+		update-alternatives --set iptables /usr/sbin/iptables-legacy
+		systemctl disable nftables.service
+		systemctl enable  iptables-restore.service
 		return
         fi
 done
