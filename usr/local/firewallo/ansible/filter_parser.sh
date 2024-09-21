@@ -115,7 +115,7 @@ if [ "$IPT" != "" ]; then
 iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION -d $DST_ADDR --dport $DST_PORT_OPTION -j $ACTION"
 echo "Regola iptables:"
 echo "$iptables_cmd" 
-echo "$iptables_cmd" >> /etc/firewallo/filter/$CHAIN_SELECTED 
+echo "$iptables_cmd" | cat - /etc/firewallo/filter/$CHAIN_SELECTED > temp && mv temp /etc/firewallo/filter/$CHAIN_SELECTED
 
 # applicare le regole ho scoperto eval :-)
 eval "$iptables_cmd"
@@ -126,8 +126,7 @@ elif [ "$NFT" != "" ] ; then
 nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
-echo "$nft_cmd" >> /etc/firewallo/filter/$CHAIN_SELECTED 
-
+echo "$nft_cmd" | cat - /etc/firewallo/filter/$CHAIN_SELECTED > temp && mv temp /etc/firewallo/filter/$CHAIN_SELECTED
 # applicare le regole ho scoperto eval :-)
 eval "$nft_cmd"
 fi
