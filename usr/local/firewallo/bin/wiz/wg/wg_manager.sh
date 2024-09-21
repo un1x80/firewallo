@@ -207,6 +207,7 @@ delete_wireguard_user() {
 
 # Funzione principale del menu
 main_menu() {
+    clear
     while true; do
         echo "Gestione WireGuard - Seleziona un'opzione:"
         echo "1) Configura il server WireGuard"
