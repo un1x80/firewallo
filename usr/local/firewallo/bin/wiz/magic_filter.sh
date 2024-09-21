@@ -78,7 +78,7 @@ validate_port() {
     fi
 }
 
-# Funzione per adattare i valori 'any' e 'range' per iptables e nftables
+# Funzione per adattare i valori 'any' e 'range' per iptables
 parse_port_range() {
     local port_range="$1"
     if [[ "$port_range" == "any" ]]; then

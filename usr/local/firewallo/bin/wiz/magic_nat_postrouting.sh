@@ -30,6 +30,16 @@ validate_ip_mask() {
         return 1  # non valido
     fi
 }
+# Funzione per validare un indirizzo IP con maschera
+validate_ip() {
+    local ip="$1"
+    if [[ "$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9] ]]; then
+        return 0  # valido
+    else
+        handle_error "$INVALID_SADDR"
+        return 1  # non valido
+    fi
+}
 
 # Funzione per validare la porta
 validate_port() {
@@ -58,7 +68,7 @@ configure_postrouting() {
     local srcip_mask="$1"
     local oif="$2"
     local type="$3"
-    local to_source_ip_mask="$4"
+    local to_source_ip="$4"
     local dport="$5"
     local comment="$6"
 
@@ -101,24 +111,24 @@ configure_postrouting() {
     if [ "$type" == "SNAT" ]; then
         if [ -z "$dport" ]; then
           if [ "$IPT" != "" ]; then
-            echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j SNAT --to-source \"$to_source_ip_mask\""
-            echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j SNAT --to-source \"$to_source_ip_mask\""\
+             echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j SNAT --to-source \"$to_source_ip\""
+             echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -j SNAT --to-source \"$to_source_ip\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
            elif [ "$NFT" != "" ]; then
-            echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"$to_source_ip_mask\""
-            echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"$to_source_ip_mask\""\
+             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"$to_source_ip\""
+             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"$to_source_ip\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
            else
-            echo $INT_ERROR_MSG
+             echo $INT_ERROR_MSG
           fi
         else
             if [ "$IPT" != "" ]; then
-            echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip_mask\""
-             echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip_mask\""\
+             echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip\""
+             echo "iptables -t nat -A POSTROUTING -s \"$srcip_mask\" -o \"$oif\" -p tcp --dport \"$dport\" -j SNAT --to-source \"$to_source_ip\""\
                 | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             elif [ "$NFT" != "" ]; then
-             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"to_source_ip_mask\""
-             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"to_source_ip_mask\""\
+             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"$to_source_ip\""
+             echo "nft add rule ip nat POSTROUTING ip saddr \"$srcip_mask\" oif \"$oif\" tcp dport \"$dport\" log prefix \\\" POSTROUTING $comment : \\\" counter snat to \"$to_source_ip\""\
               | cat - $DIRCONF/nat/firewallo.nat > temp && mv temp $DIRCONF/nat/firewallo.nat
             else
             echo $INT_ERROR_MSG
@@ -182,10 +192,10 @@ ask_for_parameters() {
     if [ "$type" == "SNAT" ]; then
         while true; do
             read -e -p "$SNAT_SOURCE_IP_PROMPT" to_source_ip_mask
-            validate_ip_mask "$to_source_ip_mask" && break
+            validate_ip "$to_source_ip" && break
         done
     else
-        to_source_ip_mask=""
+        to_source_ip=""
     fi
     while true; do
         read -e -p "$COMMENT_PROMPT" comment
@@ -196,7 +206,7 @@ ask_for_parameters() {
         fi
     done
     # Applicare la configurazione
-    configure_postrouting "$srcip_mask" "$oif" "$type" "$to_source_ip_mask" "$dport" "$comment"
+    configure_postrouting "$srcip_mask" "$oif" "$type" "$to_source_ip" "$dport" "$comment"
 }
 
 # Carica le traduzioni
