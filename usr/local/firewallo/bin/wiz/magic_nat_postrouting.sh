@@ -218,7 +218,7 @@ ask_for_parameters() {
     # Se il tipo è SNAT, chiedi l'indirizzo IP di destinazione
     if [ "$type" == "SNAT" ]; then
         while true; do
-            read -e -p "$SNAT_SOURCE_IP_PROMPT" to_source_ip_mask
+            read -e -p "$SNAT_SOURCE_IP_PROMPT" to_source_ip
             validate_ip "$to_source_ip" && break
         done
     else
