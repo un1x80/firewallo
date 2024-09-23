@@ -151,33 +151,33 @@ validate_ip_mask() {
 }
 
 #Funzione che valida l'ip senza maschera
-#validate_ip() {
-#    local ip="$1"
-#    
-#    # Verifica se l'indirizzo IP corrisponde al formato IPv4 senza maschera
-#    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-#        # Estrai i singoli byte dell'IP
- #       IFS='.' read -r -a octets <<< "$ip"
-#        
-#        # Controlla che ogni byte sia compreso tra 0 e 255
-#        for octet in "${octets[@]}"; do
-#            if ((octet < 0 || octet > 255)); then
-#                handle_error "$INVALID_ADDR"
-#                return 1  # Non valido
-#            fi
-#        done
-#        return 0  # Valido
-#    else
-#        handle_error "$INVALID_ADDR"
-#        return 1  # Non valido
-#    fi
-#}
-# Funzione per controllare la validità dell'indirizzo IP
 validate_ip() {
     local ip="$1"
-    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?$ ]]; then
-        return 0
+    
+    # Verifica se l'indirizzo IP corrisponde al formato IPv4 senza maschera
+    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        # Estrai i singoli byte dell'IP
+       IFS='.' read -r -a octets <<< "$ip"
+        
+        # Controlla che ogni byte sia compreso tra 0 e 255
+        for octet in "${octets[@]}"; do
+            if ((octet < 0 || octet > 255)); then
+                handle_error "$INVALID_ADDR"
+                return 1  # Non valido
+            fi
+        done
+        return 0  # Valido
     else
-        return 1
+        handle_error "$INVALID_ADDR"
+        return 1  # Non valido
     fi
 }
+# Funzione per controllare la validità dell'indirizzo IP
+#validate_ip() {
+#    local ip="$1"
+#    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?$ ]]; then
+#        return 0
+#    else
+#        return 1
+#    fi
+#}
