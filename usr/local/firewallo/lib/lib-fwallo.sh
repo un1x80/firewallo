@@ -162,14 +162,13 @@ validate_ip() {
         # Controlla che ogni byte sia compreso tra 0 e 255
         for octet in "${octets[@]}"; do
             if ((octet < 0 || octet > 255)); then
-                handle_error "$INVALID_SADDR"
+                handle_error "$INVALID_ADDR"
                 return 1  # Non valido
             fi
         done
-        
         return 0  # Valido
     else
-        handle_error "$INVALID_SADDR"
+        handle_error "$INVALID_ADDR"
         return 1  # Non valido
     fi
 }

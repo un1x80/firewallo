@@ -1,5 +1,6 @@
 # English
 LANG=en
+
 #Magic_filter
 SELECT_CHAIN_PROMPT="Select the chain from the following list:"
 CHAIN_SELECTED_MSG="You have selected the chain: %s"
@@ -14,6 +15,7 @@ ACTION_PROMPT="Enter the action (ACCEPT, DROP, REJECT):"
 IPT_RULE_MSG="iptables rule:"
 NFT_RULE_MSG="nftables rule:"
 INT_ERROR_MSG="Internal error: NFT or IPT not set!"
+
 #Magic_nat_postrouting
 SRCIP_MASK_PROMPT="Enter the source IP address (srcip) and mask (e.g., 192.168.1.0/24):"
 OIF_PROMPT="Enter the output interface (oif) (e.g., eth0):"
@@ -29,6 +31,7 @@ CONFIG_ERROR="Error in MASQUERADE configuration."
 SNAT_CONFIG_SUCCESS="SNAT configuration successfully completed."
 SNAT_CONFIG_ERROR="Error in SNAT configuration."
 ERROR_HANDLER_MASQ="Invalid selection. Please enter 1 for MASQUERADE or 2 for SNAT."
+
 #Magic_prerouting
 PREROUTING_CONFIG_PROMPT="PREROUTING configuration with iptables and nftables"
 SRCIP_MASK_PREROUTING_PROMPT="Enter the source IP address (srcip) and mask (e.g., 192.168.1.0/24):"
@@ -47,11 +50,11 @@ DNAT_CONFIG_SUCCESS="DNAT configuration successfully completed in iptables."
 DNAT_CONFIG_ERROR="Error in DNAT configuration in iptables."
 NFT_DNAT_CONFIG_SUCCESS="DNAT configuration successfully completed in nftables."
 NFT_DNAT_CONFIG_ERROR="Error in DNAT configuration in nftables."
-INVALID_SADDR="Invalid source address format. Please try again."
+INVALID_SADDR="Invalid address format. Please try again."
 ERROR_INVALID_ACTION="Invalid action. Please enter 'ACCEPT', 'DROP', or 'REJECT'."
-INVALID_DPORT="Invalid destination port. Please enter a valid port or 'any'."
-INVALID_DADDR="Invalid destination address format. Please try again."
-INVALID_SPORT="Invalid source port. Please enter a valid port or 'any'."
+INVALID_PORT="Invalid  port. Please enter a valid port or 'any'."
+INVALID_ADDR="Invalid  address format. Please try again."
+INVALID_SPORT="Invalid  port. Please enter a valid port or 'any'."
 INVALID_PROTO="Invalid protocol. Please enter 'tcp' or 'udp'."
 INVALID_INTERFACE="Invalid interface name."
 INVALID_TCP_UDP_CHOICE="Invalid Choice. Insert 1 for TCP or 2 for UDP."
