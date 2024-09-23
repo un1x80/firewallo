@@ -48,15 +48,7 @@ select_chain() {
     done
 }
 
-# Funzione per controllare la validità dell'indirizzo IP
-validate_ip() {
-    local ip="$1"
-    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?$ ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
+
 
 # Funzione per controllare la validità del protocollo
 validate_protocol() {
@@ -74,7 +66,29 @@ validate_port() {
     if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
         return 0
     else
-        return 1
+         handle_error "$INVALID_DPORT"
+        return 1  # non valido
+    fi
+}
+
+# Funzione per validare la porta
+validate_port() {
+    local port="$1"
+    if [[ "$port" =~ ^[0-9]+$ ]] || [[ "$port" == "any" ]] || [[ -z "$port" ]]; then
+        return 0  # valido
+    else
+       
+    fi
+}
+
+# Funzione per validare l'interfaccia di rete
+validate_oif() {
+    local oif="$1"
+    if [[ "$oif" =~ ^[a-zA-Z0-9]+$ ]]; then
+        return 0  # valido
+    else
+        handle_error "$INVALID_SELECTION_MSG"
+        return 1  # non valido
     fi
 }
 
@@ -120,3 +134,60 @@ translate_action() {
             ;;
     esac
 }
+#Funzione che valida l'ip con mashera
+validate_ip_mask() {
+    local ip_mask="$1"
+    
+    # Regex per IP validi (0-255) e maschera di rete valida (0-32)
+    if [[ "$ip_mask" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}/([0-9]|[12][0-9]|3[0-2])$ ]]; then
+        local ip="${ip_mask%/*}"
+        local mask="${ip_mask#*/}"
+
+        # Verifica che ogni ottetto dell'indirizzo IP sia compreso tra 0 e 255
+        IFS='.' read -r -a octets <<< "$ip"
+        for octet in "${octets[@]}"; do
+            if ((octet < 0 || octet > 255)); then
+                handle_error "$INVALID_SADDR"
+                return 1  # non valido
+            fi
+        done
+
+        return 0  # valido
+    else
+        handle_error "$INVALID_SADDR"
+        return 1  # non valido
+    fi
+}
+
+#Funzione che valida l'ip senza maschera
+validate_ip() {
+    local ip="$1"
+    
+    # Verifica se l'indirizzo IP corrisponde al formato IPv4 senza maschera
+    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
+        # Estrai i singoli byte dell'IP
+        IFS='.' read -r -a octets <<< "$ip"
+        
+        # Controlla che ogni byte sia compreso tra 0 e 255
+        for octet in "${octets[@]}"; do
+            if ((octet < 0 || octet > 255)); then
+                handle_error "$INVALID_SADDR"
+                return 1  # Non valido
+            fi
+        done
+        
+        return 0  # Valido
+    else
+        handle_error "$INVALID_SADDR"
+        return 1  # Non valido
+    fi
+}
+# Funzione per controllare la validità dell'indirizzo IP
+#validate_ip() {
+#    local ip="$1"
+#    if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}(/[0-9]{1,2})?$ ]]; then
+#        return 0
+#    else
+#        return 1
+#    fi
+#}
