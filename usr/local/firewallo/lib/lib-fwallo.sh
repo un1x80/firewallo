@@ -181,3 +181,13 @@ validate_ip() {
 #        return 1
 #    fi
 #}
+# Funzione per validare la porta anche vuota null
+validate_port_null() {
+    local port="$1"
+    if [[ "$port" =~ ^[0-9]+$ ]] || [[ "$port" == "any" ]] || [[ -z "$port" ]]; then
+        return 0  # valido
+    else
+        handle_error "$INVALID_DPORT"
+        return 1  # non valido
+    fi
+}

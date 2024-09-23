@@ -124,7 +124,7 @@ ask_for_parameters() {
     # Chiedi la porta e verifica
     while true; do
         read -e -p "$PORT_PROMPT" dport
-        validate_port "$dport" && break
+        validate_port_null "$dport" && break
     done
 
     # Se il tipo è SNAT, chiedi l'indirizzo IP di destinazione
