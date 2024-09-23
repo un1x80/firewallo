@@ -66,20 +66,11 @@ validate_port() {
     if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
         return 0
     else
-         handle_error "$INVALID_DPORT"
+        handle_error "$INVALID_PORT"
         return 1  # non valido
     fi
 }
 
-# Funzione per validare la porta
-validate_port() {
-    local port="$1"
-    if [[ "$port" =~ ^[0-9]+$ ]] || [[ "$port" == "any" ]] || [[ -z "$port" ]]; then
-        return 0  # valido
-    else
-       
-    fi
-}
 
 # Funzione per validare l'interfaccia di rete
 validate_oif() {
