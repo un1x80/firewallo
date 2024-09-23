@@ -1,24 +1,10 @@
 #!/bin/bash
 
-DIRCONF="/etc/firewallo"
-source $DIRCONF/firewallo.conf
+#Load library
+source /usr/local/firewallo/lib/lib-fwallo.sh
 
-# Carica il file di traduzione
-load_translations() {
-    local lang_file="$DIRCONF/lang/firewallo.lang.$LANG"
-    if [[ -f "$lang_file" ]]; then
-        source "$lang_file"
-    else
-        echo "LANG_NOT_FOUND"
-        exit 1
-    fi
-}
-
-# Funzione per mostrare un messaggio di errore e continuare
-handle_error() {
-    echo "$1" 1>&2
-    echo "$INVALID_SELECTION_MSG"
-}
+# Carica le traduzioni
+load_translations
 
 # Funzione per configurare le regole PREROUTING in iptables
 configure_iptables_prerouting() {
@@ -74,23 +60,16 @@ configure_nftables_prerouting() {
 ask_for_parameters() {
     echo "$PREROUTING_CONFIG_PROMPT"
     echo ""
-
+   
+    # Chiedi l'indirizzo IP di origine e verifica
     while true; do
         read -e -p "$SRCIP_MASK_PREROUTING_PROMPT" srcip_mask
-        if [[ "$srcip_mask" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+$ ]]; then
-            break
-        else
-            handle_error "$INVALID_SADDR"
-        fi
+        validate_ip_mask "$srcip_mask" && break
     done
 
     while true; do
         read -e -p "$IIF_PROMPT" iif
-        if [[ "$iif" =~ ^[a-zA-Z0-9]+$ ]]; then
-            break
-        else
-            handle_error "$INVALID_INTERFACE"
-        fi
+        validate_if "$iif" && break 
     done
 
     # Mostra il menu per la scelta del protocollo (tcp o udp)
@@ -118,29 +97,17 @@ ask_for_parameters() {
 
     while true; do
         read -e -p "$PORT_DEST_PROMPT" dport
-        if [[ "$dport" =~ ^[0-9]+$ ]] && [ "$dport" -ge 1 ] && [ "$dport" -le 65535 ]; then
-            break
-        else
-            handle_error "$INVALID_DPORT"
-        fi
+        validate_port $dport && break
     done
 
     while true; do
         read -e -p "$DEST_IP_PROMPT" to_dest_ip
-        if [[ "$to_dest_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            break
-        else
-            handle_error "$INVALID_DEST_IP_FORMAT"
-        fi
+        validate_ip $to_dest_ip && break
     done
 
     while true; do
         read -e -p "$DEST_PORT_PROMPT" to_dest_port
-        if [[ "$to_dest_port" =~ ^[0-9]+$ ]] && [ "$to_dest_port" -ge 1 ] && [ "$to_dest_port" -le 65535 ]; then
-            break
-        else
-            handle_error "$INVALID_DEST_PORT_FORMAT"
-        fi
+        validate_port $to_dest_port && break
     done
 
     while true; do
@@ -163,8 +130,7 @@ ask_for_parameters() {
     fi
 }
 
-# Carica le traduzioni
-load_translations
+
 
 # Eseguire la funzione per chiedere i parametri
 ask_for_parameters

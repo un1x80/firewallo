@@ -73,9 +73,9 @@ validate_port() {
 
 
 # Funzione per validare l'interfaccia di rete
-validate_oif() {
-    local oif="$1"
-    if [[ "$oif" =~ ^[a-zA-Z0-9]+$ ]]; then
+validate_if() {
+    local if="$1"
+    if [[ "$if" =~ ^[a-zA-Z0-9]+$ ]]; then
         return 0  # valido
     else
         handle_error "$INVALID_SELECTION_MSG"

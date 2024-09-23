@@ -95,7 +95,7 @@ ask_for_parameters() {
     # Chiedi l'interfaccia di uscita e verifica
     while true; do
         read -e -p "$OIF_PROMPT" oif
-        validate_oif "$oif" && break
+        validate_if "$oif" && break
     done
 
     # Mostra il menu per la scelta del tipo di masquerading
