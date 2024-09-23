@@ -12,10 +12,8 @@ select_chain
 # Chiedi i dettagli uno per uno all'utente con controlli
 while true; do
     read -e -p "$SOURCE_ADDR_PROMPT" SRC_ADDR
-    if validate_ip "$SRC_ADDR"; then
+    if validate_ip_mask "$SRC_ADDR"; then
         break
-    else
-        echo "$INVALID_SADDR"
     fi
 done
 
@@ -54,10 +52,8 @@ done
 
 while true; do
     read -e -p "$DST_ADDR_PROMPT" DST_ADDR
-    if validate_ip "$DST_ADDR"; then
+    if validate_ip_mask "$DST_ADDR"; then
         break
-    else
-        echo "$INVALID_DADDR"
     fi
 done
 
