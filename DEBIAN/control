@@ -3,6 +3,6 @@ Version: 24.9.1
 Section: utils
 Priority: optional
 Architecture: all
-Depends: bash (>= 4.0), coreutils, iptables, dialog, nano, vim
+Depends: bash (>= 4.0), coreutils, iptables, nano
 Maintainer: Matteo Fioriti <fioritim@gmail.com>
 Description: Firewallo is a firewall manager for Debian GNU/Linux that user iptables or nftables.
