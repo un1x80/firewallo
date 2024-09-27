@@ -14,7 +14,12 @@ file_path="$DIRCONF/filter/$1"
         exit 1
     fi
 }
-
+show_ports() {
+    echo -e "\n--- Porte attuali ---"
+    echo "TCP: $TCPPORT"
+    echo "UDP: $UDPPORT"
+    echo "---------------------"
+}
 # Funzione per mostrare il menu all'utente
 show_menu_add_remove() {
     echo "Gestione porte TCP/UDP:"
@@ -27,11 +32,15 @@ show_menu_add_remove() {
 }
 
 # Funzione per aggiornare il file
+#update_file() {
+#    echo "TCPPORT=\"$TCPPORT\"" > "$file_path"
+#    echo "UDPPORT=\"$UDPPORT\"" >> "$file_path"
+#}
 update_file() {
-    echo "TCPPORT=\"$TCPPORT\"" > "$file_path"
-    echo "UDPPORT=\"$UDPPORT\"" >> "$file_path"
+    # Modifica le variabili direttamente nel file
+    sed -i "s/^TCPPORT=.*/TCPPORT=\"$TCPPORT\"/" "$file_path"
+    sed -i "s/^UDPPORT=.*/UDPPORT=\"$UDPPORT\"/" "$file_path"
 }
-
 # Funzione per aggiungere una porta o un range
 add_port() {
     local protocol=$1
@@ -71,8 +80,7 @@ manage_ports() {
 
     while true; do
         clear
-        echo "Porte TCP attuali: $TCPPORT"
-        echo "Porte UDP attuali: $UDPPORT"
+        show_ports
         show_menu_add_remove
         read -p "Seleziona un'opzione: " choice
 
