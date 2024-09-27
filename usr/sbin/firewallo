@@ -101,9 +101,9 @@ select opt in $MENU ; do
 			fi			
 		else
 			# Esegui la lettura delle variabili dal file
-			read_variables
+			read_variables "$opt"
 			# Avvia la gestione delle porte
-			manage_ports
+			manage_ports 
 			#$DIALOG $DIRCONF/filter/$opt 
 		fi
 	fi
