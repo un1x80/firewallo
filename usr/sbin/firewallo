@@ -8,7 +8,8 @@ DIRCONF="/etc/firewallo"
 DIRBIN="/usr/local/firewallo/bin"
 DIRLIB="/usr/local/firewallo/lib"
 source $DIRCONF/firewallo.conf
-source $DIRLIB/lib-fwallo.sh
+source $DIRLIB/lib-wiz.sh
+source $DIRLIB/lib-filter.sh
 
 DIALOG="nano" #setta qui l'editor vi , dialog o nano se è vuoto usa vi
 
