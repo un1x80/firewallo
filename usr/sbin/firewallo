@@ -400,10 +400,7 @@ done
 main () {
 clear
 cat $DIRCONF/motd #Visualizza il banner motd
-echo "
-DEFAULT EDITOR: $DIALOG 
-###########################################
-"
+echo "DEFAULT EDITOR: $DIALOG --- MENU MAIN ---"
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo "You must set Backend select iptables o nftables"
 fi
