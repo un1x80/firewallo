@@ -106,7 +106,7 @@ manage_ports() {
                 ;;
             6)
                 echo "Uscita."
-                break
+                filter
                 ;;
             *)
                 echo "Scelta non valida!"
