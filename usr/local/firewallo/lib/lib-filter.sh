@@ -68,9 +68,11 @@ remove_port() {
 
 # Funzione principale di gestione delle porte
 manage_ports() {
+
+    while true; do
+        clear
         echo "Porte TCP attuali: $TCPPORT"
         echo "Porte UDP attuali: $UDPPORT"
-    while true; do
         show_menu_add_remove
         read -p "Seleziona un'opzione: " choice
 
@@ -96,7 +98,7 @@ manage_ports() {
                 ;;
             6)
                 echo "Uscita."
-                exit 0
+                break
                 ;;
             *)
                 echo "Scelta non valida!"
