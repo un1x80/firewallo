@@ -15,7 +15,7 @@ file_path="$DIRCONF/filter/$1"
     fi
 }
 show_ports() {
-    echo -e "\n--- Porte attuali ---"
+    echo -e "\n--- Porte attuali in $1---"
     echo "TCP: $TCPPORT"
     echo "UDP: $UDPPORT"
     echo "---------------------"
@@ -66,9 +66,9 @@ remove_port() {
 
     read -p "Inserisci la porta o il range da rimuovere ($protocol, es. 80 o 100:200): " port_to_remove
 
-    # Verifica che la porta o il range sia presente e poi la rimuove
+    # Verifica se la porta o il range esiste
     if [[ " ${!ports_var} " =~ " ${port_to_remove} " ]]; then
-        eval "$ports_var=\"\$(echo \${$ports_var} | sed 's/\b$port_to_remove\b//g')\""
+        eval "$ports_var=\"\$(echo \${$ports_var} | sed 's/\b$port_to_remove\b//g' | xargs)\""
         echo "Porta o range $port_to_remove rimosso con successo da $protocol."
     else
         echo "La porta o il range $port_to_remove non è presente in $protocol."
