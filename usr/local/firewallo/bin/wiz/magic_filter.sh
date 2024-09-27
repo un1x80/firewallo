@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Load library
-source /usr/local/firewallo/lib/lib-fwallo.sh
+source /usr/local/firewallo/lib/lib-wiz.sh
 
 # Carica le traduzioni
 load_translations

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /usr/local/firewallo/lib/lib-fwallo.sh
+source /usr/local/firewallo/lib/lib-wiz.sh
 
 # Funzione per configurare le regole POSTROUTING
 configure_postrouting() {
