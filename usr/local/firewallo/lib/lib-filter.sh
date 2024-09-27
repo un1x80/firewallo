@@ -56,18 +56,29 @@ add_port() {
 # Funzione per rimuovere una porta o un range
 remove_port() {
     local protocol=$1
-    local ports_var=$2
+    local ports_var_name=$2
     local port_to_remove
+
+    # Ottieni il valore attuale delle porte
+    ports_var_value=$(eval echo \$$ports_var_name)
 
     read -p "Inserisci la porta o il range da rimuovere ($protocol, es. 80 o 100:200): " port_to_remove
 
-    # Verifica se la porta o il range esiste nella variabile
-    if [[ " ${!ports_var} " =~ " ${port_to_remove} " ]]; then
-        # Rimuovi la porta/range con sed, assicurandoti che gli spazi in eccesso vengano gestiti
-        eval "$ports_var=\"\$(echo \${$ports_var} | sed -e 's/\b$port_to_remove\b//g' -e 's/  */ /g' -e 's/^ *//g' -e 's/ *\$//g')\""
-        echo "Porta o range $port_to_remove rimosso con successo da $protocol." ; echo "ENTER..." ; read INVIO
+    # Verifica se la porta o il range esiste
+    if [[ " ${ports_var_value} " =~ " ${port_to_remove} " ]]; then
+        # Rimuove la porta o il range e ripulisce gli spazi in eccesso
+        ports_var_value=$(echo "$ports_var_value" | sed -e "s/\b$port_to_remove\b//g" -e 's/  */ /g' -e 's/^ *//g' -e 's/ *$//g')
+
+        # Assegna il nuovo valore alla variabile corretta (TCPPORT o UDPPORT)
+        if [[ "$protocol" == "TCP" ]]; then
+            TCPPORT="$ports_var_value"
+        elif [[ "$protocol" == "UDP" ]]; then
+            UDPPORT="$ports_var_value"
+        fi
+
+        echo "Porta o range $port_to_remove rimosso con successo da $protocol."
     else
-        echo "La porta o il range $port_to_remove non è presente in $protocol." ;  echo "ENTER..." ; read INVIO
+        echo "La porta o il range $port_to_remove non è presente in $protocol."
     fi
 }
 
