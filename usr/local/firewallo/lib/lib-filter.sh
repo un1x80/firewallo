@@ -7,6 +7,7 @@ source $DIRCONF/firewallo.conf
 read_variables() {
 # Definisce il percorso del file passato per variabile
 file_path="$DIRCONF/filter/$1"
+CATENA=$1
     if [[ -f "$file_path" ]]; then
         source "$file_path"
     else
@@ -15,10 +16,10 @@ file_path="$DIRCONF/filter/$1"
     fi
 }
 show_ports() {
-    echo -e "\n--- Porte attuali in $1---"
+    echo -e "\n--- Porte attuali in $CATENA ---"
     echo "TCP: $TCPPORT"
     echo "UDP: $UDPPORT"
-    echo "---------------------"
+    echo "----------------------------------"
 }
 # Funzione per mostrare il menu all'utente
 show_menu_add_remove() {
@@ -102,7 +103,7 @@ manage_ports() {
                 update_file
                 ;;
             3)
-                remove_port "TCP" "UDPPORT"
+                remove_port "TCP" "TCPPORT"
                 update_file
                 ;;
             4)
