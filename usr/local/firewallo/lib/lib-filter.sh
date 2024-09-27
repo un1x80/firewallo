@@ -31,11 +31,6 @@ show_menu_add_remove() {
     echo "6) Esci"
 }
 
-# Funzione per aggiornare il file
-#update_file() {
-#    echo "TCPPORT=\"$TCPPORT\"" > "$file_path"
-#    echo "UDPPORT=\"$UDPPORT\"" >> "$file_path"
-#}
 update_file() {
     # Modifica le variabili direttamente nel file
     sed -i "s/^TCPPORT=.*/TCPPORT=\"$TCPPORT\"/" "$file_path"
@@ -66,12 +61,13 @@ remove_port() {
 
     read -p "Inserisci la porta o il range da rimuovere ($protocol, es. 80 o 100:200): " port_to_remove
 
-    # Verifica se la porta o il range esiste
+    # Verifica se la porta o il range esiste nella variabile
     if [[ " ${!ports_var} " =~ " ${port_to_remove} " ]]; then
-        eval "$ports_var=\"\$(echo \${$ports_var} | sed 's/\b$port_to_remove\b//g' | xargs)\""
-        echo "Porta o range $port_to_remove rimosso con successo da $protocol."
+        # Rimuovi la porta/range con sed, assicurandoti che gli spazi in eccesso vengano gestiti
+        eval "$ports_var=\"\$(echo \${$ports_var} | sed -e 's/\b$port_to_remove\b//g' -e 's/  */ /g' -e 's/^ *//g' -e 's/ *\$//g')\""
+        echo "Porta o range $port_to_remove rimosso con successo da $protocol." ; echo "ENTER..." ; read INVIO
     else
-        echo "La porta o il range $port_to_remove non è presente in $protocol."
+        echo "La porta o il range $port_to_remove non è presente in $protocol." ;  echo "ENTER..." ; read INVIO
     fi
 }
 
