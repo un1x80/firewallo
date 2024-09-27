@@ -5,8 +5,10 @@
 #Setup preliminare
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
-DIRBIN="/usr/local/firewallo/bin/"
+DIRBIN="/usr/local/firewallo/bin"
+DIRLIB="/usr/local/firewallo/lib"
 source $DIRCONF/firewallo.conf
+source $DIRLIB/lib-fwallo.sh
 
 DIALOG="nano" #setta qui l'editor vi , dialog o nano se è vuoto usa vi
 
@@ -77,14 +79,15 @@ conf () {
 
 #Funzione di editing del table Filter
 filter () {
-MENU="
-fw2fw	fw2lan		fw2wan		fw2vpns		fw2dmz		\
-lan2fw	lan2lan		lan2wan		lan2vpns 	lan2dmz  	\
-wan2fw	wan2lan		wan2wan		wan2vpns 	wan2dmz   	\
-vpns2fw	vpns2lan	vpns2wan	vpns2vpns 	vpns2dmz 	\
-dmz2fw	dmz2lan		dmz2wan		dmz2vpns 	dmz2dmz 	\
-exit"
-
+#MENU="
+#fw2fw	fw2lan		fw2wan		fw2vpns		fw2dmz		\
+#lan2fw	lan2lan		lan2wan		lan2vpns 	lan2dmz  	\
+#wan2fw	wan2lan		wan2wan		wan2vpns 	wan2dmz   	\
+#vpns2fw	vpns2lan	vpns2wan	vpns2vpns 	vpns2dmz 	\
+#dmz2fw	dmz2lan		dmz2wan		dmz2vpns 	dmz2dmz 	\
+#exit"
+#Funzione da lib-fwallo.sh
+select_chain 
 select opt in $MENU ; do
 	if [ "$opt" = "exit" ] ; then
 		main 
