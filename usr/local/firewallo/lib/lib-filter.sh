@@ -76,11 +76,13 @@ remove_port() {
             UDPPORT="$ports_var_value"
         fi
 
-        echo "Porta o range $port_to_remove rimosso con successo da $protocol."
+        echo "Porta o range $port_to_remove rimosso con successo da $protocol." ; echo "ENTER..." ; read INVIO
     else
-        echo "La porta o il range $port_to_remove non è presente in $protocol."
+        echo "La porta o il range $port_to_remove non è presente in $protocol." ; echo "ENTER..." ; read INVIO
     fi
 }
+
+
 
 # Funzione principale di gestione delle porte
 manage_ports() {
