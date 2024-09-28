@@ -347,22 +347,22 @@ echo "##############END RESET################"
 case "$1" in
    'start')
 printf "\nStarting firewall..."
-start "" 1> $LOGF 2>> $LOGF
+start "" > $LOGF   2>&1
 printf "... ok\n"
 ;;
    'stop')
 printf "\nTerminating firewall..."
-stop "" 1> $LOGF 2>> $LOGF
+stop "" > $LOGF  2>&1
 printf "... ok\n"
  ;;
     'restart')
-    $0 stop  2> $LOGF
-    $0 start 2>> $LOGF
+    $0 stop  >  $LOGF  2>&1
+    $0 start >> $LOGF  2>&1
 ;;
 
 'reset')
 printf "\nResetting firewall..."
-reset ""   1> $LOGF 2>> $LOGF
+reset ""   > $LOGF  2>&1
 printf "... ok\n"
 ;;
    *)
