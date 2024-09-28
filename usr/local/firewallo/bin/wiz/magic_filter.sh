@@ -81,7 +81,7 @@ while true; do
 done
 while true; do
     read -e -p "$COMMENT_PROMPT" comment
-    comment=$(echo $commet| tr -s " " "_")
+    comment=$(echo $comment| tr -s " " "_")
         if [[ "$comment" =~ ^[a-zA-Z0-9_]+$ ]]; then
         break
     else
