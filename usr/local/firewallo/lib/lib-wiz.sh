@@ -12,7 +12,9 @@ load_translations() {
         echo "LANG_NOT_FOUND"
         exit 1
     fi
-}
+};load_translations
+#Infatti carico subito le traduzioni
+
 
 handle_error() {
     echo "$1" 1>&2
@@ -24,11 +26,11 @@ handle_error() {
 select_chain() {
     echo "$SELECT_CHAIN_PROMPT"
     CHAINS=(
-        fw2fw	fw2lan	fw2wan	fw2vpns	    fw2dmz \
-        lan2fw	lan2lan	lan2wan	lan2vpns	lan2dmz \
-        wan2fw	wan2lan	wan2wan	wan2vpns	wan2dmz \
-        vpns2fw	vpns2lan	vpns2wan	vpns2vpns	vpns2dmz \
-        dmz2fw	dmz2lan	dmz2wan	dmz2vpns	dmz2dmz \
+        fw2fw	fw2lan	    fw2wan	    fw2vpns	    fw2dmz      \
+        lan2fw	lan2lan	    lan2wan	    lan2vpns	lan2dmz     \
+        wan2fw	wan2lan	    wan2wan	    wan2vpns	wan2dmz     \      
+        vpns2fw	vpns2lan	vpns2wan	vpns2vpns	vpns2dmz    \
+        dmz2fw	dmz2lan	    dmz2wan	    dmz2vpns	dmz2dmz     \
         exit
     )
 
@@ -191,3 +193,4 @@ validate_port_null() {
         return 1  # non valido
     fi
 }
+

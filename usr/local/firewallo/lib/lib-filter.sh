@@ -12,7 +12,8 @@ load_translations() {
         echo "LANG_NOT_FOUND"
         exit 1
     fi
-}
+};load_translations 
+#Infatti carico subito le traduzioni
 
 handle_error() {
     echo "$1" 1>&2
