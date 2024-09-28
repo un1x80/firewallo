@@ -6,8 +6,12 @@ source /usr/local/firewallo/lib/lib-wiz.sh
 # Carica le traduzioni
 load_translations
 
-# Seleziona la catena
+# Seleziona la catena se non ti viene passata
+if [ "$1" = "" ] ; then
 select_chain
+elif [ "$1 != " ] ; then
+CHAIN_SELECTED=$1
+fi
 
 # Chiedi i dettagli uno per uno all'utente con controlli
 while true; do

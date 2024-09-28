@@ -29,7 +29,8 @@ show_menu_add_remove() {
     echo "3) Rimuovi una porta o un range TCP"
     echo "4) Aggiungi una porta o un range UDP"
     echo "5) Rimuovi una porta o un range UDP"
-    echo "6) Esci"
+    echo "6) Usa il Wizard per creare una regola complessa"
+    echo "7) Esci"
 }
 
 update_file() {
@@ -115,7 +116,12 @@ manage_ports() {
                 remove_port "UDP" "UDPPORT"
                 update_file
                 ;;
+            
             6)
+                $DIRBIN/wiz/magic_filter.sh $CATENA
+                filter
+                ;;
+            7)
                 echo "Uscita."
                 filter
                 ;;
