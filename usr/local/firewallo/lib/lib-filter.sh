@@ -118,6 +118,9 @@ manage_ports() {
                 ;;
             
             6)
+                clear
+                cat $DIRCONF/motd #Visualizza il banner motd
+                echo "AGGIUNGI REGOLA A $CATENA"
                 $DIRBIN/wiz/magic_filter.sh $CATENA
                 ;;
             7)
