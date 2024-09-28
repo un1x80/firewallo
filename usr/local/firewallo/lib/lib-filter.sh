@@ -119,7 +119,6 @@ manage_ports() {
             
             6)
                 $DIRBIN/wiz/magic_filter.sh $CATENA
-                filter
                 ;;
             7)
                 echo "Uscita."
