@@ -99,7 +99,7 @@ if [ "$IPT" != "" ] ; then
     #Così lo ficca in cima
     # echo "$iptables_cmd"| cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
     #così lo ficca infondo
-    printf  "\n$comment\n$iptables_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
+    printf  "\n#COMMENT:$comment\n$iptables_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
 elif [ "$NFT" != "" ]; then
@@ -114,7 +114,7 @@ elif [ "$NFT" != "" ]; then
     #Così lo ficca in cima
     #echo $nft_cmd | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
     #così lo ficca infondo
-    printf "\n$comment\n$nft_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
+    printf "\n#COMMENT:$comment\n$nft_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
 else
