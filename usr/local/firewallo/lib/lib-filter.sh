@@ -3,6 +3,22 @@
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
 
+# Carica il file di traduzione
+load_translations() {
+    local lang_file="$DIRCONF/lang/firewallo.lang.$LANG"
+    if [[ -f "$lang_file" ]]; then
+        source "$lang_file"
+    else
+        echo "LANG_NOT_FOUND"
+        exit 1
+    fi
+}
+
+handle_error() {
+    echo "$1" 1>&2
+    echo "$INVALID_SELECTION_MSG"
+}
+
 # Funzione per leggere le variabili dal file
 read_variables() {
 # Definisce il percorso del file passato per variabile
@@ -15,6 +31,17 @@ CATENA=$1
         exit 1
     fi
 }
+# Funzione per controllare la validità della porta
+validate_port() {
+    local port="$1"
+    if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
+        return 0
+    else
+        handle_error "$INVALID_PORT"
+        return 1  # non valido
+    fi
+}
+
 show_ports() {
     echo -e "\n--- Porte attuali in $CATENA ---"
     echo "TCP: $TCPPORT"
@@ -45,7 +72,7 @@ add_port() {
     local new_port
 
     read -p "Inserisci la porta o il range da aggiungere ($protocol, es. 80 o 100:200): " new_port
-
+    validate_port $newport 
     # Verifica che la porta o il range non sia già presente
     if [[ ! " ${!ports_var} " =~ " ${new_port} " ]]; then
         eval "$ports_var=\"\${$ports_var} \$new_port\""
