@@ -81,7 +81,7 @@ add_port() {
             echo "La porta o il range $new_port è già presente in $protocol."
         fi
     else 
-    handle_error "$INVALID_PORT"
+    handle_error "$INVALID_PORT" ; echo "PRESS ENTER ... " ; read ENTER
     fi
 }
 
