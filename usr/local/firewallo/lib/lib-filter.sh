@@ -150,7 +150,7 @@ manage_ports() {
 
         case $choice in
             1)
-                $DIALOG $file_path
+                $EDITOR $file_path
                 ;;
             2)
                 add_port "TCP" "TCPPORT"

@@ -75,7 +75,7 @@ conf () {
 filter () {
 clear
 cat $DIRCONF/motd #Visualizza il banner motd
-echo "--- FILTER MENU ---"
+echo " --- FILTER MENU ---"
 MENU="
 fw2fw	fw2lan		fw2wan		fw2vpns		fw2dmz		\
 lan2fw	lan2lan		lan2wan		lan2vpns 	lan2dmz  	\
