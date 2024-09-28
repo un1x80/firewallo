@@ -67,7 +67,7 @@ validate_port() {
     local port="$1"
     # Condizioni per uscire con "Exit", "exit", "Quit" o "quit"
     if [[ "$port" == "Exit" || "$port" == "exit" || "$port" == "Quit" || "$port" == "quit" ]]; then
-        return 1  # Uscita richiesta
+        break  # Uscita richiesta
     fi
     
     if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
@@ -84,7 +84,7 @@ validate_if() {
     local if="$1"
         # Condizioni per uscire con "Exit", "exit", "Quit" o "quit"
     if [[ "$if" == "Exit" || "$if" == "exit" || "$if" == "Quit" || "$if" == "quit" ]]; then
-        return 1  # Uscita richiesta
+        break  # Uscita richiesta
     fi
     if [[ "$if" =~ ^[a-zA-Z0-9]+$ ]]; then
         return 0  # valido
@@ -141,7 +141,7 @@ validate_ip_mask() {
     local ip_mask="$1"
         # Condizioni per uscire con "Exit", "exit", "Quit" o "quit"
     if [[ "$ip_mask" == "Exit" || "$ip_mask" == "exit" || "$ip_mask" == "Quit" || "$ip_mask" == "quit" ]]; then
-        return 1  # Uscita richiesta
+        break  # Uscita richiesta
     fi
     # Regex per IP validi (0-255) e maschera di rete valida (0-32)
     if [[ "$ip_mask" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}/([0-9]|[12][0-9]|3[0-2])$ ]]; then
@@ -169,7 +169,7 @@ validate_ip() {
     local ip="$1"
             # Condizioni per uscire con "Exit", "exit", "Quit" o "quit"
     if [[ "$ip" == "Exit" || "$ip" == "exit" || "$ip" == "Quit" || "$ip" == "quit" ]]; then
-        return 1  # Uscita richiesta
+        break  # Uscita richiesta
     fi
     # Verifica se l'indirizzo IP corrisponde al formato IPv4 senza maschera
     if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
@@ -203,7 +203,7 @@ validate_port_null() {
     local port="$1"
             # Condizioni per uscire con "Exit", "exit", "Quit" o "quit"
     if [[ "$port" == "Exit" || "$port" == "exit" || "$port" == "Quit" || "$port" == "quit" ]]; then
-        return 1  # Uscita richiesta
+        break  # Uscita richiesta
     fi
     if [[ "$port" =~ ^[0-9]+$ ]] || [[ "$port" == "any" ]] || [[ -z "$port" ]]; then
         return 0  # valido
