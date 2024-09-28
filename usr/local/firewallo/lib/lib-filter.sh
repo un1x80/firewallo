@@ -143,7 +143,7 @@ manage_ports() {
 
     while true; do
         clear
-        color_text "magenta" $(cat $DIRCONF/motd) #Visualizza il banner motd
+        cat $DIRCONF/motd #Visualizza il banner motd
         show_ports
         show_menu_add_remove
         read -p "Seleziona un'opzione: " choice
