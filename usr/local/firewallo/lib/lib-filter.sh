@@ -37,8 +37,7 @@ validate_port() {
     if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
         return 0
     else
-        handle_error "$INVALID_PORT"
-        exit 1  # non valido
+        return 1  # non valido
     fi
 }
 
@@ -73,12 +72,16 @@ add_port() {
 
     read -p "Inserisci la porta o il range da aggiungere ($protocol, es. 80 o 100:200): " new_port
     validate_port "$new_port" 
-    # Verifica che la porta o il range non sia già presente
-    if [[ ! " ${!ports_var} " =~ " ${new_port} " ]]; then
-        eval "$ports_var=\"\${$ports_var} \$new_port\""
-        echo "Porta o range $new_port aggiunto con successo a $protocol."
-    else
-        echo "La porta o il range $new_port è già presente in $protocol."
+    if [ "$?" = "0" ] ; then
+        # Verifica che la porta o il range non sia già presente
+        if [[ ! " ${!ports_var} " =~ " ${new_port} " ]]; then
+            eval "$ports_var=\"\${$ports_var} \$new_port\""
+            echo "Porta o range $new_port aggiunto con successo a $protocol."
+        else
+            echo "La porta o il range $new_port è già presente in $protocol."
+        fi
+    else 
+    handle_error "$INVALID_PORT"
     fi
 }
 
