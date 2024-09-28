@@ -67,7 +67,7 @@ validate_port() {
     local port="$1"
     # Condizioni per uscire con "Exit", "exit", "Quit" o "quit"
     if [[ "$port" == "Exit" || "$port" == "exit" || "$port" == "Quit" || "$port" == "quit" ]]; then
-        break  # Uscita richiesta
+        exit 1  # Uscita richiesta
     fi
     
     if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
