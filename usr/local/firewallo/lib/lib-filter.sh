@@ -71,14 +71,14 @@ show_ports() {
 }
 # Funzione per mostrare il menu all'utente
 show_menu_add_remove() {
-    echo "Gestione porte TCP/UDP:"
+    color_text "yellow" "Gestione porte TCP/UDP:"
     echo "1) Edita il file a mano"
     echo "2) Aggiungi una porta o un range TCP"
     echo "3) Rimuovi una porta o un range TCP"
     echo "4) Aggiungi una porta o un range UDP"
     echo "5) Rimuovi una porta o un range UDP"
     echo "6) Usa il Wizard per creare una regola complessa"
-    echo "7) Esci"
+    color_text "blue" "7) Esci"
 }
 
 update_file() {
@@ -143,7 +143,7 @@ manage_ports() {
 
     while true; do
         clear
-        cat $DIRCONF/motd #Visualizza il banner motd
+        color_text "magenta" $(cat $DIRCONF/motd) #Visualizza il banner motd
         show_ports
         show_menu_add_remove
         read -p "Seleziona un'opzione: " choice
