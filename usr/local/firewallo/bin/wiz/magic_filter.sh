@@ -81,7 +81,8 @@ while true; do
 done
 while true; do
     read -e -p "$COMMENT_PROMPT" comment
-    if [[ "$comment" =~ ^[a-zA-Z0-9_]+$ ]]; then
+    comment=$(echo $commet| tr -s " " "_")
+        if [[ "$comment" =~ ^[a-zA-Z0-9_]+$ ]]; then
         break
     else
         handle_error "$INVALID_COMMENT_FORMAT"
@@ -98,7 +99,7 @@ if [ "$IPT" != "" ] ; then
     #Così lo ficca in cima
     # echo "$iptables_cmd"| cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
     #così lo ficca infondo
-    echo "$iptables_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
+    printf  "\n$iptables_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
 elif [ "$NFT" != "" ]; then
@@ -113,7 +114,7 @@ elif [ "$NFT" != "" ]; then
     #Così lo ficca in cima
     #echo $nft_cmd | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
     #così lo ficca infondo
-    echo $nft_cmd >> $DIRCONF/filter/$CHAIN_SELECTED
+    printf "\n$nft_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
 else
