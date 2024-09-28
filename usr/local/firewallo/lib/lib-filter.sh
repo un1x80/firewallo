@@ -65,8 +65,8 @@ validate_port() {
 
 show_ports() {
     echo -e "\n--- Porte attuali in $CATENA ---"
-    color_text "yellow" "TCP: $TCPPORT"
-    color_text "blue" "UDP: $UDPPORT"
+    color_text "magenta" "TCP: $TCPPORT"
+    color_text "cyan" "UDP: $UDPPORT"
     echo "----------------------------------"
 }
 # Funzione per mostrare il menu all'utente

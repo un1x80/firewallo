@@ -11,21 +11,14 @@ source $DIRCONF/firewallo.conf
 source $DIRLIB/lib-wiz.sh
 source $DIRLIB/lib-filter.sh
 
-DIALOG="nano" #setta qui l'editor vi , dialog o nano se è vuoto usa vi
+EDITOR="nano" #setta qui l'editor vi o nano se è vuoto usa vi
 
-if [ "$DIALOG" = "" ] ; then
-	DIALOG="vi"
-	OPTS=""
-elif [ "$DIALOG" = "nano" ] ; then
-	DIALOG="nano"
-	OPTS=""
-elif [ "$DIALOG" = "dialog" ] ; then
-	DIALOG="dialog"
-	OPTS="0 0"
-
-elif [ "$DIALOG" = "vi" ] ; then
-	DIALOG="vi"
-	OPTS=""
+if [ "$EDITOR" = "" ] ; then
+	EDITOR="vi"
+elif [ "$EDITOR" = "nano" ] ; then
+	EDITOR="nano"
+elif [ "$EDITOR" = "vi" ] ; then
+	EDITOR="vi"
 fi
 
 # Carica il file di traduzione
@@ -41,41 +34,41 @@ load_translations() {
 
 #Funzione che apre in editor il contenuto di /etc/network/interfaces 
 networking () {
-    if [ "$DIALOG" = "dialog" ] ; then
-		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/network/interfaces  $OPTS  2> .tmp
-	    RETVAL=$?
-        if [ "$RETVAL" = "0" ]; then
-			cat .tmp >  /etc/network/interfaces ; rm .tmp        
-		fi
-	else
-		$DIALOG /etc/network/interfaces
-	fi
+    #if [ "$EDITOR" = "dialog" ] ; then
+	#	$EDITOR --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/network/interfaces  $OPTS  2> .tmp
+	#    RETVAL=$?
+    #    if [ "$RETVAL" = "0" ]; then
+	#		cat .tmp >  /etc/network/interfaces ; rm .tmp        
+	#	fi
+	#else
+		$EDITOR /etc/network/interfaces
+	#fi
 }
 
 #Funziona che apre in editor il file /etc/sysctl.conf
 sysctl  () {
-	if [ "$DIALOG" = "dialog" ] ; then
- 		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/sysctl.conf   $OPTS  2> .tmp
-    	RETVAL=$?
-        if [ "$RETVAL" = "0" ]; then
-        	cat .tmp >  /etc/sysctl.conf ; rm .tmp
-        fi     
-    else
-    	$DIALOG /etc/sysctl.conf
-    fi
+	#if [ "$EDITOR" = "dialog" ] ; then
+ 	#	$EDITOR --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/sysctl.conf   $OPTS  2> .tmp
+    # 	RETVAL=$?
+    #     if [ "$RETVAL" = "0" ]; then
+    #    	cat .tmp >  /etc/sysctl.conf ; rm .tmp
+    #    fi     
+    #else
+    	$EDITOR /etc/sysctl.conf
+    #fi
 }
 
 #Funzione che apre in editor il file di conf fi firewallo
 conf () {
-	if [ "$DIALOG" = "dialog" ] ; then
-		$DIALOG --backtitle CONFIGURATION_EDIT --title firewallo.conf --editbox $DIRCONF/firewallo.conf  $OPTS  2> .tmp 
-		RETVAL=$?
-       	if [ "$RETVAL" = "0" ]; then
-			cat .tmp > $DIRCONF/firewallo.conf ; rm .tmp
-		fi  
-    else
-  		$DIALOG $DIRCONF/firewallo.conf
-	fi
+	#if [ "$EDITOR" = "dialog" ] ; then
+	#	$EDITOR --backtitle CONFIGURATION_EDIT --title firewallo.conf --editbox $DIRCONF/firewallo.conf  $OPTS  2> .tmp 
+	#	RETVAL=$?
+    #   	if [ "$RETVAL" = "0" ]; then
+	#		cat .tmp > $DIRCONF/firewallo.conf ; rm .tmp
+	#	fi  
+    #else
+  		$EDITOR $DIRCONF/firewallo.conf
+	#fi
 }
 
 #Funzione di editing del table Filter
@@ -96,61 +89,61 @@ select opt in $MENU ; do
 	if [ "$opt" = "exit" ] ; then
 		main 
 	else
-		if [ "$DIALOG" = "dialog" ] ; then
-			$DIALOG --backtitle FILTER_EDIT --title $opt --editbox $DIRCONF/filter/$opt 		$OPTS 2> .tmp 
-			RETVAL=$?
-           	if [ "$RETVAL" = "0" ]; then
-				cat .tmp > $DIRCONF/filter/$opt ; rm .tmp
-			fi			
-		else
+		#if [ "$EDITOR" = "EDITOR" ] ; then
+		#	$EDITOR --backtitle FILTER_EDIT --title $opt --editbox $DIRCONF/filter/$opt 		$OPTS 2> .tmp 
+		#	RETVAL=$?
+        #   	if [ "$RETVAL" = "0" ]; then
+		#		cat .tmp > $DIRCONF/filter/$opt ; rm .tmp
+		#	fi			
+		#else
 			# Esegui la lettura delle variabili dal file
 			read_variables "$opt"
 			# Avvia la gestione delle porte
 			manage_ports "$opt"
-			#$DIALOG $DIRCONF/filter/$opt 
-		fi
+			#$EDITOR $DIRCONF/filter/$opt 
+		#fi
 	fi
 done
 }
 
 #Funzione di editing manuale del table Nat
 nat  () {
-	if [ "$DIALOG" = "dialog" ] ; then
-        $DIALOG --backtitle NAT_EDIT --title firewallo.nat --editbox $DIRCONF/nat/firewallo.nat  	  $OPTS 2> .tmp
-		RETVAL=$?
-    	if [ "$RETVAL" = "0" ]; then
-			cat .tmp > $DIRCONF/nat/firewallo.nat ; rm .tmp
-		fi
+	#if [ "$EDITOR" = "dialog" ] ; then
+    #    $EDITOR --backtitle NAT_EDIT --title firewallo.nat --editbox $DIRCONF/nat/firewallo.nat  	  $OPTS 2> .tmp
+	#	RETVAL=$?
+    #	if [ "$RETVAL" = "0" ]; then
+	#		cat .tmp > $DIRCONF/nat/firewallo.nat ; rm .tmp
+	#	fi
 
-	else
-		$DIALOG $DIRCONF/nat/firewallo.nat
-	fi
+	#else
+		$EDITOR $DIRCONF/nat/firewallo.nat
+	#fi
 }
 #Funzione di editing manuale del mangle
 mangle  () {
-	 if [ "$DIALOG" = "dialog" ] ; then
-		$DIALOG --backtitle MANGLE_EDIT --title firewallo.mangle --editbox $DIRCONF/mangle/firewallo.mangle $OPTS 2> .tmp
-	    RETVAL=$?
-        if [ "$RETVAL" = "0" ]; then
-			cat .tmp > $DIRCONF/mangle/firewallo.mangle ; rm .tmp
-		fi		
-    else
-		$DIALOG	$DIRCONF/mangle/firewallo.mangle
-	fi
+	#if [ "$EDITOR" = "dialog" ] ; then
+	#	$EDITOR --backtitle MANGLE_EDIT --title firewallo.mangle --editbox $DIRCONF/mangle/firewallo.mangle $OPTS 2> .tmp
+	#    RETVAL=$?
+    #    if [ "$RETVAL" = "0" ]; then
+	#		cat .tmp > $DIRCONF/mangle/firewallo.mangle ; rm .tmp
+	#	fi		
+    #else
+		$EDITOR	$DIRCONF/mangle/firewallo.mangle
+	#fi
 }
 
 #Funzione di editing manuale del routing
 route  () {
-	if [ "$DIALOG" = "dialog" ] ; then
-        $DIALOG --backtitle ROUTE_EDIT --title firewallo.route --editbox $DIRCONF/route/firewallo.route $OPTS 2> .tmp
-		RETVAL=$?
-        if [ "$RETVAL" = "0" ]; then
-		cat .tmp > $DIRCONF/route/firewallo.route ; rm .tmp
-		fi
+	#if [ "$EDITOR" = "dialog" ] ; then
+    #    $EDITOR --backtitle ROUTE_EDIT --title firewallo.route --editbox $DIRCONF/route/firewallo.route $OPTS 2> .tmp
+	#	RETVAL=$?
+    #    if [ "$RETVAL" = "0" ]; then
+	#	cat .tmp > $DIRCONF/route/firewallo.route ; rm .tmp
+	#	fi
 
-	else
- 		$DIALOG $DIRCONF/route/firewallo.route
-	fi
+	#else
+ 		$EDITOR $DIRCONF/route/firewallo.route
+	#fi
 }
 
 #Funzione di start di Firewallo
@@ -278,12 +271,13 @@ done
 log_filter () { 
     echo "SELECT chains do you want to view"
 
-    MENU=("EXIT" "state" "icmp_good" "bad_tcp_flags" "POSTROUTING" "PREROUTING" "DROP" "OUTPUT_DROP" "INPUT_DROP" "FORWARD_DROP"  \
-          "fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" \
-          "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" \
-          "wan2fw" "wan2lan" "wan2wan" "wan2vpns" "wan2dmz" \
-          "vpns2fw" "vpns2lan" "vpns2wan" "vpns2vpns" "vpns2dmz" \
-          "dmz2fw" "dmz2lan" "dmz2wan" "dmz2vpns" "dmz2dmz" "nothing")
+    MENU=("fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" 			\
+          "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" 	\
+          "wan2fw" "wan2lan" "wan2wan" "wan2vpns" "wan2dmz" 	\
+          "vpns2fw" "vpns2lan" "vpns2wan" "vpns2vpns" "vpns2dmz"\
+          "dmz2fw" "dmz2lan" "dmz2wan" "dmz2vpns" "dmz2dmz"  	\
+		  "state" "icmp_good" "bad_tcp_flags" "nothing"			\
+		  "POSTROUTING" "PREROUTING" "DROP" "OUTPUT_DROP" "INPUT_DROP" "FORWARD_DROP" "EXIT")
 
     
     select opt in "${MENU[@]}"; do
@@ -402,7 +396,7 @@ done
 main () {
 clear
 cat $DIRCONF/motd #Visualizza il banner motd
-echo " DEFAULT EDITOR: $DIALOG --- MENU MAIN ---"
+echo " EDITOR: $EDITOR --- MENU MAIN ---"
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo "You must set Backend select iptables o nftables"
 fi
