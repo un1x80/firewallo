@@ -2,6 +2,27 @@
 
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
+color_text() {
+    local color="$1"
+    local text="$2"
+
+    # Mappa dei colori
+    case "$color" in
+        black) color_code="30" ;;
+        red) color_code="31" ;;
+        green) color_code="32" ;;
+        yellow) color_code="33" ;;
+        blue) color_code="34" ;;
+        magenta) color_code="35" ;;
+        cyan) color_code="36" ;;
+        white) color_code="37" ;;
+        *) color_code="37" ;; # Default to white if color not found
+    esac
+
+    # Restituisce la stringa colorata con reset alla fine
+    echo -e "\e[${color_code}m${text}\e[0m"
+}
+
 
 # Carica il file di traduzione
 load_translations() {
@@ -17,7 +38,7 @@ load_translations() {
 
 handle_error() {
     echo "$1" 1>&2
-    echo "$INVALID_SELECTION_MSG"
+    color_text "red" "$INVALID_SELECTION_MSG"
 }
 
 # Funzione per leggere le variabili dal file
@@ -44,8 +65,8 @@ validate_port() {
 
 show_ports() {
     echo -e "\n--- Porte attuali in $CATENA ---"
-    echo "TCP: $TCPPORT"
-    echo "UDP: $UDPPORT"
+    color_text "yellow" "TCP: $TCPPORT"
+    color_text "blue" "UDP: $UDPPORT"
     echo "----------------------------------"
 }
 # Funzione per mostrare il menu all'utente
