@@ -98,8 +98,10 @@ if [ "$IPT" != "" ] ; then
     echo "$IPT_RULE_MSG" ; echo "$iptables_cmd"
     #Così lo ficca in cima
     # echo "$iptables_cmd"| cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
+    
     #così lo ficca infondo
-    printf  "\n#COMMENT:$comment\n$iptables_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
+    echo "#COMMENT:$comment
+    $iptables_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
 elif [ "$NFT" != "" ]; then
@@ -113,8 +115,11 @@ elif [ "$NFT" != "" ]; then
     echo "$NFT_RULE_MSG"; echo "$nft_cmd"
     #Così lo ficca in cima
     #echo $nft_cmd | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
+    
     #così lo ficca infondo
-    printf "\n#COMMENT:$comment\n$nft_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
+    echo  "
+    #COMMENT:$comment
+    $nft_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
 else
