@@ -88,15 +88,21 @@ while true; do
     fi
 done
 if [ "$IPT" != "" ] ; then
+    
     # Adatta le porte per iptables
     SRC_PORT_OPTION_IPT=$(parse_port_range_ipt "$SRC_PORT")
     DST_PORT_OPTION_IPT=$(parse_port_range_ipt "$DST_PORT")
     # Aggiungi la regola in iptables
     iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION_IPT -d $DST_ADDR --dport $DST_PORT_OPTION_IPT -j $ACTION"
     echo "$IPT_RULE_MSG" ; echo "$iptables_cmd"
-    echo "$iptables_cmd"| cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
+    #Così lo ficca in cima
+    # echo "$iptables_cmd"| cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
+    #così lo ficca infondo
+    echo "$iptables_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
+
 elif [ "$NFT" != "" ]; then
+    
     # Adatta le porte per nftables
     SRC_PORT_OPTION_NFT=$(parse_port_range_nft "$SRC_PORT")
     DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
@@ -104,7 +110,10 @@ elif [ "$NFT" != "" ]; then
     nft_action=$(translate_action "$ACTION")
     nft_cmd="nft \"add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT log prefix \\\"$CHAIN_SELECTED $comment : \\\" $nft_action\""
     echo "$NFT_RULE_MSG"; echo "$nft_cmd"
-    echo $nft_cmd | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
+    #Così lo ficca in cima
+    #echo $nft_cmd | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
+    #così lo ficca infondo
+    echo $nft_cmd >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
 else
