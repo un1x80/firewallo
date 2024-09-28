@@ -25,6 +25,7 @@ handle_error() {
 # Funzione per visualizzare le catene disponibili e permettere la selezione
 select_chain() {
     echo "$SELECT_CHAIN_PROMPT"
+    echo "Dio bestia"
     CHAINS=(
         fw2fw	fw2lan	    fw2wan	    fw2vpns	    fw2dmz      \
         lan2fw	lan2lan	    lan2wan	    lan2vpns	lan2dmz     \
