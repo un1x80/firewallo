@@ -38,7 +38,7 @@ validate_port() {
         return 0
     else
         handle_error "$INVALID_PORT"
-        return 1  # non valido
+        exit 1  # non valido
     fi
 }
 
@@ -72,7 +72,7 @@ add_port() {
     local new_port
 
     read -p "Inserisci la porta o il range da aggiungere ($protocol, es. 80 o 100:200): " new_port
-    validate_port $new_port 
+    validate_port "$new_port" 
     # Verifica che la porta o il range non sia già presente
     if [[ ! " ${!ports_var} " =~ " ${new_port} " ]]; then
         eval "$ports_var=\"\${$ports_var} \$new_port\""
