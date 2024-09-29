@@ -13,7 +13,7 @@
     - name: Estrarre il backup nella directory /etc/firewallo sovrascrivendo i file esistenti
       ansible.builtin.unarchive:
         src: /tmp/firewallo_backup.tar.gz
-        dest: /etc/firewallo
+        dest: /
         remote_src: yes
         extra_opts: [--overwrite]
       register: bck_ok
