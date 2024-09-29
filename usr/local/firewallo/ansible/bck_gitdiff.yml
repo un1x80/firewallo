@@ -43,12 +43,6 @@
         chdir: /var/ansible/firewallo/repo_bck/
       when: git_repo_check.rc != 0
 
-    - name: Configurare il remote origin (se non esiste già)
-      command: git remote add origin <your-remote-repository-url>
-      args:
-        chdir: /var/ansible/firewallo/repo_bck/
-      ignore_errors: yes  # Ignorare se il remote esiste già
-
     - name: Controllare se ci sono cambiamenti nei file del repository
       command: git status --porcelain
       args:
