@@ -117,10 +117,11 @@ elif [ "$NFT" != "" ]; then
     #echo $nft_cmd | cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
     
     #così lo ficca infondo
-    echo  "
-    #COMMENT:$comment
-    $nft_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
-    echo "PRESS ENTER TO CONTINUE..." ; read ENTER
+echo  "
+#COMMENT:$comment
+$nft_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
+
+echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
 else
     echo "$INT_ERROR_MSG" ;     echo "PRESS ENTER TO CONTINUE..." ; read ENTER

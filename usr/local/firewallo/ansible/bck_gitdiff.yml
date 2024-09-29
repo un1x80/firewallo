@@ -1,0 +1,53 @@
+---
+- name: Backup di /etc/firewallo e verifica modifiche con Git
+  hosts: firewallo
+  become: true  # Per eseguire i comandi con privilegi di root
+  tasks:
+
+    - name: Creare il backup della directory /etc/firewallo
+      ansible.builtin.command:
+        cmd: "tar -czf /tmp/firewallo_backup_{{ ansible_date_time.iso8601 }}.tar.gz /etc/firewallo"
+      args:
+        warn: false
+      register: backup_file_result
+
+    - name: Imposta il percorso del file di backup creato
+      set_fact:
+        backup_file: "{{ backup_file_result.stdout_lines[0] | default('/tmp/firewallo_backup_{{ ansible_date_time.iso8601 }}.tar.gz') }}"
+
+    - name: Copiare il file di backup nella macchina locale
+      fetch:
+        src: "{{ backup_file }}"
+        dest: "/var/ansible/firewallo/backup/"
+        flat: yes
+
+    - name: Copiare i file di /etc/firewallo nella directory del repository Git locale
+      copy:
+        src: /etc/firewallo/
+        dest: /var/ansible/firewallo/repo_bck/
+        remote_src: yes
+
+    - name: Controllare se ci sono cambiamenti nei file del repository
+      command: git status --porcelain
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      register: git_status_output
+      changed_when: git_status_output.stdout != ""
+
+    - name: Eseguire git add
+      command: git add -A
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      when: git_status_output.stdout != ""
+
+    - name: Eseguire git commit se ci sono cambiamenti
+      command: git commit -m "Aggiornamento backup firewallo"
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      when: git_status_output.stdout != ""
+
+    - name: Eseguire git push per inviare il commit al repository remoto
+      command: git push
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      when: git_status_output.stdout != ""

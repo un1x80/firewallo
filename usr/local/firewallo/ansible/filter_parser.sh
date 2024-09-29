@@ -71,9 +71,9 @@ translate_action() {
 }
 
 # Controllo che il numero di argomenti sia corretto
-if [ "$#" -ne 7 ]; then
+if [ "$#" -ne 8 ]; then
     echo "Errore: numero di argomenti non corretto."
-    echo "Uso: $0 <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT>"
+    echo "Uso: $0 <chain> <srcaddr/mask> <tcp|udp> <sport|range|any> <dstaddr/mask> <dport|range|any> <ACCEPT|DROP|REJECT> <comment>"
     exit 0  # Esce solo dal controllo ma non termina la shell
 fi
 
@@ -85,6 +85,7 @@ SRC_PORT="$4"
 DST_ADDR="$5"
 DST_PORT="$6"
 ACTION="$7"
+COMMENT="$8"
 
 # Verifica che la catena sia valida
 if [[ ! " ${valid_chains[@]} " =~ " ${CHAIN_SELECTED} " ]]; then
@@ -121,7 +122,11 @@ if [ "$IPT" != "" ]; then
 iptables_cmd="iptables -t filter -A $CHAIN_SELECTED -p $PROTOCOL -s $SRC_ADDR --sport $SRC_PORT_OPTION -d $DST_ADDR --dport $DST_PORT_OPTION -j $ACTION"
 echo "Regola iptables:"
 echo "$iptables_cmd" 
-echo "$iptables_cmd" | cat - /etc/firewallo/filter/$CHAIN_SELECTED > temp && mv temp /etc/firewallo/filter/$CHAIN_SELECTED
+#echo "$iptables_cmd" | cat - /etc/firewallo/filter/$CHAIN_SELECTED > temp && mv temp /etc/firewallo/filter/$CHAIN_SELECTED
+
+echo  "
+#COMMENT:$comment
+$iptables_cmd" >> /etc/firewallo/filter/$CHAIN_SELECTED
 
 # applicare le regole ho scoperto eval :-)
 eval "$iptables_cmd"
@@ -132,7 +137,14 @@ elif [ "$NFT" != "" ] ; then
 nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
-echo "$nft_cmd" | cat - /etc/firewallo/filter/$CHAIN_SELECTED > temp && mv temp /etc/firewallo/filter/$CHAIN_SELECTED
+#così lo ficca in cima
+#echo "$nft_cmd" | cat - /etc/firewallo/filter/$CHAIN_SELECTED > temp && mv temp /etc/firewallo/filter/$CHAIN_SELECTED
+
+#così lo ficca infondo
+echo  "
+#COMMENT:$comment
+$nft_cmd" >> /etc/firewallo/filter/$CHAIN_SELECTED
+
 # applicare le regole ho scoperto eval :-)
 eval "$nft_cmd"
 fi

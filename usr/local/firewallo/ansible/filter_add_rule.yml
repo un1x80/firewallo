@@ -6,11 +6,11 @@
 
     - name: Verifica se lo script firewall_parser.sh esiste
       stat:
-        path: /usr/local/bin/firewall_parser.sh
+        path: /usr/local/firewallo/ansible/filter_parser.sh
       register: firewall_script_stat
 
     - name: Esegui il parser per inserire una regola firewall
       command: >
-        /usr/local/bin/firewall_parser.sh {{ chain }} {{ srcaddr }} {{ protocol }} {{ sport }} {{ dstaddr }} {{ dport }} {{ action }} {{ comment }}
+        /usr/local/firewallo/ansible/filter_parser.sh {{ chain }} {{ srcaddr }} {{ protocol }} {{ sport }} {{ dstaddr }} {{ dport }} {{ action }} {{ comment }}
       args:
         chdir: /usr/local/bin
