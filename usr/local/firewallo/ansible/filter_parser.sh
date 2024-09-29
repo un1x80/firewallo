@@ -125,7 +125,7 @@ echo "$iptables_cmd"
 #echo "$iptables_cmd" | cat - /etc/firewallo/filter/$CHAIN_SELECTED > temp && mv temp /etc/firewallo/filter/$CHAIN_SELECTED
 
 echo  "
-#COMMENT:$comment
+#COMMENT:$COMMENT
 $iptables_cmd" >> /etc/firewallo/filter/$CHAIN_SELECTED
 
 # applicare le regole ho scoperto eval :-)
@@ -134,7 +134,7 @@ eval "$iptables_cmd"
 
 elif [ "$NFT" != "" ] ; then
 # Genera e mostra la regola nftables
-nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION $nft_action"
+nft_cmd="nft add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION $PROTOCOL dport $DST_PORT_OPTION log prefix \\\"$CHAIN_SELECTED : $COMMENT \\\" $nft_action"
 echo "Regola nftables:"
 echo "$nft_cmd"
 #così lo ficca in cima
@@ -142,7 +142,7 @@ echo "$nft_cmd"
 
 #così lo ficca infondo
 echo  "
-#COMMENT:$comment
+#COMMENT:$COMMENT
 $nft_cmd" >> /etc/firewallo/filter/$CHAIN_SELECTED
 
 # applicare le regole ho scoperto eval :-)
