@@ -39,7 +39,7 @@
       command: git config --global user.name "Your Name"
       args:
         chdir: /var/ansible/firewallo/repo_bck/
-        
+
     - name: Verifica se la directory è un repository Git
       command: git rev-parse --is-inside-work-tree
       args:
@@ -68,12 +68,6 @@
 
     - name: Eseguire git commit se ci sono cambiamenti
       command: git commit -m "Aggiornamento backup firewallo"
-      args:
-        chdir: /var/ansible/firewallo/repo_bck/
-      when: git_status_output.stdout != ""
-
-    - name: Eseguire git push per inviare il commit al repository remoto
-      command: git push -u origin master
       args:
         chdir: /var/ansible/firewallo/repo_bck/
       when: git_status_output.stdout != ""
