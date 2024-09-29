@@ -5,15 +5,13 @@
   tasks:
 
     - name: Creare il backup della directory /etc/firewallo
-      ansible.builtin.command:
+      ansible.builtin.command: 
         cmd: "tar -czf /tmp/firewallo_backup_{{ ansible_date_time.iso8601 }}.tar.gz /etc/firewallo"
-      args:
-        warn: false
       register: backup_file_result
 
     - name: Imposta il percorso del file di backup creato
       set_fact:
-        backup_file: "{{ backup_file_result.stdout_lines[0] | default('/tmp/firewallo_backup_{{ ansible_date_time.iso8601 }}.tar.gz') }}"
+        backup_file: "/tmp/firewallo_backup_{{ ansible_date_time.iso8601 }}.tar.gz"
 
     - name: Copiare il file di backup nella macchina locale
       fetch:
@@ -34,7 +32,7 @@
       register: git_status_output
       changed_when: git_status_output.stdout != ""
 
-    - name: Eseguire git add
+    - name: Eseguire git add se ci sono cambiamenti
       command: git add -A
       args:
         chdir: /var/ansible/firewallo/repo_bck/
