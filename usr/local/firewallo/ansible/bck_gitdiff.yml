@@ -19,15 +19,9 @@
         dest: "/var/ansible/firewallo/backup/"
         flat: yes
     
-    - name: Sincronizzare la directory /etc/firewallo nella macchina locale
-      synchronize:
-        mode: push  # Uso "push" per inviare i file dalla macchina remota alla macchina di controllo
-        src: /etc/firewallo/
-        dest: /var/ansible/firewallo/repo_bck/
-        delete: yes  # Elimina i file locali che non esistono più sulla sorgente remota
-        archive: yes
-        recursive: yes
-      delegate_to: localhost  # Sincronizza con il server Ansible
+    - name: Copiare la directory usando rsync
+      command: rsync -avz --delete /etc/firewallo/ localhost:/var/ansible/firewallo/repo_bck/
+      delegate_to: localhost
 
       
 - name: Esegui operazioni Git sulla macchina locale
