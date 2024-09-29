@@ -19,17 +19,16 @@
         dest: "/var/ansible/firewallo/backup/"
         flat: yes
     
-    - name: Scompattare il backup nella directory del repository Git
-      unarchive:
-        src: "{{ backup_file }}"
-        dest: "/var/ansible/firewallo/repo_bck/"
-        remote_src: yes  # Indica che il file si trova sul nodo remoto
-        extra_opts: [--overwrite]  # Opzione per sovrascrivere i file esistenti
+    - name: Scaricare la directory remota /etc/firewallo in locale
+      fetch:
+        src: /etc/firewallo/
+        dest: /var/ansible/firewallo/repo_bck/
+        flat: no  # Mantiene la struttura delle directory
       
 - name: Esegui operazioni Git sulla macchina locale
   hosts: localhost
   tasks:
-  
+
     - name: Verifica se la directory è un repository Git
       command: git rev-parse --is-inside-work-tree
       args:
