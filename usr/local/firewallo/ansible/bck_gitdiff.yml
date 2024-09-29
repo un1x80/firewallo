@@ -20,11 +20,10 @@
         flat: yes
 
     - name: Copiare i file di /etc/firewallo nella directory del repository Git locale
-      copy:
+      fetch:
         src: /etc/firewallo/
         dest: /var/ansible/firewallo/repo_bck/
-        remote_src: yes
-        force: yes  # Copia ricorsivamente i file e le directory
+        flat: yes
 
 - name: Esegui operazioni Git sulla macchina locale
   hosts: localhost
