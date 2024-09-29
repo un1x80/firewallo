@@ -30,6 +30,26 @@
 - name: Esegui operazioni Git sulla macchina locale
   hosts: localhost
   tasks:
+
+    - name: Verifica se la directory è un repository Git
+      command: git rev-parse --is-inside-work-tree
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      ignore_errors: yes
+      register: git_repo_check
+
+    - name: Inizializzare il repository Git se non esiste
+      command: git init
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      when: git_repo_check.rc != 0
+
+    - name: Configurare il remote origin (se non esiste già)
+      command: git remote add origin <your-remote-repository-url>
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      ignore_errors: yes  # Ignorare se il remote esiste già
+
     - name: Controllare se ci sono cambiamenti nei file del repository
       command: git status --porcelain
       args:
@@ -50,7 +70,8 @@
       when: git_status_output.stdout != ""
 
     - name: Eseguire git push per inviare il commit al repository remoto
-      command: git push
+      command: git push -u origin master
       args:
         chdir: /var/ansible/firewallo/repo_bck/
       when: git_status_output.stdout != ""
+      
