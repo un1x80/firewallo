@@ -1,6 +1,6 @@
 ---
 - name: Configura firewall utilizzando il parser
-  hosts: target_host
+  hosts: firewallo
   become: true  # Esegue i comandi con privilegi di root
   tasks:
 
@@ -9,15 +9,8 @@
         path: /usr/local/bin/firewall_parser.sh
       register: firewall_script_stat
 
-    - name: Copia il parser se non esiste
-      copy:
-        src: /path/to/local/firewall_parser.sh  # Percorso dello script nel sistema locale
-        dest: /usr/local/bin/firewall_parser.sh
-        mode: '0755'
-      when: not firewall_script_stat.stat.exists
-
     - name: Esegui il parser per inserire una regola firewall
       command: >
-        /usr/local/bin/firewall_parser.sh {{ chain }} {{ srcaddr }} {{ protocol }} {{ sport }} {{ dstaddr }} {{ dport }} {{ action }}
+        /usr/local/bin/firewall_parser.sh {{ chain }} {{ srcaddr }} {{ protocol }} {{ sport }} {{ dstaddr }} {{ dport }} {{ action }} {{ comment }}
       args:
         chdir: /usr/local/bin
