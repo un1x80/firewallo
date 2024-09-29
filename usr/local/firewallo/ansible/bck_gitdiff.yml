@@ -18,10 +18,13 @@
         src: "{{ backup_file }}"
         dest: "/var/ansible/firewallo/backup/"
         flat: yes
-    
-    - name: Copiare la directory usando rsync
-      command: rsync -avz --delete /etc/firewallo/ localhost:/var/ansible/firewallo/repo_bck/
-      delegate_to: localhost
+
+    - name: Scaricare la directory remota /etc/firewallo in locale
+      synchronize:
+        mode: pull
+        src: /etc/firewallo/
+        dest: /var/ansible/firewallo/repo_bck/
+      #delegate_to: 10.81.81.200
 
       
 - name: Esegui operazioni Git sulla macchina locale
