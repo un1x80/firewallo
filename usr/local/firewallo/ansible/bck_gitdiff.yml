@@ -5,7 +5,7 @@
   tasks:
 
     - name: Creare il backup della directory /etc/firewallo
-      ansible.builtin.command: 
+      ansible.builtin.command:
         cmd: "tar -czf /tmp/firewallo_backup_{{ ansible_date_time.iso8601 }}.tar.gz /etc/firewallo"
       register: backup_file_result
 
@@ -19,13 +19,12 @@
         dest: "/var/ansible/firewallo/backup/"
         flat: yes
 
-    - name: Sincronizzare la directory /etc/firewallo nella macchina locale
-      synchronize:
+    - name: Copiare i file di /etc/firewallo nella directory del repository Git locale
+      copy:
         src: /etc/firewallo/
         dest: /var/ansible/firewallo/repo_bck/
-        delete: yes  # Elimina i file locali che non esistono più sulla sorgente remota
-        archive: yes
-        recursive: yes
+        remote_src: yes
+        recurse: yes  # Copia ricorsivamente i file e le directory
 
 - name: Esegui operazioni Git sulla macchina locale
   hosts: localhost
@@ -74,4 +73,3 @@
       args:
         chdir: /var/ansible/firewallo/repo_bck/
       when: git_status_output.stdout != ""
-      
