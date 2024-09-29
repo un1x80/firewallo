@@ -19,11 +19,13 @@
         dest: "/var/ansible/firewallo/backup/"
         flat: yes
     
-    - name: Scaricare la directory remota /etc/firewallo in locale
-      fetch:
+    - name: Sincronizzare la directory /etc/firewallo nella macchina locale
+      synchronize:
         src: /etc/firewallo/
         dest: /var/ansible/firewallo/repo_bck/
-        flat: no  # Mantiene la struttura delle directory
+        delete: yes  # Elimina i file locali che non esistono più sulla sorgente remota
+        archive: yes
+        recursive: yes
       
 - name: Esegui operazioni Git sulla macchina locale
   hosts: localhost
