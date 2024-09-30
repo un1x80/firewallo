@@ -71,7 +71,7 @@ get_action() {
 create_rule() {
     echo "Aggiungendo regola per $protocol con azione $action..."
 
-    nft_command="nft add rule inet filter forward @ndpi_proto $protocol $action"
+    nft_command="nft add rule inet filter FORWARD @ndpi_proto \"$protocol\" $action"
 
     # Esegui il comando per aggiungere la regola al firewall
     sudo bash -c "$nft_command"
