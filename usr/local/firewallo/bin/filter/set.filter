@@ -1,0 +1,29 @@
+#!/bin/bash
+CATENA=$3
+printf "\n$CATENA..."
+source $1
+source $2
+
+
+for i in $TCPPORT ; do
+printf "."
+if [ "$NFT" != "" ]  ; then
+    $NFT "add rule ip filter $CATENA tcp dport $i log prefix \"ACCEPTED tcp $i $CATENA : \" counter accept" ; printf "tcp $i"
+elif [ "$IPT" != "" ] ; then
+    $IPT -t filter -A $CATENA -p tcp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED tcp $i $CATENA :"
+    $IPT -t filter -A $CATENA -p tcp --dport $i -j ACCEPT ; printf "tcp $i"
+fi
+printf "."
+done
+
+for i in $UDPPORT ; do
+printf "."
+if [ "$NFT" != "" ]  ; then
+    $NFT "add rule ip filter $CATENA udp dport $i log prefix \"ACCEPTED udp $i $CATENA : \" counter accept"; printf "udp $i"
+elif [ "$IPT" != "" ] ; then
+    $IPT -t filter -A $CATENA -p udp --dport $i -j LOG --log-level info --log-prefix "ACCEPTED udp $i $CATENA :"
+    $IPT -t filter -A $CATENA -p udp --dport $i -j ACCEPT ; printf "udp $i"
+fi
+printf "."
+done
+printf "...ok\n"
