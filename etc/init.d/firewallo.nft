@@ -81,12 +81,14 @@ $NFT "flush ruleset"
 $NFT "add table ip filter"
 $NFT table inet filter 
 	{ 
-		chain forward {
+		chain forward 
+		{
         type filter hook forward priority -1; policy accept;
         # Invia il traffico TCP e UDP a NFQUEUE per l'ispezione con suricata
         ip protocol tcp queue num 0 bypass
         ip protocol udp queue num 0 bypass
-    }
+		}
+	}				
 $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy drop; }"
 $NFT "add chain ip filter FORWARD { type filter hook forward priority 0; policy drop;}"
 $NFT "add chain ip filter OUTPUT { type filter hook output priority 0; policy drop; }"
