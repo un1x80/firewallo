@@ -90,7 +90,7 @@ lan2wan lan2dmz lan2lan lan2vpns lan2fw 	    \
 wan2wan wan2dmz wan2lan wan2vpns wan2fw 	    \
 dmz2wan dmz2dmz dmz2lan dmz2vpns dmz2fw 	    \
 fw2wan fw2dmz fw2lan fw2vpns fw2fw		        \
-vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw	";
+vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw dpi";
 
 for CAT in $CHAINS ; do
     $NFT "add chain ip filter $CAT" ;
