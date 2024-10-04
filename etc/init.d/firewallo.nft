@@ -77,9 +77,7 @@ fi
 echo "Flushing policies and setting up new policies for chains...... "
 
 $NFT "flush ruleset"
-
 $NFT "add table ip filter"
-$NFT "add table ip filter FORWARD { type filter hook forward priority -1; policy accept ; ip protocol tcp queue num 0 bypass ; ip protocol udp queue num 0 bypass ;}"
 $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy drop; }"
 $NFT "add chain ip filter FORWARD { type filter hook forward priority 0; policy drop;}"
 $NFT "add chain ip filter OUTPUT { type filter hook output priority 0; policy drop; }"
@@ -107,6 +105,7 @@ done
 /bin/bash $DIRCONF/nat/firewallo.nat
 
 ############################
+$NFT "add rule ip filter dpi ip protocol tcp queue num 0 bypass "
 $NFT "add rule ip filter stato ct state related,established 									log prefix \"ACCEPT state related-established:\"	counter accept"
 $NFT "add rule ip filter stato ct state related 												log prefix \"ACCEPT state related :\"          	counter accept"
 $NFT "add rule ip filter stato ct state established 											log prefix \"ACCEPT state established:\" 		counter accept"
