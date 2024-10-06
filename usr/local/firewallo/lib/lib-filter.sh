@@ -69,7 +69,7 @@ validate_port() {
         if [[ "$min_port" -ge 1 && "$max_port" -le 65535 && "$min_port" -lt "$max_port" ]]; then
             # Se la variabile $NFT non è vuota, sostituisci i : con -
             if [[ -n "$NFT" ]]; then
-                port="${min_port}-${max_port}"
+                new_port="${min_port}-${max_port}"
             fi
             return 0  # Intervallo valido
         else
