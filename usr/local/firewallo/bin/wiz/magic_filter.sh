@@ -100,7 +100,8 @@ if [ "$IPT" != "" ] ; then
     # echo "$iptables_cmd"| cat - $DIRCONF/filter/$CHAIN_SELECTED > temp && mv temp $DIRCONF/filter/$CHAIN_SELECTED
     
     #così lo ficca infondo
-    echo "#COMMENT:$comment
+    echo "
+    #COMMENT:$comment
     $iptables_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
     echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 
