@@ -104,8 +104,13 @@ done
 /bin/bash $DIRCONF/mangle/firewallo.mangle
 /bin/bash $DIRCONF/nat/firewallo.nat
 
+#Setup dpi suricata rules
+if [ "$NFT" != "" ] ; then
+/bin/bash $DIRCONF/filter/dpi
+fi
+
 ############################
-$NFT "add rule ip filter dpi ip protocol tcp queue num 0 bypass "
+#$NFT "add rule ip filter dpi ip protocol tcp queue num 0 bypass "
 $NFT "add rule ip filter stato ct state related,established 									log prefix \"ACCEPT state related-established:\"	counter accept"
 $NFT "add rule ip filter stato ct state related 												log prefix \"ACCEPT state related :\"          	counter accept"
 $NFT "add rule ip filter stato ct state established 											log prefix \"ACCEPT state established:\" 		counter accept"
