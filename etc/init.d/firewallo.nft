@@ -178,7 +178,7 @@ $NFT "add rule ip filter icmp_good icmp type echo-reply    									log prefix \
 
 
 #FILTER CHAINS ATTRIBUTION IN FORWARD
-
+$NFT "add rule ip filter FORWARD counter jump dpi"			###
 $NFT "add rule ip filter FORWARD counter jump stato"		###
 $NFT "add rule ip filter FORWARD counter jump dnserv"		###
 $NFT "add rule ip filter FORWARD counter jump icmp_good"	###

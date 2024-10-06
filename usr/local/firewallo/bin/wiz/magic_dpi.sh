@@ -88,7 +88,7 @@ if [ "$NFT" != "" ]; then
     DST_PORT_OPTION_NFT=$(parse_port_range_nft "$DST_PORT")
     
     # Costruisci il comando nftables per aggiungere la regola nella catena dpi
-    nft_cmd="nft \"add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT queue num 0 comment \\\"$comment\\\"\""
+    nft_cmd="nft \"add rule ip filter $CHAIN_SELECTED ip saddr $SRC_ADDR ip daddr $DST_ADDR $PROTOCOL sport $SRC_PORT_OPTION_NFT $PROTOCOL dport $DST_PORT_OPTION_NFT counter queue num 0 bypass comment \\\"$comment\\\"\""
     
     echo "$NFT_RULE_MSG"; echo "$nft_cmd"
     
