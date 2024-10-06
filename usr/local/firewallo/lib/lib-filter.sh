@@ -53,15 +53,28 @@ CATENA=$1
         exit 1
     fi
 }
-# Funzione per controllare la validità della porta
+# Funzione per controllare la validità della porta o di un intervallo di porte
 validate_port() {
     local port="$1"
+    
+    # Controllo se è "any" oppure un numero singolo valido
     if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
-        return 0
+        return 0  # Porta singola valida o "any"
+    
+    # Controllo se è un intervallo di porte nel formato min:max
+    elif [[ "$port" =~ ^[0-9]+:[0-9]+$ ]]; then
+        IFS=":" read -r min_port max_port <<< "$port"
+        # Verifica che entrambi i valori siano validi e min_port sia minore di max_port
+        if [[ "$min_port" -ge 1 && "$max_port" -le 65535 && "$min_port" -lt "$max_port" ]]; then
+            return 0  # Intervallo valido
+        else
+            return 1  # Intervallo non valido
+        fi
     else
-        return 1  # non valido
+        return 1  # Non valido
     fi
 }
+
 
 show_ports() {
     echo -e "\n--- Porte attuali in $CATENA ---"
