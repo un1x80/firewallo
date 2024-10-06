@@ -2,6 +2,7 @@
 
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
+
 color_text() {
     local color="$1"
     local text="$2"
@@ -66,6 +67,10 @@ validate_port() {
         IFS=":" read -r min_port max_port <<< "$port"
         # Verifica che entrambi i valori siano validi e min_port sia minore di max_port
         if [[ "$min_port" -ge 1 && "$max_port" -le 65535 && "$min_port" -lt "$max_port" ]]; then
+            # Se la variabile $NFT non è vuota, sostituisci i : con -
+            if [[ -n "$NFT" ]]; then
+                port="${min_port}-${max_port}"
+            fi
             return 0  # Intervallo valido
         else
             return 1  # Intervallo non valido
@@ -75,12 +80,17 @@ validate_port() {
     fi
 }
 
-
+# Funzione per mostrare le porte attualmente aperte all'utente
 show_ports() {
     echo -e "\n--- Porte attuali in $CATENA ---"
     color_text "magenta" "TCP: $TCPPORT"
     color_text "cyan" "UDP: $UDPPORT"
     echo "----------------------------------"
+    echo "---Regole attuali:---"
+    cat $DIRCONF/$CATENA | grep -v 'TCPPORT=' | grep -v 'UDPPORT='
+    echo "----------------------------------"
+
+
 }
 # Funzione per mostrare il menu all'utente
 show_menu_add_remove() {
