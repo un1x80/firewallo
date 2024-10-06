@@ -59,4 +59,4 @@ INVALID_INTERFACE="Nome dell'interfaccia non valido."
 INVALID_TCP_UDP_CHOICE="Scelta non valida. Per favore, inserisci 1 per TCP o 2 per UDP."
 
 #firewallo
-$SAVECONF_IPT_NFT="Salva la conf di iptables in /etc/iptables/rules.v4 e lo abilità in startup"
+SAVECONF_IPT_NFT="Salva la conf di iptables in /etc/iptables/rules.v4 e lo abilità in startup"
