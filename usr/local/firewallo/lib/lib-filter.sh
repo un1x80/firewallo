@@ -88,7 +88,7 @@ show_ports() {
     color_text "cyan" "UDP: $UDPPORT"
     echo "----------------------------------"
     echo "---Regole attuali:---"
-    cat $DIRCONF/filter/$CATENA | grep -v 'TCPPORT=' | grep -v 'UDPPORT='
+    cat $DIRCONF/filter/$CATENA | grep -v 'TCPPORT=' | grep -v 'UDPPORT=' | grep -v '#'
     echo "----------------------------------"
 
 
