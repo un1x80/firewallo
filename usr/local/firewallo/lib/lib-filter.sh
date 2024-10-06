@@ -82,7 +82,8 @@ validate_port() {
 
 # Funzione per mostrare le porte attualmente aperte all'utente
 show_ports() {
-    echo -e "\n--- Porte attuali in $CATENA ---"
+    echo -e "
+    --- Porte attuali in $CATENA ---"
     color_text "magenta" "TCP: $TCPPORT"
     color_text "cyan" "UDP: $UDPPORT"
     echo "----------------------------------"
