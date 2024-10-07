@@ -4,5 +4,12 @@
 	dh $@
 
 override_dh_install:
-	# Esegui dh_install, ma escludi specifici file
+	# Esegui dh_install, ma escludi README.md e LICENSE
 	dh_install --exclude=README.md --exclude=LICENSE
+	
+	# Evita di sovrascrivere i file in /etc/firewallo se esistono già
+	for file in etc/firewallo/*; do \
+		if [ ! -f /etc/firewallo/`basename $$file` ]; then \
+			install -D $$file /etc/firewallo/`basename $$file`; \
+		fi; \
+	done
