@@ -5,10 +5,10 @@ if ! dpkg -s suricata >/dev/null 2>&1; then
 fi
 
 # Copia del file suricata.yml personalizzato
-install -m 644 etc/suricata/suricata.yml /etc/suricata/suricata.yml
+install -m 644 postinst/suricata.yml /etc/suricata/suricata.yml
 
 # Copia del file suricata.service personalizzato
-install -m 644 lib/systemd/system/suricata.service /lib/systemd/system/suricata.service
+install -m 644 postinst/suricata.service /lib/systemd/system/suricata.service
 
 # Ricaricare il daemon di systemd per rilevare le modifiche al servizio
 systemctl daemon-reload
