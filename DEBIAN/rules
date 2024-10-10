@@ -13,4 +13,3 @@ override_dh_install:
 			install -D $$file /etc/firewallo/`basename $$file`; \
 		fi; \
 	done
-	#Esegue Update di suricata
