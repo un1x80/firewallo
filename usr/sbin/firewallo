@@ -349,8 +349,8 @@ function suricata_wizard {
     $DIRBIN/wiz/magic_suricata.sh
 }
 
-function ndpi_wizard {
-    $DIRBIN/wiz/magic_ndpi.sh
+function dpi_wizard {
+    $DIRBIN/wiz/magic_dpi.sh
 }
 
 function wg_manager_wizard {
@@ -373,7 +373,7 @@ do
             suricata_wizard
             ;;
         3)
-            ndpi_wizard
+            dpi_wizard
             ;;
 	    4)
             wg_manager_wizard
