@@ -332,8 +332,8 @@ function show_menu {
     echo "   -DEV- FIREWALLO WIZARD MENU -DEV-  "
     echo "======================================"
     echo "1) Filter Wizard"
-    echo "2) Nat Prerouting Wizard"
-    echo "3) Nat Postrouting Wizard"
+    echo "2) Suricata Wizard"
+    echo "3) nDpi Wizard"
     echo "4) WireGuard"
     echo "5) Exit"
     echo "======================================"
@@ -345,12 +345,12 @@ function filter_wizard {
     $DIRBIN/wiz/magic_filter.sh
 }
 
-function nat_prerouting_wizard {
-    $DIRBIN/wiz/magic_nat_prerouting.sh
+function suricata_wizard {
+    $DIRBIN/wiz/magic_suricata.sh
 }
 
-function nat_postrouting_wizard {
-    $DIRBIN/wiz/magic_nat_postrouting.sh
+function ndpi_wizard {
+    $DIRBIN/wiz/magic_ndpi.sh
 }
 
 function wg_manager_wizard {
@@ -370,12 +370,12 @@ do
             filter_wizard
             ;;
         2)
-            nat_prerouting_wizard
+            suricata_wizard
             ;;
         3)
-            nat_postrouting_wizard
+            ndpi_wizard
             ;;
-	4)
+	    4)
             wg_manager_wizard
             ;;
         5)
