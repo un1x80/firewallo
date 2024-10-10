@@ -52,7 +52,7 @@ sysctl  () {
     # 	RETVAL=$?
     #     if [ "$RETVAL" = "0" ]; then
     #    	cat .tmp >  /etc/sysctl.conf ; rm .tmp
-    #    fi
+    #    fi     
     #else
     	$EDITOR /etc/sysctl.conf
     #fi
@@ -108,9 +108,6 @@ done
 
 #Funzione di editing manuale del table Nat
 nat  () {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
-show_wizard_nat
 	#if [ "$EDITOR" = "dialog" ] ; then
     #    $EDITOR --backtitle NAT_EDIT --title firewallo.nat --editbox $DIRCONF/nat/firewallo.nat  	  $OPTS 2> .tmp
 	#	RETVAL=$?
@@ -119,6 +116,7 @@ show_wizard_nat
 	#	fi
 
 	#else
+		$EDITOR $DIRCONF/nat/firewallo.nat
 	#fi
 }
 #Funzione di editing manuale del mangle
@@ -323,18 +321,19 @@ logs () {
 		fi
     done
 }
+
 show_wizard () {
 clear
 cat $DIRCONF/motd #Visualizza il banner motd
 function show_menu {
     clear
     echo "======================================"
-    echo "   -DEV- FIREWALLO WIZARD MENU -DEV-  "
+    echo "         FIREWALLO WIZARD MENU        "
     echo "======================================"
     echo "1) Filter Wizard"
     echo "2) Nat Prerouting Wizard"
     echo "3) Nat Postrouting Wizard"
-    echo "4) WireGuard"
+	echo "4) WireGuard" 
     echo "5) Exit"
     echo "======================================"
     echo -n "Select an option: "
@@ -346,7 +345,7 @@ function filter_wizard {
 }
 
 function nat_prerouting_wizard {
-    $DIRBIN/wiz/magic_nat_prerouting.sh
+	$DIRBIN/wiz/magic_nat_prerouting.sh
 }
 
 function nat_postrouting_wizard {
@@ -375,71 +374,10 @@ do
         3)
             nat_postrouting_wizard
             ;;
-	4)
+		4)
             wg_manager_wizard
             ;;
         5)
-            echo "Exit"
-            break
-            ;;
-        *)
-            echo "Select right Option!."
-            ;;
-    esac
-
-    # Pausa per permettere la lettura del messaggio
-    echo -n "Press Enter to continue..."
-    read
-done
-}
-
-show_wizard_nat () {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
-function show_menu_nat {
-    echo " "
-    echo "======================================"
-    echo "           FIREWALLO NAT  "
-    echo "======================================"
-    echo "1) Nat Prerouting Wizard"
-    echo "2) Nat Postrouting Wizard"
-    echo "3) Manual Edit File "
-    echo "4) Exit"
-    echo "======================================"
-    echo -n "Select an option: "
-}
-
-# Funzioni per le diverse opzioni
-function nat_prerouting_wizard {
-	$DIRBIN/wiz/magic_nat_prerouting.sh
-}
-
-function nat_postrouting_wizard {
-    	$DIRBIN/wiz/magic_nat_postrouting.sh
-}
-function edit_manual_nat {
-	$EDITOR $DIRCONF/nat/firewallo.nat
-}
-
-
-
-
-# Ciclo principale del menu
-while true
-do
-    show_menu_nat
-    read option_nat
-
-    case $option_nat in
-        1)
-            nat_prerouting_wizard
-            ;;
-        2)
-            nat_postrouting_wizard
-            ;;
-	3)  edit_manual_nat
-	    ;;
-	4)
             echo "Exit"
             break
             ;;
@@ -474,7 +412,7 @@ select opt in $MENU ; do
         sysctl ; main
 	elif [ "$opt" = "filter" ] ; then
         filter ; main
-        elif [ "$opt" = "nat" ] ; then
+    elif [ "$opt" = "nat" ] ; then
         nat ; main
 	elif [ "$opt" = "mangle" ] ; then
         mangle ; main
@@ -490,9 +428,9 @@ select opt in $MENU ; do
         status ; main
 	elif [ "$opt" = "rulesview" ] ; then
         rules ; main
-        elif [ "$opt" = "saveconf" ] ; then
+    elif [ "$opt" = "saveconf" ] ; then
         saveconf ; main
-        elif [ "$opt" = "nft-iptables" ] ; then
+    elif [ "$opt" = "nft-iptables" ] ; then
         nftiptables ; main
 	elif [ "$opt" = "logs" ] ; then
         logs ; main
