@@ -511,7 +511,7 @@ select opt in $MENU ; do
     elif [ "$opt" = "Export_conf" ] ; then
 		export_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
     elif [ "$opt" = "Restore_conf" ] ; then
-		export_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
+		restore_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
