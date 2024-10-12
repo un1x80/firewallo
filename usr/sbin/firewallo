@@ -416,6 +416,53 @@ export_conf () {
     fi
 
 }
+restore_conf() {
+    # Cerca i file di backup chiamati firewallo-conf-*.tar.gz nella directory corrente
+    local files=($(ls firewallo-conf-*.tar.gz 2>/dev/null))
+
+    # Se non ci sono file di backup, informa l'utente e termina la funzione
+    if [[ ${#files[@]} -eq 0 ]]; then
+        echo "Non ci sono file di backup disponibili nella directory corrente."
+        return 1
+    fi
+
+    # Mostra un menu con i file trovati
+    echo "Seleziona un file di backup da ripristinare:"
+    for i in "${!files[@]}"; do
+        echo "$((i+1)). ${files[$i]}"
+    done
+
+    # Chiede all'utente di scegliere un'opzione
+    read -p "Inserisci il numero del backup da ripristinare: " scelta
+
+    # Verifica che l'input sia valido
+    if ! [[ "$scelta" =~ ^[0-9]+$ ]] || ((scelta < 1 || scelta > ${#files[@]})); then
+        echo "Scelta non valida."
+        return 1
+    fi
+
+    # Ottiene il nome del file selezionato
+    local file_selezionato="${files[$((scelta-1))]}"
+
+    # Chiede conferma all'utente
+    read -p "Sei sicuro di voler ripristinare $file_selezionato su /etc/firewallo? [s/N]: " conferma
+
+    if [[ "$conferma" != "s" && "$conferma" != "S" ]]; then
+        echo "Ripristino annullato."
+        return 1
+    fi
+
+    # Estrae il file di backup sovrascrivendo la directory /etc/firewallo
+    sudo tar -xzf "$file_selezionato" -C /etc
+
+    # Verifica se il comando tar ha avuto successo
+    if [[ $? -eq 0 ]]; then
+        echo "Ripristino completato con successo da $file_selezionato."
+    else
+        echo "Errore durante il ripristino del backup."
+        return 1
+    fi
+}
 
 #Funzione principale
 main () {
@@ -427,7 +474,7 @@ if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 fi
 
 #Opzioni del menu
-MENU="networking sysctl conf filter nat mangle start stop restart route wizard status rulesview saveconf nft-iptables logs Export_conf exit"
+MENU="networking sysctl conf filter nat mangle start stop restart route wizard status rulesview saveconf nft-iptables logs Export_conf Restore_conf exit"
 select opt in $MENU ; do 
 	if [ "$opt" = "networking" ] ; then
 		networking ;  main
@@ -462,6 +509,8 @@ select opt in $MENU ; do
 	elif [ "$opt" = "wizard" ] ; then
 		show_wizard ; main
     elif [ "$opt" = "Export_conf" ] ; then
+		export_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
+    elif [ "$opt" = "Restore_conf" ] ; then
 		export_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
