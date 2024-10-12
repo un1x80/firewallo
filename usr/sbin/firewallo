@@ -398,6 +398,24 @@ do
     read
 done
 }
+export_conf () {
+    # Imposta la variabile per la data e l'ora corrente nel formato YYYYMMDD-HHMMSS
+    local data_odierna_ora=$(date +"%Y%m%d-%H%M%S")
+
+    # Nome del file tar.gz
+    local nome_file="firewallo-conf-${data_odierna_ora}.tar.gz"
+
+    # Crea il backup della directory /etc/firewallo nella directory corrente
+    tar -czf "$nome_file" /etc/firewallo
+
+    # Verifica se il comando tar ha avuto successo
+    if [[ $? -eq 0 ]]; then
+        echo "Backup creato con successo: $(pwd)/$nome_file"
+    else
+        echo "Errore nella creazione del backup."
+    fi
+
+}
 
 #Funzione principale
 main () {
@@ -409,7 +427,7 @@ if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 fi
 
 #Opzioni del menu
-MENU="networking sysctl conf filter nat mangle start stop restart route wizard status rulesview saveconf nft-iptables logs exit"
+MENU="networking sysctl conf filter nat mangle start stop restart route wizard status rulesview saveconf nft-iptables logs Export_conf exit"
 select opt in $MENU ; do 
 	if [ "$opt" = "networking" ] ; then
 		networking ;  main
@@ -443,6 +461,8 @@ select opt in $MENU ; do
         logs ; main
 	elif [ "$opt" = "wizard" ] ; then
 		show_wizard ; main
+    elif [ "$opt" = "Export_conf" ] ; then
+		export_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
