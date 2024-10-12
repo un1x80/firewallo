@@ -411,15 +411,11 @@ function show_menu_nat {
 
 # Funzioni per le diverse opzioni
 function nat_prerouting_wizard {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
 	$DIRBIN/wiz/magic_nat_prerouting.sh
 }
 
 function nat_postrouting_wizard {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
-	$DIRBIN/wiz/magic_nat_postrouting.sh
+    	$DIRBIN/wiz/magic_nat_postrouting.sh
 }
 function edit_manual_nat {
 	$EDITOR $DIRCONF/nat/firewallo.nat
