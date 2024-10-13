@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+
+%:
+    dh $@
+
+override_dh_install:
+    # Usa rsync per copiare solo i file desiderati nella directory temporanea
+    rsync -av --exclude=README.md --exclude=LICENSE --exclude=.git --exclude=postinst ./ debian/tmp/
+    
+    # Continua con l'installazione usando il contenuto filtrato
+    dh_install --sourcedir=debian/tmp
+
+	# Evita di sovrascrivere i file in /etc/firewallo se esistono già
+	for file in etc/firewallo/*; do \
+		if [ ! -f /etc/firewallo/`basename $$file` ]; then \
+			install -D $$file /etc/firewallo/`basename $$file`; \
+		fi; \
+	done
+	
