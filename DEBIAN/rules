@@ -8,8 +8,8 @@ override_dh_install:
 	dh_install --exclude=README.md --exclude=LICENSE --exclude=.git --exclude=postinst
 
 	# Evita di sovrascrivere i file in /etc/firewallo se esistono già
-	for file in etc/firewallo/*; do \
-		if [ ! -f /etc/firewallo/`basename $$file` ]; then \
-			install -D $$file /etc/firewallo/`basename $$file`; \
-		fi; \
-	done
+	#	for file in etc/firewallo/*; do \
+	#	if [ ! -f /etc/firewallo/`basename $$file` ]; then \
+	#		install -D $$file /etc/firewallo/`basename $$file`; \
+	#	fi; \
+	#done
