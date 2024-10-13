@@ -46,9 +46,9 @@
       become: yes
 
     - name: Build the .deb package
-      command: dpkg-buildpackage -us -uc /opt/firewallo
+      command: dpkg-buildpackage -us -uc
       args:
-        chdir: /opt/
+        chdir: /opt/firewallo
     
     - name: Ensure the package was created
       stat:
