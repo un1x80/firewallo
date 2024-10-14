@@ -6,28 +6,24 @@
       apt:
         name: git
         state: present
-      become: yes
 
     - name: Check if iptables is installed
       apt:
         name: iptables
         state: present
-      become: yes
 
     - name: Check if nftables is installed
       apt:
         name: nftables
         state: present
-      become: yes
     
-    - name: check if directory /opt/firewallo exist
+    - name: Ensure /opt/firewallo directory exists
       file:
         path: /opt/firewallo
         state: directory
         mode: '0755'
         owner: root
         group: root
- 
 
     - name: Clone repository firewallo in /opt/firewallo
       git:
@@ -36,23 +32,100 @@
         version: test
         update: yes  # Aggiorna il repository se già esistente
         force: yes  # Ignora modifiche locali
-      register: result_git
     
     - name: Ensure dpkg-dev is installed
       apt:
         name: dpkg-dev
         state: present
         update_cache: yes
-      become: yes
+
+    - name: Create DEBIAN control directory
+      file:
+        path: /opt/firewallo_pkg/DEBIAN
+        state: directory
+        mode: '0755'
+
+    - name: Create control file for .deb package
+      copy:
+        dest: /opt/firewallo_pkg/DEBIAN/control
+        content: |
+          Package: firewallo
+          Version: 24.9.1
+          Section: utils
+          Priority: optional
+          Architecture: all
+          Depends: bash (>= 4.0), coreutils, iptables, nano, suricata
+          Maintainer: Matteo Fioriti <fioritim@gmail.com>
+          Description: Firewallo is a firewall manager for Debian GNU/Linux that uses iptables or nftables.
+           Questo pacchetto include un sistema di gestione del firewall basato su iptables e nftables.
+    
+    - name: Copy etc directory
+      copy:
+        src: /opt/firewallo/etc
+        dest: /opt/firewallo_pkg/etc
+        remote_src: yes
+    
+    - name: Copy usr directory
+      copy:
+        src: /opt/firewallo/usr
+        dest: /opt/firewallo_pkg/usr
+        remote_src: yes
+
+    - name: Copy postinst script
+      copy:
+        dest: /opt/firewallo_pkg/DEBIAN/postinst
+        content: |
+          #!/bin/bash
+          
+          # Installare Suricata se non è già installato
+          if ! dpkg -s suricata >/dev/null 2>&1; then
+              apt update
+              apt install -y suricata
+          fi
+
+          # Copia del file suricata.yml personalizzato se non esiste già
+          if [ ! -f /etc/suricata/suricata.yml ]; then
+              install -m 644 /opt/firewallo/postinst/suricata.yml /etc/suricata/suricata.yml
+          fi
+
+          # Copia del file suricata.service personalizzato se non esiste già
+          if [ ! -f /lib/systemd/system/suricata.service ]; then
+              install -m 644 /opt/firewallo/postinst/suricata.service /lib/systemd/system/suricata.service
+          fi
+
+          # Verifica se esiste la directory /etc/firewallo, altrimenti la crea
+          if [ ! -d /etc/firewallo ]; then
+              mkdir -p /etc/firewallo
+          fi
+
+          # Copia dei file di configurazione personalizzati in /etc/firewallo solo se non esistono già
+          for file in /opt/firewallo/etc/firewallo/*; do
+              filename=$(basename "$file")
+              if [ ! -f "/etc/firewallo/$filename" ]; then
+                  install -m 644 "$file" "/etc/firewallo/$filename"
+              fi
+          done
+
+          # Ricaricare il daemon di systemd per rilevare le modifiche al servizio
+          systemctl daemon-reload
+
+          # Avviare il servizio Suricata
+          systemctl start suricata
+
+          # Abilitare Suricata all'avvio del sistema
+          systemctl enable suricata
+
+          exit 0
+      mode: '0755'
 
     - name: Build the .deb package
-      command: dpkg-deb --build /opt/firewallo
+      command: dpkg-deb --build /opt/firewallo_pkg
       args:
         chdir: /opt/
     
     - name: Ensure the package was created
       stat:
-        path: /opt/firewallo.deb
+        path: /opt/firewallo_pkg.deb
       register: package_stat
 
     - name: Fail if package was not created
@@ -62,14 +135,13 @@
 
     - name: Notify user that package was created
       debug:
-        msg: "The .deb package has been successfully built: /opt/firewallo.deb"
+        msg: "The .deb package has been successfully built: /opt/firewallo_pkg.deb"
     
     - name: Ensure firewallo is uninstalled
       apt:
         name: firewallo
         state: absent
-      become: yes
       
     - name: Install the .deb package
       apt:
-        deb: /opt/firewallo.deb
+        deb: /opt/firewallo_pkg.deb
