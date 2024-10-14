@@ -99,7 +99,7 @@
           fi
 
           # Copia dei file di configurazione personalizzati in /etc/firewallo solo se non esistono già
-          for file in /opt/firewallo/etc/firewallo/*; do
+          for file in /opt/firewallo_pkg/etc/firewallo/*; do
               filename=$(basename "$file")
               if [ ! -f "/etc/firewallo/$filename" ]; then
                   install -m 644 "$file" "/etc/firewallo/$filename"
