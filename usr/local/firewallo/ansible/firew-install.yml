@@ -30,8 +30,8 @@
         repo: 'https://github.com/un1x80/firewallo.git'
         dest: /opt/firewallo
         version: test
-        update: yes  # Aggiorna il repository se già esistente
-        force: yes  # Ignora modifiche locali
+        update: yes
+        force: yes
     
     - name: Ensure dpkg-dev is installed
       apt:
@@ -116,6 +116,11 @@
           systemctl enable suricata
 
           exit 0
+
+    - name: Set executable permissions on postinst script
+      file:
+        path: /opt/firewallo_pkg/DEBIAN/postinst
+        mode: '0755'
 
     - name: Build the .deb package
       command: dpkg-deb --build /opt/firewallo_pkg
