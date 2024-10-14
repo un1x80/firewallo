@@ -62,13 +62,13 @@
     - name: Copy etc directory
       copy:
         src: /opt/firewallo/etc
-        dest: /opt/firewallo_pkg/etc
+        dest: /opt/firewallo_pkg/
         remote_src: yes
     
     - name: Copy usr directory
       copy:
         src: /opt/firewallo/usr
-        dest: /opt/firewallo_pkg/usr
+        dest: /opt/firewallo_pkg/
         remote_src: yes
 
     - name: Copy postinst script
