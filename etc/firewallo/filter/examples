@@ -1,0 +1,28 @@
+# IPTABLES Example Rules:
+$IPT -t filter -A lan2wan -p tcp --dport 80 -s 192.168.1.32 -d 2.3.4.5 \
+-j LOG --log-level info --log-prefix "ACCEPTED tcp 80 lan2wan from 192.168.1.32 to 2.3.4.5 :"
+
+$IPT -t filter -A lan2wan -p tcp --dport 80 -s 192.168.1.32 -d 2.3.4.5 -j ACCEPT
+
+# NFTABLES Example Rules:
+$NFT "add rule ip filter lan2wan ip saddr 192.168.1.32 ip daddr 2.3.4.5 tcp dport 80 \
+log prefix \"ACCEPTED tcp 80 lan2wan from 192.168.1.32 to 2.3.4.5 : \" counter accept"
+
+# CHAIS
+fw2fw	fw2lan		fw2wan		fw2vpns		fw2dmz		\
+lan2fw	lan2lan		lan2wan		lan2vpns 	lan2dmz  	\
+wan2fw	wan2lan		wan2wan		wan2vpns 	wan2dmz   	\
+vpns2fw	vpns2lan	vpns2wan	vpns2vpns 	vpns2dmz 	\
+dmz2fw	dmz2lan		dmz2wan		dmz2vpns 	dmz2dmz 	\
+
+# ENVIRONMENT
+LO="127.0.0.1"
+LANIF="ethX" -> LANIF_1 = First interface in firewallo.conf, LANIF_2 = Second interface in firewallo.conf etc
+WANIF="ethX" -> Like bottom
+DMZIF="ethX" -> idem
+VPNIF="tun0 tun1 wg0" -> idem
+DNS1="192.168.xxx.xxx"
+DNS2="192.168.xxx.xxx"
+DNS3="8.8.8.8"
+LANRANGE="192.168.xxx.xxx/24 192.168.zzz.xxx/24"
+DMZRANGE="192.168.xxy.xxx/14 10.20.20.x/24"

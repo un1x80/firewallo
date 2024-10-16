@@ -1,8 +1,0 @@
-#!/usr/bin/make -f
-
-%:
-	dh $@
-
-override_dh_install:
-	# Esegui dh_install, ma escludi specifici file
-	dh_install --exclude=README.md --exclude=LICENSE
