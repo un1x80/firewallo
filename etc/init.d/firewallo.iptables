@@ -329,9 +329,13 @@ dmz2wan dmz2dmz dmz2lan dmz2vpns dmz2fw          \
 fw2wan fw2dmz fw2lan fw2vpns fw2fw               \
 vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw     ";
 
+#for CAT0 in $CHAINS0 ; do
+#/bin/bash $DIRBIN/filter/$CAT0  "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf" 
+#done
 for CAT0 in $CHAINS0 ; do
-/bin/bash $DIRBIN/filter/$CAT0  "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf" 
+/bin/bash $DIRBIN/filter/set.filter "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf" "$CAT0"
 done
+
 
 echo "Firewall setting are finish...                                  ...OK"
 }
