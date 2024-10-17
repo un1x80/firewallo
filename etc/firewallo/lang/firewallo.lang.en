@@ -68,4 +68,5 @@ SAVECONF_IPT_NFT="Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable it 
 
 #Logs
 SELECT_CHAIN_TO_VIEW="SELECT chains do you want to view"
-#1raw
+SELECT_LOG_TYPE="SELECT log type"
+#2raw

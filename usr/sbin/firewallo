@@ -218,7 +218,7 @@ log_filter () {
     clear 
     cat $DIRCONF/motd #Visualizza il banner motd
 
-    echo "SELECT chains do you want to view"
+    echo "$SELECT_CHAIN_TO_VIEW"
 
     MENU=("fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" 			\
           "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" 	\
@@ -226,7 +226,8 @@ log_filter () {
           "vpns2fw" "vpns2lan" "vpns2wan" "vpns2vpns" "vpns2dmz"\
           "dmz2fw" "dmz2lan" "dmz2wan" "dmz2vpns" "dmz2dmz"  	\
 		  "state" "icmp_good" "bad_tcp_flags" "nothing"			\
-		  "POSTROUTING" "PREROUTING" "DROP" "OUTPUT_DROP" "INPUT_DROP" "FORWARD_DROP" "EXIT")
+		  "POSTROUTING" "PREROUTING" "DROP" "OUTPUT_DROP"       \
+          "INPUT_DROP" "FORWARD_DROP" "EXIT")
 
     
     select opt in "${MENU[@]}"; do
@@ -259,7 +260,10 @@ log_filter () {
 
 # Funzione per selezionare il tipo di log
 logs () {
-    echo "SELECT log type"
+    clear 
+    cat $DIRCONF/motd #Visualizza il banner motd
+
+    echo "$SELECT_LOG_TYPE"
     MENU1=("EXIT" "live" "1 week ago" "1 day ago" "1 hour ago" "1 minute ago" )
     
     select opt1 in "${MENU1[@]}"; do
@@ -276,21 +280,19 @@ cat $DIRCONF/motd #Visualizza il banner motd
 function show_menu {
     clear
     echo "======================================"
-    echo "   -DEV- FIREWALLO WIZARD MENU -DEV-  "
+    echo "  Network Deep Packet Inspection      "
     echo "======================================"
-    echo "1) Filter Wizard"
-    echo "2) Suricata Wizard"
-    echo "3) nDpi Wizard"
-    echo "4) WireGuard"
-    echo "5) Exit"
+    echo "1) Suricata Config"
+    echo "2) Network dpi Filter"
+    echo "3) Exit"
     echo "======================================"
     echo -n "Select an option: "
 }
 
 # Funzioni per le diverse opzioni
-function filter_wizard {
-    $DIRBIN/wiz/magic_filter.sh
-}
+#function filter_wizard {
+#    $DIRBIN/wiz/magic_filter.sh
+#}
 
 function suricata_wizard {
     $DIRBIN/wiz/magic_suricata.sh
@@ -300,9 +302,9 @@ function dpi_wizard {
     $DIRBIN/wiz/magic_dpi.sh
 }
 
-function wg_manager_wizard {
-    $DIRBIN/wiz/wg/wg_manager.sh
-}
+#function wg_manager_wizard {
+#    $DIRBIN/wiz/wg/wg_manager.sh
+#}
 
 
 
@@ -314,18 +316,12 @@ do
 
     case $option in
         1)
-            filter_wizard
-            ;;
-        2)
             suricata_wizard
             ;;
-        3)
+        2)
             dpi_wizard
             ;;
-	    4)
-            wg_manager_wizard
-            ;;
-        5)
+        3)
             echo "Exit"
             break
             ;;
@@ -477,7 +473,7 @@ if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 fi
 
 #Opzioni del menu
-MENU="networking sysctl conf filter nat mangle start stop restart route wizard status rulesview saveconf nft-iptables logs Export_conf Restore_conf exit"
+MENU="networking sysctl conf filter nat mangle start stop restart route wizard status rulesview saveconf nft-iptables logs export_conf restore_conf exit"
 select opt in $MENU ; do 
 	if [ "$opt" = "networking" ] ; then
 		networking ;  main
@@ -511,9 +507,9 @@ select opt in $MENU ; do
         logs ; main
 	elif [ "$opt" = "wizard" ] ; then
 		show_wizard ; main
-    elif [ "$opt" = "Export_conf" ] ; then
+    elif [ "$opt" = "export_conf" ] ; then
 		export_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
-    elif [ "$opt" = "Restore_conf" ] ; then
+    elif [ "$opt" = "restore_conf" ] ; then
 		restore_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
