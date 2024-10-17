@@ -215,6 +215,9 @@ done
 
 # Funzione per monitorare i log con Ctrl+C che uccide solo journalctl
 log_filter () { 
+    clear 
+    cat $DIRCONF/motd #Visualizza il banner motd
+
     echo "SELECT chains do you want to view"
 
     MENU=("fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" 			\
