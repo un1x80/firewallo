@@ -83,12 +83,12 @@ validate_port() {
 # Funzione per mostrare le porte attualmente aperte all'utente
 show_ports() {
     echo -e "
-    --- $ACTUAL_PORTS $CATENA ---"
+--- $ACTUAL_PORTS $CATENA ---"
     color_text "magenta" "TCP: $TCPPORT"
     color_text "cyan" "UDP: $UDPPORT"
     echo "----------------------------------"
-    echo "---$ACTUAL_RULES:---"
-    color_text "yellow" $(cat $DIRCONF/filter/$CATENA | grep -v 'TCPPORT=' | grep -v 'UDPPORT=' | grep -v '#')
+    echo "---$ACTUAL_RULES:$CATENA---"
+    RULES_CAT=$(cat $DIRCONF/filter/$CATENA | grep -v 'TCPPORT=' | grep -v 'UDPPORT=' | grep -v '#')
     echo "----------------------------------"
 
 
