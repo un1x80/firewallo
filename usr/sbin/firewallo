@@ -274,6 +274,7 @@ logs () {
 		fi
     done
 }
+
 show_netdpi () {
 clear
 cat $DIRCONF/motd #Visualizza il banner motd
@@ -295,11 +296,11 @@ function show_menu {
 #}
 
 function suricata_wizard {
-    $DIRBIN/wiz/magic_suricata.sh
+    $DIRBIN/wiz/magic_suricata.sh ; show_netdpi
 }
 
 function dpi_wizard {
-    $DIRBIN/wiz/magic_dpi.sh
+    $DIRBIN/wiz/magic_dpi.sh ; show_netdpi 
 }
 
 #function wg_manager_wizard {
