@@ -11,6 +11,15 @@ CHAIN_SELECTED="dpi"
 
 # Chiedi i dettagli uno per uno all'utente con controlli
 while true; do
+
+  
+    clear
+    cat $DIRCONF/motd #Visualizza il banner motd
+    echo ""
+    echo "--------------------------------------------------"
+    echo "---Network Dpi Rules-Send Traffic on DPI Engine---"
+    echo "--------------------------------------------------"
+
     read -e -p "$SOURCE_ADDR_PROMPT" SRC_ADDR
     if validate_ip_mask "$SRC_ADDR"; then
         break
