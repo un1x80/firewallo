@@ -85,7 +85,7 @@ restart_suricata() {
 show_current_rules() {
     echo "Regole attuali nel file block.rules:"
     RULESNOW=$(cat /etc/suricata/rules/block.rules)
-    color_text "yellow" $RULESNOW
+    color_text "yellow" "$RULESNOW"
 }
 
 # Main script
