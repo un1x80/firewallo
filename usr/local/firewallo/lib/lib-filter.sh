@@ -42,7 +42,7 @@ handle_error() {
     color_text "red" "$INVALID_SELECTION_MSG"
 }
 
-# Funzione per leggere le variabili dal file
+# Funzione per leggere le variabili delle porte dai file delle catene
 read_variables() {
 # Definisce il percorso del file passato per variabile
 file_path="$DIRCONF/filter/$1"
@@ -50,7 +50,7 @@ CATENA=$1
     if [[ -f "$file_path" ]]; then
         source "$file_path"
     else
-        echo "Il file $file_path non esiste. Crealo con le variabili tcpports e udpports."
+        echo "$file_path $NOT_EXIST"
         exit 1
     fi
 }
@@ -83,11 +83,11 @@ validate_port() {
 # Funzione per mostrare le porte attualmente aperte all'utente
 show_ports() {
     echo -e "
-    --- Porte attuali in $CATENA ---"
+    --- $ACTUAL_PORTS $CATENA ---"
     color_text "magenta" "TCP: $TCPPORT"
     color_text "cyan" "UDP: $UDPPORT"
     echo "----------------------------------"
-    echo "---Regole attuali:---"
+    echo "---$ACTUAL_RULES:---"
     cat $DIRCONF/filter/$CATENA | grep -v 'TCPPORT=' | grep -v 'UDPPORT=' | grep -v '#'
     echo "----------------------------------"
 
@@ -95,14 +95,14 @@ show_ports() {
 }
 # Funzione per mostrare il menu all'utente
 show_menu_add_remove() {
-    color_text "yellow" "Gestione porte TCP/UDP:"
-    echo "1) Edita il file a mano"
-    echo "2) Aggiungi una porta o un range TCP"
-    echo "3) Rimuovi una porta o un range TCP"
-    echo "4) Aggiungi una porta o un range UDP"
-    echo "5) Rimuovi una porta o un range UDP"
-    echo "6) Usa il Wizard per creare una regola complessa"
-    color_text "blue" "7) Esci"
+    color_text "yellow" "$GEST_PORTS"
+    echo "1) $MANUAL_FILE_EDIT"
+    echo "2) $ADD_TCP"
+    echo "3) $REMOVE_TCP"
+    echo "4) $ADD_UDP"
+    echo "5) $REMOVE_UDP"
+    echo "6) $COMPLEX_RULE"
+    color_text "red" "7) $EXIT"
 }
 
 update_file() {
@@ -116,15 +116,15 @@ add_port() {
     local ports_var=$2
     local new_port
 
-    read -p "Inserisci la porta o il range da aggiungere ($protocol, es. 80 o 100:200): " new_port
+    read -p "$INSERT_PORT ($protocol, ex. 80 o 100:200): " new_port
     validate_port "$new_port" 
     if [ "$?" = "0" ] ; then
         # Verifica che la porta o il range non sia già presente
         if [[ ! " ${!ports_var} " =~ " ${new_port} " ]]; then
             eval "$ports_var=\"\${$ports_var} \$new_port\""
-            echo "Porta o range $new_port aggiunto con successo a $protocol."
+            echo " $new_port $SUCCESS_ADD $protocol."
         else
-            echo "La porta o il range $new_port è già presente in $protocol."
+            echo "$PORT_OR_RANGE $new_port $ALREADY_PRESENT $protocol."
         fi
     else 
     handle_error "$INVALID_PORT" ; echo "PRESS ENTER ... " ; read ENTER
@@ -140,7 +140,7 @@ remove_port() {
     # Ottieni il valore attuale delle porte
     ports_var_value=$(eval echo \$$ports_var_name)
 
-    read -p "Inserisci la porta o il range da rimuovere ($protocol, es. 80 o 100:200): " port_to_remove
+    read -p "$PORT_RANGE_TO_REMOVE ($protocol, ex. 80 o 100:200): " port_to_remove
 
     # Verifica se la porta o il range esiste
     if [[ " ${ports_var_value} " =~ " ${port_to_remove} " ]]; then
@@ -154,9 +154,9 @@ remove_port() {
             UDPPORT="$ports_var_value"
         fi
 
-        echo "Porta o range $port_to_remove rimosso con successo da $protocol." ; echo "ENTER..." ; read INVIO
+        echo "$PORT_OR_RANGE $port_to_remove $REMOVED $protocol." ; echo "ENTER..." ; read INVIO
     else
-        echo "La porta o il range $port_to_remove non è presente in $protocol." ; echo "ENTER..." ; read INVIO
+        echo "$PORT_OR_RANGE $port_to_remove $NOT_PRESENT $protocol." ; echo "ENTER..." ; read INVIO
     fi
 }
 
@@ -170,7 +170,7 @@ manage_ports() {
         cat $DIRCONF/motd #Visualizza il banner motd
         show_ports
         show_menu_add_remove
-        read -p "Seleziona un'opzione: " choice
+        read -p "$SELECT_AN_OPTION" choice
 
         case $choice in
             1)
@@ -196,15 +196,15 @@ manage_ports() {
             6)
                 clear
                 cat $DIRCONF/motd #Visualizza il banner motd
-                echo "AGGIUNGI REGOLA A $CATENA"
+                echo "$ADD_RULE_TO $CATENA"
                 $DIRBIN/wiz/magic_filter.sh $CATENA
                 ;;
             7)
-                echo "Uscita."
+                echo "Exit"
                 filter
                 ;;
             *)
-                echo "Scelta non valida!"
+                echo "$INVALID_SELECTION"
                 ;;
         esac
     done
