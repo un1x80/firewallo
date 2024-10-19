@@ -278,7 +278,6 @@ show_netdpi () {
 clear
 cat $DIRCONF/motd #Visualizza il banner motd
 function show_menu {
-    clear
     echo "======================================"
     echo "  Network Deep Packet Inspection      "
     echo "======================================"
