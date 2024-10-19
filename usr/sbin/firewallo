@@ -317,9 +317,13 @@ do
 
     case $option in
         1)
+            clear
+            cat $DIRCONF/motd #Visualizza il banner motd
             suricata_wizard
             ;;
         2)
+            clear
+            cat $DIRCONF/motd #Visualizza il banner motd
             dpi_wizard
             ;;
         3)
