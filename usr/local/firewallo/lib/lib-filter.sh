@@ -89,6 +89,7 @@ show_ports() {
     echo "----------------------------------"
     echo "---$ACTUAL_RULES:$CATENA---"
     RULES_CAT=$(cat $DIRCONF/filter/$CATENA | grep -v 'TCPPORT=' | grep -v 'UDPPORT=' | grep -v '#')
+    color_text "yellow" "$RULES_CAT"
     echo "----------------------------------"
 
 
