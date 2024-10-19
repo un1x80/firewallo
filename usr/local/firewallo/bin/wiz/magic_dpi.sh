@@ -44,7 +44,7 @@ while true; do
             break
             ;;
         *)
-            handle_error "$INVALID_PROTOCOL"
+            handle_error "$INVALID_PROTOCOL" ; sleep 1
             ;;
     esac
 done
@@ -56,7 +56,7 @@ while true; do
     if validate_port "$SRC_PORT"; then
         break
     else
-        echo "$INVALID_SPORT"
+        echo "$INVALID_SPORT" ; sleep 1
     fi
 done
 
@@ -65,6 +65,8 @@ while true; do
     read -e -p "$DST_ADDR_PROMPT" DST_ADDR
     if validate_ip_mask "$DST_ADDR"; then
         break
+    else
+        echo "$INVALID_ADDR" ; sleep 1
     fi
 done
 
@@ -75,7 +77,7 @@ while true; do
     if validate_port "$DST_PORT"; then
         break
     else
-        echo "$INVALID_DPORT"
+        echo "$INVALID_DPORT" ; sleep 1
     fi
 done
 
@@ -86,7 +88,7 @@ while true; do
     if [[ "$comment" =~ ^[a-zA-Z0-9_]+$ ]]; then
         break
     else
-        handle_error "$INVALID_COMMENT_FORMAT"
+        handle_error "$INVALID_COMMENT_FORMAT" ; sleep 1
     fi
 done
 
