@@ -24,7 +24,7 @@ while true; do
     if validate_ip_mask "$SRC_ADDR"; then
         break
     else
-        echo "$INVALID_SPORT" ; sleep 1
+        echo "$INVALID_ADDR" ; sleep 1
     fi
 done
 
