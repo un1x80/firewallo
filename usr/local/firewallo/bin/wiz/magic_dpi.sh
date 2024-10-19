@@ -23,6 +23,8 @@ while true; do
     read -e -p "$SOURCE_ADDR_PROMPT" SRC_ADDR
     if validate_ip_mask "$SRC_ADDR"; then
         break
+    else
+        echo "$INVALID_SPORT" ; sleep 1
     fi
 done
 
