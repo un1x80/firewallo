@@ -91,6 +91,7 @@ show_current_rules() {
 # Main script
 clear
 cat $DIRCONF/motd # Visualizza il banner motd
+echo ""
 echo "---------------------------------------------"
 color_text "yellow" "Wizard per la configurazione di Suricata"
 echo "---------------------------------------------"
