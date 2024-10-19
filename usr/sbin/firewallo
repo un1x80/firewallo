@@ -296,11 +296,11 @@ function show_menu {
 #}
 
 function suricata_wizard {
-    $DIRBIN/wiz/magic_suricata.sh ; show_netdpi
+    $DIRBIN/wiz/magic_suricata.sh ;
 }
 
 function dpi_wizard {
-    $DIRBIN/wiz/magic_dpi.sh ; show_netdpi 
+    $DIRBIN/wiz/magic_dpi.sh ;
 }
 
 #function wg_manager_wizard {
