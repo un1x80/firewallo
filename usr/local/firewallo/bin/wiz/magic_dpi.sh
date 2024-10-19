@@ -97,8 +97,8 @@ if [ "$NFT" != "" ]; then
 #COMMENT:$comment
 $nft_cmd" >> $DIRCONF/filter/$CHAIN_SELECTED
 
-    echo "PRESS ENTER TO CONTINUE..." ; read ENTER
+ #   echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 else
     echo "$INT_ERROR_MSG"
-    echo "PRESS ENTER TO CONTINUE..." ; read ENTER
+  #  echo "PRESS ENTER TO CONTINUE..." ; read ENTER
 fi
