@@ -1,6 +1,5 @@
 #!/bin/bash
 source /usr/local/firewallo/lib/lib-wiz.sh
-
 # Controlla se il file esiste
 if [ -f /etc/firewallo/.sid ]; then
     # Leggi il valore attuale da .sid e incrementalo di uno
@@ -12,17 +11,15 @@ fi
 
 # Scrivi il nuovo valore nel file .sid
 echo $SID > /etc/firewallo/.sid
-
 # Array con tutti i protocolli supportati da Suricata
 protocols=(
     "Facebook" "Skype" "WhatsApp" "YouTube"
-    "Netflix" "Dropbox" "Google Drive" "OneDrive"
-    "Steam" "PlayStation Network" "Xbox Live" "Zoom"
-    "Microsoft Teams" "Instagram" "Twitter" "Telegram"
-    "TikTok" "Amazon Prime Video" "Spotify" "Apple Music"
-    "Discord" "Gmail" "Bitcoin" "Ethereum" "BitTorrent"
-    "OpenVPN" "IPsec" "WireGuard" "SMTP" "IMAP"
-    "POP3" "Tor" "SSH" "HTTPS" "HTTP" "DNS"
+    "Netflix" "Dropbox"
+    "Google Drive" "OneDrive" "Steam" "PlayStation Network"
+    "Xbox Live" "Zoom" "Microsoft Teams" "Instagram" "Twitter"
+    "Telegram" "TikTok" "Amazon Prime Video" "Spotify"
+    "Apple Music" "Discord" "Gmail" "Bitcoin" "Ethereum" 
+    "BitTorrent" "OpenVPN" "IPsec" "WireGuard" "SMTP" "IMAP" "POP3" "Tor" "SSH" "HTTPS" "HTTP" "DNS" 
 )
 
 # Funzione per controllare se Suricata è attivo
@@ -33,21 +30,24 @@ check_suricata() {
     fi
 }
 
-# Funzione per mostrare e selezionare i protocolli supportati
+# Funzione per mostrare i protocolli supportati
 show_protocols() {
-    echo "Scegli i protocolli da bloccare (inserisci 'fine' per terminare la selezione):"
+    echo "Scegli i protocolli da bloccare (puoi selezionarne più di uno separando i numeri con uno spazio):"
+    for i in "${!protocols[@]}"; do
+        echo "$((i + 1))) ${protocols[$i]}"
+    done
+    echo -n "Inserisci i numeri corrispondenti ai protocolli desiderati: "
+    read -a protocol_choices
+}
+
+# Funzione per ottenere i protocolli selezionati
+get_protocols() {
     selected_protocols=()
-    
-    PS3="Inserisci il numero del protocollo che desideri bloccare o 'fine' per terminare: "
-    
-    select protocol in "${protocols[@]}" "fine"; do
-        if [[ $protocol == "fine" ]]; then
-            break
-        elif [[ -n $protocol ]]; then
-            echo "Protocollo selezionato: $protocol"
-            selected_protocols+=("$protocol")
+    for choice in "${protocol_choices[@]}"; do
+        if ((choice > 0 && choice <= ${#protocols[@]})); then
+            selected_protocols+=("${protocols[$((choice - 1))]}")
         else
-            echo "Scelta non valida, riprova."
+            echo "Scelta non valida: $choice. Ignorato."
         fi
     done
 }
@@ -56,17 +56,14 @@ show_protocols() {
 create_rules() {
     for protocol in "${selected_protocols[@]}"; do
         echo "Aggiungendo regola per bloccare il traffico del protocollo $protocol..."
-        protocol=$(echo "$protocol" | tr '[:upper:]' '[:lower:]' | tr -d " ")
+	protocol=$(echo "$protocol" | tr '[:upper:]' '[:lower:]'| tr -d " ")
 
         # Aggiungi la regola al file delle regole di Suricata
         rule="drop ip any any -> any any (msg:\"Blocco traffico $protocol\"; app-layer-protocol:$protocol; sid:$SID; rev:1; classtype:policy-violation;)"
         echo "$rule" | sudo tee -a /etc/suricata/rules/block.rules > /dev/null
-        SID=$((SID + 1))
     done
 
     echo "Regole aggiunte con successo al file delle regole."
-    # Salva l'ultimo SID incrementato
-    echo $SID > /etc/firewallo/.sid
 }
 
 # Funzione per riavviare Suricata
@@ -89,7 +86,7 @@ show_current_rules() {
 
 # Main script
 clear
-cat $DIRCONF/motd # Visualizza il banner motd
+cat $DIRCONF/motd #Visualizza il banner motd
 echo "---------------------------------------------"
 echo "Wizard per la configurazione di Suricata"
 echo "---------------------------------------------"
@@ -102,6 +99,7 @@ show_current_rules
 
 # Chiedi all'utente di scegliere i protocolli da bloccare
 show_protocols
+get_protocols
 
 # Crea le regole di blocco per i protocolli scelti
 create_rules
