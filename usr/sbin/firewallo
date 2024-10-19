@@ -453,7 +453,7 @@ restore_conf() {
     # Chiede conferma all'utente
     read -p "$CONFIRM_RESTORE" conferma
 
-    if [[ "$conferma" != "s" && "$conferma" != "S" ]]; then
+    if [[ "$conferma" != "s" && "$conferma" != "S" && "$conferma" != "y" && "$conferma" != "Y" ]]; then
         echo "$RESTORE_ABORT"
         return 1
     fi
