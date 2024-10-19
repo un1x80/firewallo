@@ -5,7 +5,7 @@ LANG=en
 SELECT_CHAIN_PROMPT="Select the chain from the following list:"
 CHAIN_SELECTED_MSG="You have selected the chain: %s"
 LANG_NOT_FOUND="Translation file not found!"
-INVALID_SELECTION_MSG="Invalid input. Please try again."
+INVALID_SELECTION_MSG="Invalid input. Please try again." #->sbin/firewallo
 SOURCE_ADDR_PROMPT="Enter the source address (e.g., 192.168.1.1/32):"
 PROTOCOL_PROMPT="Enter the protocol (tcp or udp):"
 SRC_PORT_PROMPT="Enter the source port (e.g., 80 or 'any'):"
@@ -60,13 +60,21 @@ INVALID_SPORT="Invalid  port. Please enter a valid port or 'any'."
 INVALID_PROTO="Invalid protocol. Please enter 'tcp' or 'udp'."
 INVALID_INTERFACE="Invalid interface name."
 INVALID_TCP_UDP_CHOICE="Invalid Choice. Insert 1 for TCP or 2 for UDP."
-#25 raw
+#25raw
 
 #firewallo
 SAVECONF_IPT_NFT="Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable it at startup."
-#1raw
+SELECT_IPT_OR_NFT="SELECT IPTABLES OR NFTABLES"
+#2raw
 
 #Logs
 SELECT_CHAIN_TO_VIEW="SELECT chains do you want to view"
 SELECT_LOG_TYPE="SELECT log type"
 #2raw
+
+#Export_Restore_backup
+NO_BACKUP="There are no backup files available in the current directory."
+SELECT_FILE_RESTORE="Select a backup file to restore:"
+SELECT_NUMBER_BCK="Enter the number of the backup to restore:"
+CONFIRM_RESTORE="Are you sure you want to restore $file_selezionato to /etc/firewallo? [y/N]: "
+#4raw

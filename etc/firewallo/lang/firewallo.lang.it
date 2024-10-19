@@ -4,7 +4,7 @@ LANG=it
 SELECT_CHAIN_PROMPT="Seleziona la catena dalla seguente lista:"
 CHAIN_SELECTED_MSG="Hai selezionato la catena: %s"
 LANG_NOT_FOUND="File di traduzione non trovato!"
-INVALID_SELECTION_MSG="Input non valido. Riprova."
+INVALID_SELECTION_MSG="Input non valido. Riprova." #->/sbin/firewallo
 SOURCE_ADDR_PROMPT="Inserisci l'indirizzo sorgente (es. 192.168.1.1/32):"
 PROTOCOL_PROMPT="Inserisci il protocollo (tcp o udp):"
 SRC_PORT_PROMPT="Inserisci la porta sorgente (es. 80 o 'any'):"
@@ -63,9 +63,17 @@ INVALID_TCP_UDP_CHOICE="Scelta non valida. Per favore, inserisci 1 per TCP o 2 p
 
 #firewallo
 SAVECONF_IPT_NFT="Salva la conf di iptables in /etc/iptables/rules.v4 e lo abilità in startup"
-#1raw 
+SELECT_IPT_OR_NFT="SELEZIONA IPTABLES O NFTABLES"
+#2raw 
 
 #Logs
 SELECT_CHAIN_TO_VIEW="Seleziona la catena che vuoi visualizzare"
 SELECT_LOG_TYPE="Seleziona il tipo di log"
 #2raw
+
+#Export_Restore_backup
+NO_BACKUP="Non ci sono file di backup disponibili nella directory corrente."
+SELECT_FILE_RESTORE="Seleziona un file di backup da ripristinare:"
+SELECT_NUMBER_BCK="Inserisci il numero del backup da ripristinare:"
+CONFIRM_RESTORE="Sei sicuro di voler ripristinare $file_selezionato su /etc/firewallo? [s/N]: "
+#1raw
