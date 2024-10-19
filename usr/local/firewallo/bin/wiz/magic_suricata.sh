@@ -12,13 +12,13 @@ fi
 echo $SID > /etc/firewallo/.sid
 # Array con tutti i protocolli supportati da Suricata
 protocols=(
-    "BitTorrent" "Facebook" "Skype" "WhatsApp" "YouTube"
-    "Netflix" "Tor" "SSH" "HTTPS" "HTTP" "DNS" "Dropbox"
+    "Facebook" "Skype" "WhatsApp" "YouTube"
+    "Netflix" "Dropbox"
     "Google Drive" "OneDrive" "Steam" "PlayStation Network"
     "Xbox Live" "Zoom" "Microsoft Teams" "Instagram" "Twitter"
-    "Snapchat" "Telegram" "TikTok" "Amazon Prime Video" "Spotify"
-    "Apple Music" "Discord" "Gmail" "Office 365" "Slack" "Bitcoin"
-    "Ethereum" "OpenVPN" "IPsec" "WireGuard" "SMTP" "IMAP" "POP3"
+    "Telegram" "TikTok" "Amazon Prime Video" "Spotify"
+    "Apple Music" "Discord" "Gmail" "Bitcoin" "Ethereum" 
+    "BitTorrent" "OpenVPN" "IPsec" "WireGuard" "SMTP" "IMAP" "POP3" "Tor" "SSH" "HTTPS" "HTTP" "DNS" 
 )
 
 # Funzione per controllare se Suricata è attivo
