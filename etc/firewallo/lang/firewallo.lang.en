@@ -76,5 +76,9 @@ SELECT_LOG_TYPE="SELECT log type"
 NO_BACKUP="There are no backup files available in the current directory."
 SELECT_FILE_RESTORE="Select a backup file to restore:"
 SELECT_NUMBER_BCK="Enter the number of the backup to restore:"
-CONFIRM_RESTORE="Are you sure you want to restore $file_selezionato to /etc/firewallo? [y/N]: "
-#4raw
+CONFIRM_RESTORE="Are you sure you want to restore configuraztion [y/N]: "
+RESTORE_ABORT="Restore canceled."
+RESTORED_OK="Restore completed successfully."
+RESTORE_ERROR="Errore durante il ripristino del backup."
+BACKUP_OK="Backup successfully created:"
+#8raw

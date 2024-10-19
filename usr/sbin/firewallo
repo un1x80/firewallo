@@ -283,7 +283,7 @@ function show_menu {
     echo "======================================"
     echo "  Network Deep Packet Inspection      "
     echo "======================================"
-    echo "1) Select Protocol to block"
+    echo "1) Protocol block"
     echo "2) Network dpi Filter"
     echo "3) Exit"
     echo "======================================"
@@ -416,9 +416,9 @@ export_conf () {
 
     # Verifica se il comando tar ha avuto successo
     if [[ $? -eq 0 ]]; then
-        echo "Backup successfully created: $(pwd)/$nome_file"
+        echo " $(pwd)/$nome_file"
     else
-        echo "Error backup not created."
+        echo "$ERROR_BCK"
     fi
 
 }
@@ -454,7 +454,7 @@ restore_conf() {
     read -p "$CONFIRM_RESTORE" conferma
 
     if [[ "$conferma" != "s" && "$conferma" != "S" ]]; then
-        echo "Ripristino annullato."
+        echo "$RESTORE_ABORT"
         return 1
     fi
 
@@ -463,9 +463,9 @@ restore_conf() {
 
     # Verifica se il comando tar ha avuto successo
     if [[ $? -eq 0 ]]; then
-        echo "Ripristino completato con successo da $file_selezionato."
+        echo "$RESTORED_OK $file_selezionato"
     else
-        echo "Errore durante il ripristino del backup."
+        echo "$RESTORE_ERROR"
         return 1
     fi
 }
@@ -476,7 +476,7 @@ clear
 cat $DIRCONF/motd #Visualizza il banner motd
 echo " EDITOR: $EDITOR --- MENU MAIN ---"
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
-	echo "You must set Backend select iptables o nftables"
+	echo "INTERNAL ERROR: You must set Backend select iptables o nftables"
 fi
 
 #Opzioni del menu

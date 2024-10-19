@@ -1,5 +1,6 @@
 # Italiano
 LANG=it
+
 #Magic_filter
 SELECT_CHAIN_PROMPT="Seleziona la catena dalla seguente lista:"
 CHAIN_SELECTED_MSG="Hai selezionato la catena: %s"
@@ -75,5 +76,10 @@ SELECT_LOG_TYPE="Seleziona il tipo di log"
 NO_BACKUP="Non ci sono file di backup disponibili nella directory corrente."
 SELECT_FILE_RESTORE="Seleziona un file di backup da ripristinare:"
 SELECT_NUMBER_BCK="Inserisci il numero del backup da ripristinare:"
-CONFIRM_RESTORE="Sei sicuro di voler ripristinare $file_selezionato su /etc/firewallo? [s/N]: "
-#1raw
+CONFIRM_RESTORE="Sei sicuro di voler ripristinare la configurazione [s/N]: "
+RESTORE_ABORT="Ripristino annullato."
+RESTORED_OK="Restore completato con successo."
+RESTORE_ERROR="Errore durante il ripristino del backup."
+BACKUP_OK="Backup creato correttamente:"
+ERROR_BCK="Errore backup non creato."
+#8raw
