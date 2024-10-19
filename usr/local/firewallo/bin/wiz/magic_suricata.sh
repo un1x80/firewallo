@@ -109,3 +109,4 @@ restart_suricata
 show_current_rules
 
 echo "Configurazione di Suricata completata con successo!"
+echo "PRESS ENTER TO CONTINUE..." ; read ENTER
