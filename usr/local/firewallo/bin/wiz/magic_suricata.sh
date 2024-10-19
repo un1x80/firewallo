@@ -84,14 +84,15 @@ restart_suricata() {
 # Funzione per mostrare le regole attuali di Suricata
 show_current_rules() {
     echo "Regole attuali nel file block.rules:"
-    sudo cat /etc/suricata/rules/block.rules
+    RULESNOW=$(cat /etc/suricata/rules/block.rules)
+    color_text "yellow" $RULESNOW
 }
 
 # Main script
 clear
 cat $DIRCONF/motd # Visualizza il banner motd
 echo "---------------------------------------------"
-echo "Wizard per la configurazione di Suricata"
+color_text "yellow" "Wizard per la configurazione di Suricata"
 echo "---------------------------------------------"
 
 # Verifica se Suricata è attivo
