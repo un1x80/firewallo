@@ -85,6 +85,7 @@ show_current_rules() {
 
 # Main script
 clear
+cat $DIRCONF/motd #Visualizza il banner motd
 echo "---------------------------------------------"
 echo "Wizard per la configurazione di Suricata"
 echo "---------------------------------------------"
@@ -109,4 +110,3 @@ restart_suricata
 show_current_rules
 
 echo "Configurazione di Suricata completata con successo!"
-echo "PRESS ENTER TO CONTINUE..." ; read ENTER
