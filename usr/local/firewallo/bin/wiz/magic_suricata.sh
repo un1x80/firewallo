@@ -1,4 +1,5 @@
 #!/bin/bash
+source /usr/local/firewallo/lib/lib-wiz.sh
 # Controlla se il file esiste
 if [ -f /etc/firewallo/.sid ]; then
     # Leggi il valore attuale da .sid e incrementalo di uno

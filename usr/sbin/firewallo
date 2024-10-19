@@ -312,6 +312,8 @@ function dpi_wizard {
 # Ciclo principale del menu
 while true
 do
+    clear
+    cat $DIRCONF/motd #Visualizza il banner motd
     show_menu
     read option
 
