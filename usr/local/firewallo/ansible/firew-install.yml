@@ -54,7 +54,7 @@
           Section: utils
           Priority: optional
           Architecture: all
-          Depends: bash (>= 4.0), coreutils, iptables, nano, suricata
+          Depends: bash (>= 4.0), coreutils, iptables, nftables, nano
           Maintainer: Matteo Fioriti <fioritim@gmail.com>
           Description: Firewallo is a firewall manager for Debian GNU/Linux that uses iptables or nftables.
            Questo pacchetto include un sistema di gestione del firewall basato su iptables e nftables.
@@ -85,19 +85,15 @@
 
           # Copia del file suricata.yml personalizzato se non esiste già
           if [ ! -f /etc/suricata/suricata.yaml ]; then
-              install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.yaml /etc/suricata/suricata.yaml
+            install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.yaml /etc/suricata/suricata.yaml
           else       
-             mv /etc/suricata/suricata.yaml /etc/suricata/suricata.yaml.bck
-             install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.yaml /etc/suricata/suricata.yaml
+            mv /etc/suricata/suricata.yaml /etc/suricata/suricata.yaml.bck
+            install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.yaml /etc/suricata/suricata.yaml
           fi
 
           # Copia del file suricata.service personalizzato se non esiste già
-          if [ ! -f /lib/systemd/system/suricata.service ]; then
-              install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.service /lib/systemd/system/suricata.service
-          else 
-              mv /lib/systemd/system/suricata.service /lib/systemd/system/suricata.old
-              install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.service /lib/systemd/system/suricata.service
-          fi
+          install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.service /lib/systemd/system/suricata.service
+      
 
           # Verifica se esiste la directory /etc/firewallo, altrimenti la crea
           if [ ! -d /etc/firewallo ]; then

@@ -36,7 +36,7 @@
         chdir: /var/ansible/firewallo/repo_bck/
 
     - name: Configurare il nome utente Git
-      command: git config --global user.name "Your Name"
+      command: git config --global Matteo.Fioriti "Matteo Fioriti"
       args:
         chdir: /var/ansible/firewallo/repo_bck/
 
