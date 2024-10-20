@@ -16,7 +16,8 @@ apt install ./firewallo-24.9.1-amd64.deb -y
 ```
 
 ## 🔐Basic usage
-WIP
+Exec firewallo from a root shell and select a number of configuration menu. 
+
 
 ## 🛠️Build
 
