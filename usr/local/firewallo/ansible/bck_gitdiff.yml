@@ -1,0 +1,73 @@
+---
+- name: Backup di /etc/firewallo e verifica modifiche con Git
+  hosts: firewallo
+  become: true  # Per eseguire i comandi con privilegi di root
+  tasks:
+
+    - name: Creare il backup della directory /etc/firewallo
+      ansible.builtin.command:
+        cmd: "tar -czf /tmp/firewallo_backup_{{ ansible_date_time.iso8601 }}.tar.gz /etc/firewallo"
+      register: backup_file_result
+
+    - name: Imposta il percorso del file di backup creato
+      set_fact:
+        backup_file: "/tmp/firewallo_backup_{{ ansible_date_time.iso8601 }}.tar.gz"
+
+    - name: Copiare il file di backup nella macchina locale
+      fetch:
+        src: "{{ backup_file }}"
+        dest: "/var/ansible/firewallo/backup/"
+        flat: yes
+
+    - name: Scaricare la directory remota /etc/firewallo in locale
+      synchronize:
+        mode: pull
+        src: /etc/firewallo/
+        dest: /var/ansible/firewallo/repo_bck/
+      #delegate_to: 10.81.81.200
+
+      
+- name: Esegui operazioni Git sulla macchina locale
+  hosts: localhost
+  tasks:
+    - name: Configurare l'identità Git
+      command: git config --global user.email "you@example.com"
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+
+    - name: Configurare il nome utente Git
+      command: git config --global Matteo.Fioriti "Matteo Fioriti"
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+
+    - name: Verifica se la directory è un repository Git
+      command: git rev-parse --is-inside-work-tree
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      ignore_errors: yes
+      register: git_repo_check
+
+    - name: Inizializzare il repository Git se non esiste
+      command: git init
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      when: git_repo_check.rc != 0
+
+    - name: Controllare se ci sono cambiamenti nei file del repository
+      command: git status --porcelain
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      register: git_status_output
+      changed_when: git_status_output.stdout != ""
+
+    - name: Eseguire git add se ci sono cambiamenti
+      command: git add -A
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      when: git_status_output.stdout != ""
+
+    - name: Eseguire git commit se ci sono cambiamenti
+      command: git commit -m "Aggiornamento backup firewallo"
+      args:
+        chdir: /var/ansible/firewallo/repo_bck/
+      when: git_status_output.stdout != ""

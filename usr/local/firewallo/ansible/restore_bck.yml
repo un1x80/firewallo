@@ -1,0 +1,35 @@
+---
+- name: Ripristinare il backup su /etc/firewallo
+  hosts: firewallo
+  become: true  # Per eseguire i comandi con privilegi di root
+  tasks:
+
+    - name: Caricare il file di backup sul server remoto
+      copy:
+        src: /var/ansible/firewallo/backup/{{ firewallo_bck }}.tar.gz
+        dest: /tmp/firewallo_backup.tar.gz
+        mode: '0644'
+
+    - name: Estrarre il backup nella directory /etc/firewallo sovrascrivendo i file esistenti
+      ansible.builtin.unarchive:
+        src: /tmp/firewallo_backup.tar.gz
+        dest: /
+        remote_src: yes
+        extra_opts: [--overwrite]
+      register: bck_ok
+
+    - name: Verificare i permessi corretti per la directory /etc/firewallo
+      ansible.builtin.file:
+        path: /etc/firewallo
+        mode: '0755'
+        state: directory
+
+    - name: Avviso del ripristino del backup avvenuto correttamente.
+      ansible.builtin.debug:
+        msg: "Il ripristino del backup {{ firewallo_bck }} è avvenuto correttamente."
+      when: bck_ok is succeeded
+
+    - name: Avvisare in caso di errore durante il ripristino del backup
+      ansible.builtin.fail:
+        msg: "Errore durante il ripristino del backup {{ firewallo_bck }}."
+      when: bck_ok is failed

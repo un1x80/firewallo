@@ -1,64 +1,57 @@
 #!/bin/bash
+#Decommenta per Debug
 #set -x
+
+#Setup preliminare
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
+DIRBIN="/usr/local/firewallo/bin"
+DIRLIB="/usr/local/firewallo/lib"
 source $DIRCONF/firewallo.conf
-#DIALOG=`which dialog`
-DIALOG="nano"
+source $DIRLIB/lib-wiz.sh
+source $DIRLIB/lib-filter.sh
 
-if [ "$DIALOG" = "" ] ; then
-	DIALOG="vi"
-	OPTS=""
-elif [ "$DIALOG" = "nano" ] ; then
-	DIALOG="nano"
-	OPTS=""
-elif [ "$DIALOG" = "dialog" ] ; then
-	DIALOG="nano"
-	OPTS=""
+EDITOR="nano" #setta qui l'editor vi o nano se è vuoto usa vi
 
-elif [ "$DIALOG" != "" ] ; then
-	DIALOG="$DIALOG"
-	OPTS="0 0"
+if [ "$EDITOR" = "" ] ; then
+	EDITOR="vi"
+elif [ "$EDITOR" = "nano" ] ; then
+	EDITOR="nano"
+elif [ "$EDITOR" = "vi" ] ; then
+	EDITOR="vi"
 fi
 
-networking () {
-    if [ "$DIALOG" = "dialog" ] ; then
-		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/network/interfaces  $OPTS  2> .tmp
-	    RETVAL=$?
-        if [ "$RETVAL" = "0" ]; then
-			cat .tmp >  /etc/network/interfaces ; rm .tmp        
-		fi
-	else
-		$DIALOG /etc/network/interfaces
-	fi
-}
-
-sysctl  () {
-	if [ "$DIALOG" = "dialog" ] ; then
- 		$DIALOG --backtitle CONFIGURATION_INTERFACES --title interfaces --editbox  /etc/sysctl.conf   $OPTS  2> .tmp
-    	RETVAL=$?
-        if [ "$RETVAL" = "0" ]; then
-        	cat .tmp >  /etc/sysctl.conf ; rm .tmp
-        fi     
+# Carica il file di traduzione
+load_translations() {
+    local lang_file="$DIRCONF/lang/firewallo.lang.$LANG"
+    if [[ -f "$lang_file" ]]; then
+        source "$lang_file"
     else
-    	$DIALOG /etc/sysctl.conf
+        echo "LANG_NOT_FOUND"
+        exit 1
     fi
 }
 
-
-conf () {
-	if [ "$DIALOG" = "dialog" ] ; then
-		$DIALOG --backtitle CONFIGURATION_EDIT --title firewallo.conf --editbox $DIRCONF/firewallo.conf  $OPTS  2> .tmp 
-		RETVAL=$?
-       	if [ "$RETVAL" = "0" ]; then
-			cat .tmp > $DIRCONF/firewallo.conf ; rm .tmp
-		fi  
-    else
-  		$DIALOG $DIRCONF/firewallo.conf
-	fi
+#Funzione che apre in editor il contenuto di /etc/network/interfaces 
+networking () {
+		$EDITOR /etc/network/interfaces
 }
 
+#Funziona che apre in editor il file /etc/sysctl.conf
+sysctl  () {
+    	$EDITOR /etc/sysctl.conf
+}
+
+#Funzione che apre in editor il file di conf fi firewallo
+conf () {
+  		$EDITOR $DIRCONF/firewallo.conf
+}
+
+#Funzione di editing del table Filter
 filter () {
+clear
+cat $DIRCONF/motd #Visualizza il banner motd
+echo " --- FILTER MENU ---"
 MENU="
 fw2fw	fw2lan		fw2wan		fw2vpns		fw2dmz		\
 lan2fw	lan2lan		lan2wan		lan2vpns 	lan2dmz  	\
@@ -67,71 +60,46 @@ vpns2fw	vpns2lan	vpns2wan	vpns2vpns 	vpns2dmz 	\
 dmz2fw	dmz2lan		dmz2wan		dmz2vpns 	dmz2dmz 	\
 exit"
 
+ 
 select opt in $MENU ; do
 	if [ "$opt" = "exit" ] ; then
 		main 
 	else
-		if [ "$DIALOG" = "dialog" ] ; then
-			$DIALOG --backtitle FILTER_EDIT --title $opt --editbox $DIRCONF/filter/$opt 		$OPTS 2> .tmp 
-			RETVAL=$?
-           	if [ "$RETVAL" = "0" ]; then
-				cat .tmp > $DIRCONF/filter/$opt ; rm .tmp
-			fi			
-		else
-			$DIALOG $DIRCONF/filter/$opt 
-		fi
-	fi
+        #Legge $opt
+		read_variables "$opt"
+		# Avvia la gestione delle porte
+		manage_ports "$opt"
+    fi 
 done
 }
 
+#Funzione di editing manuale del table Nat
 nat  () {
-	if [ "$DIALOG" = "dialog" ] ; then
-        $DIALOG --backtitle NAT_EDIT --title firewallo.nat --editbox $DIRCONF/nat/firewallo.nat  	  $OPTS 2> .tmp
-		RETVAL=$?
-    	if [ "$RETVAL" = "0" ]; then
-			cat .tmp > $DIRCONF/nat/firewallo.nat ; rm .tmp
-		fi
-
-	else
-		$DIALOG $DIRCONF/nat/firewallo.nat
-	fi
+clear
+cat $DIRCONF/motd #Visualizza il banner motd
+show_wizard_nat
 }
 
+#Funzione di editing manuale del mangle
 mangle  () {
-	 if [ "$DIALOG" = "dialog" ] ; then
-		$DIALOG --backtitle MANGLE_EDIT --title firewallo.mangle --editbox $DIRCONF/mangle/firewallo.mangle $OPTS 2> .tmp
-	    RETVAL=$?
-        if [ "$RETVAL" = "0" ]; then
-			cat .tmp > $DIRCONF/mangle/firewallo.mangle ; rm .tmp
-		fi		
-    else
-		$DIALOG	$DIRCONF/mangle/firewallo.mangle
-	fi
+		$EDITOR	$DIRCONF/mangle/firewallo.mangle
 }
 
+#Funzione di editing manuale del routing
 route  () {
-	if [ "$DIALOG" = "dialog" ] ; then
-        $DIALOG --backtitle ROUTE_EDIT --title firewallo.route --editbox $DIRCONF/route/firewallo.route $OPTS 2> .tmp
-		RETVAL=$?
-        if [ "$RETVAL" = "0" ]; then
-		cat .tmp > $DIRCONF/route/firewallo.route ; rm .tmp
-		fi
-
-	else
- 		$DIALOG $DIRCONF/route/firewallo.route
-	fi
+ 		$EDITOR $DIRCONF/route/firewallo.route
 }
 
+#Funzione di start di Firewallo
 start () {
 if  [ "$NFT" != "" ] ; then
 /etc/init.d/firewallo.nft start
-
 elif [ "$IPT" != "" ]  ; then
-
 /etc/init.d/firewallo.iptables start
 fi
 }
 
+#Funzione di stop di Firewallo
 stop () {
 if  [ "$NFT" != "" ] ; then
 /etc/init.d/firewallo.nft stop
@@ -141,15 +109,18 @@ fi
 
 }
 
+#Funzione di restart 
 restart () {
 stop
 start
 }
 
+#Funzione di visualizzazione dello status
 status () {
 less $DIRCONF/status.log
 }
 
+#Funzione di list delle regole 
 rules () {
 if [ "$IPT" != "" ]  ;then
 	$IPT -t filter 	-L -vn > .filter
@@ -173,9 +144,12 @@ main
 
 #done
 }
+
+#Funzione di salvataggio della configurazione di iptables/nftables ed enable del servizio su systemd
 saveconf () {
+restart #Mi assicuro che il firewall sia startato se no che regole salvo.
 if [ "$IPT" != "" ] ; then
-	echo "Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable nftables at startup."
+	echo "$SAVECONF_IPT_NFT" 
 	echo '
 [Unit]
 Description=Restore iptables rules
@@ -183,46 +157,55 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c "/sbin/iptables-nft-restore < /etc/iptables/rules.v4"
-ExecStartPost=/bin/bash -c "/sbin/ip6tables-nft-restore < /etc/iptables/rules.v6"
+ExecStart=/bin/bash -c "/sbin/iptables-restore < /etc/iptables/rules.v4"
+#ExecStartPost=/bin/bash -c "/sbin/ip6tables-restore < /etc/iptables/rules.v6"
 RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target
-'> /etc/systemd/system/iptables-restore.service
+'> /etc/systemd/system/iptables-restore.service #Ok metto su systemd il restore di iptables
 	systemctl daemon-reload
 	systemctl disable nftables.service
 	systemctl enable  iptables-restore.service
-	if  [ ! -e /etc/iptables ]  ; then mkdir /etc/iptables/ ; fi
-	iptables-nft-save > /etc/iptables/rules.v4
+	        if  [ ! -e /etc/iptables ]  ; then #Controllo che /etc/iptables ci sia 
+            mkdir /etc/iptables/
+            fi 
+    iptables-save > /etc/iptables/rules.v4
 	chmod 644 /etc/iptables/rules.v4
 	echo "..OK"
 elif [ "$NFT" != ""  ] ; then
-	echo "Save Conf to /etc/nftables.conf and enable nftables at startup."
-	systemctl disable iptables-restore.service
-	systemctl enable nftables.service
-	nft list ruleset > /etc/nftables.conf
-	echo "..OK"
+	    echo "Save Conf to /etc/nftables.conf and enable nftables at startup."
+	    systemctl disable iptables-restore.service
+	    systemctl enable nftables.service
+	    nft list ruleset > /etc/nftables.conf
+	    echo "..OK"
 fi
 }
+
+#Funzione di switch del backend nft/iptables
 nftiptables () {
-echo "SELECT IPTABLES OR NFTABLES"
+echo "$SELECT_IPT_OR_NFT"
 MENU1="iptables nftables"
 opt1=""
 select opt1 in $MENU1 ; do
-        if [ "$opt1" = "nftables" ] ; then
-                export IPT="";
-		export NFT="/usr/sbin/nft"
-		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf
-		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf
-		printf 'NFT=\"/usr/sbin/nft\"' >> $DIRCONF/firewallo.conf
+        if [ "$opt1" = "nftables" ] ; then #se selezioni nft
+        export IPT=""; #Svuoto IPT
+		export NFT="/usr/sbin/nft" #Setto NFT
+		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf #vuoto iptables in firewallo.conf
+		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf #vuoto anche nft 
+		printf 'NFT=\"/usr/sbin/nft\"' >> $DIRCONF/firewallo.conf #risetto nft
+		update-alternatives --set iptables /usr/sbin/iptables-nft
+		systemctl enable nftables.service
 		return
-        elif [ "$opt1" = "iptables" ] ; then
-                export NFT="";
-		export IPT="/sbin/iptables"
-		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf
-		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf
-                printf 'IPT=\"/sbin/iptables\"' >> $DIRCONF/firewallo.conf
+        elif [ "$opt1" = "iptables" ] ; then #Se selezioni iptables
+        export NFT=""; #Svuoto NFT
+		export IPT="/sbin/iptables" #Setto iptables
+		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf #Vuoto iptables e anche nft
+		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf #
+        printf 'IPT=\"/sbin/iptables\"' >> $DIRCONF/firewallo.conf #Setto iptables
+		update-alternatives --set iptables /usr/sbin/iptables-legacy
+		systemctl disable nftables.service
+		systemctl enable  iptables-restore.service
 		return
         fi
 done
@@ -232,20 +215,24 @@ done
 
 # Funzione per monitorare i log con Ctrl+C che uccide solo journalctl
 log_filter () { 
-    echo "SELECT chains do you want to view"
+    clear 
+    cat $DIRCONF/motd #Visualizza il banner motd
 
-    # Definizione del menu come array
-    MENU=("EXIT" "state" "icmp_good" "bad_tcp_flags" "POSTROUTING" "PREROUTING" "DROP" "OUTPUT_DROP" "INPUT_DROP" "FORWARD_DROP"  \
-          "fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" \
-          "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" \
-          "wan2fw" "wan2lan" "wan2wan" "wan2vpns" "wan2dmz" \
-          "vpns2fw" "vpns2lan" "vpns2wan" "vpns2vpns" "vpns2dmz" \
-          "dmz2fw" "dmz2lan" "dmz2wan" "dmz2vpns" "dmz2dmz" "nothing")
+    echo "$SELECT_CHAIN_TO_VIEW"
 
-    # Usa l'array con select
+    MENU=("fw2fw" "fw2lan" "fw2wan" "fw2vpns" "fw2dmz" 			\
+          "lan2fw" "lan2lan" "lan2wan" "lan2vpns" "lan2dmz" 	\
+          "wan2fw" "wan2lan" "wan2wan" "wan2vpns" "wan2dmz" 	\
+          "vpns2fw" "vpns2lan" "vpns2wan" "vpns2vpns" "vpns2dmz"\
+          "dmz2fw" "dmz2lan" "dmz2wan" "dmz2vpns" "dmz2dmz"  	\
+		  "state" "icmp_good" "bad_tcp_flags" "nothing"			\
+		  "POSTROUTING" "PREROUTING" "DROP" "OUTPUT_DROP"       \
+          "INPUT_DROP" "FORWARD_DROP" "EXIT")
+
+    
     select opt in "${MENU[@]}"; do
         if [ "$opt" = "EXIT" ]; then
-            echo "Uscita dal log filter."
+            echo "Exit from filter."
             break  # Esci dal ciclo
 
         elif [ "$opt" = "nothing" ] && [ "$1" = "live" ]; then	
@@ -273,7 +260,10 @@ log_filter () {
 
 # Funzione per selezionare il tipo di log
 logs () {
-    echo "SELECT log type"
+    clear 
+    cat $DIRCONF/motd #Visualizza il banner motd
+
+    echo "$SELECT_LOG_TYPE"
     MENU1=("EXIT" "live" "1 week ago" "1 day ago" "1 hour ago" "1 minute ago" )
     
     select opt1 in "${MENU1[@]}"; do
@@ -285,21 +275,213 @@ logs () {
     done
 }
 
+show_netdpi () {
+clear
+cat $DIRCONF/motd #Visualizza il banner motd
+function show_menu {
+    echo ""
+    echo "======================================"
+    echo "  Network Deep Packet Inspection      "
+    echo "======================================"
+    echo "1) Protocol block"
+    echo "2) Network dpi Filter"
+    echo "3) Exit"
+    echo "======================================"
+    echo -n "Select an option: "
+}
+
+# Funzioni per le diverse opzioni
+#function filter_wizard {
+#    $DIRBIN/wiz/magic_filter.sh
+#}
+
+function suricata_wizard {
+    $DIRBIN/wiz/magic_suricata.sh ;
+}
+
+function dpi_wizard {
+    $DIRBIN/wiz/magic_dpi.sh ;
+}
+
+#function wg_manager_wizard {
+#    $DIRBIN/wiz/wg/wg_manager.sh
+#}
 
 
+
+# Ciclo principale del menu
+while true
+do
+    clear
+    cat $DIRCONF/motd #Visualizza il banner motd
+    show_menu
+    read option
+
+    case $option in
+        1)
+            clear
+            cat $DIRCONF/motd #Visualizza il banner motd
+            suricata_wizard
+            ;;
+        2)
+            clear
+            cat $DIRCONF/motd #Visualizza il banner motd
+            dpi_wizard
+            ;;
+        3)
+            echo "Exit"
+            break
+            ;;
+        *)
+            echo "Select right Option!."
+            ;;
+    esac
+
+    # Pausa per permettere la lettura del messaggio
+    echo -n "Press Enter to continue..."
+    read
+done
+}
+
+show_wizard_nat () {
+clear
+cat $DIRCONF/motd #Visualizza il banner motd
+function show_menu_nat {
+    echo " "
+    echo "======================================"
+    echo "           FIREWALLO NAT  "
+    echo "======================================"
+    echo "1) Nat Prerouting Wizard"
+    echo "2) Nat Postrouting Wizard"
+    echo "3) Manual Edit File "
+    echo "4) Exit"
+    echo "======================================"
+    echo -n "Select an option: "
+}
+
+# Funzioni per le diverse opzioni
+function nat_prerouting_wizard {
+clear
+cat $DIRCONF/motd #Visualizza il banner motd
+	$DIRBIN/wiz/magic_nat_prerouting.sh
+}
+
+function nat_postrouting_wizard {
+clear
+cat $DIRCONF/motd #Visualizza il banner motd
+	$DIRBIN/wiz/magic_nat_postrouting.sh
+}
+function edit_manual_nat {
+	$EDITOR $DIRCONF/nat/firewallo.nat
+}
+
+# Ciclo principale del menu
+while true
+do
+    show_menu_nat
+    read option_nat
+
+    case $option_nat in
+        1)
+            nat_prerouting_wizard
+            ;;
+        2)
+            nat_postrouting_wizard
+            ;;
+	    3)  edit_manual_nat
+	        ;;
+	    4)
+            echo "Exit"
+            break
+            ;;
+        *)
+            echo "Select right Option!."
+            ;;
+    esac
+
+    # Pausa per permettere la lettura del messaggio
+    echo -n "Press Enter to continue..."
+    read
+done
+}
+export_conf () {
+    # Imposta la variabile per la data e l'ora corrente nel formato YYYYMMDD-HHMMSS
+    local data_odierna_ora=$(date +"%Y%m%d-%H%M%S")
+
+    # Nome del file tar.gz
+    local nome_file="firewallo-conf-${data_odierna_ora}.tar.gz"
+
+    # Crea il backup della directory /etc/firewallo nella directory corrente
+    tar -czf "$nome_file" /etc/firewallo
+
+    # Verifica se il comando tar ha avuto successo
+    if [[ $? -eq 0 ]]; then
+        echo " $(pwd)/$nome_file"
+    else
+        echo "$ERROR_BCK"
+    fi
+
+}
+restore_conf() {
+    # Cerca i file di backup chiamati firewallo-conf-*.tar.gz nella directory corrente
+    local files=($(ls firewallo-conf-*.tar.gz 2>/dev/null))
+
+    # Se non ci sono file di backup, informa l'utente e termina la funzione
+    if [[ ${#files[@]} -eq 0 ]]; then
+        echo "$NO_BACKUP"
+        return 1
+    fi
+
+    # Mostra un menu con i file trovati
+    echo "$SELECT_FILE_RESTORE"
+    for i in "${!files[@]}"; do
+        echo "$((i+1)). ${files[$i]}"
+    done
+
+    # Chiede all'utente di scegliere un'opzione
+    read -p "$SELECT_NUMBER_BCK" scelta
+
+    # Verifica che l'input sia valido
+    if ! [[ "$scelta" =~ ^[0-9]+$ ]] || ((scelta < 1 || scelta > ${#files[@]})); then
+        echo "$INVALID_SELECTION_MSG"
+        return 1
+    fi
+
+    # Ottiene il nome del file selezionato
+    local file_selezionato="${files[$((scelta-1))]}"
+
+    # Chiede conferma all'utente
+    read -p "$CONFIRM_RESTORE" conferma
+
+    if [[ "$conferma" != "s" && "$conferma" != "S" && "$conferma" != "y" && "$conferma" != "Y" ]]; then
+        echo "$RESTORE_ABORT"
+        return 1
+    fi
+
+    # Estrae il file di backup sovrascrivendo la directory /etc/firewallo
+    sudo tar -xzf "$file_selezionato" -C /etc
+
+    # Verifica se il comando tar ha avuto successo
+    if [[ $? -eq 0 ]]; then
+        echo "$RESTORED_OK $file_selezionato"
+    else
+        echo "$RESTORE_ERROR"
+        return 1
+    fi
+}
+
+#Funzione principale
 main () {
 clear
-cat $DIRCONF/motd
-echo "
-DEFAULT EDITOR: $DIALOG 
-###########################################
-"
+cat $DIRCONF/motd #Visualizza il banner motd
+echo " EDITOR: $EDITOR --- MENU MAIN ---"
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
-	echo " DEVI SETTARE IL Backend Scegli iptables o nftables"
+	echo "INTERNAL ERROR: You must set Backend select iptables o nftables"
 fi
 
-MENU="networking sysctl conf filter nat mangle start stop restart route status rulesview saveconf nft-iptables logs exit"
-select opt in $MENU ; do
+#Opzioni del menu
+MENU="networking sysctl conf filter nat mangle start stop restart route networkdpi status rulesview saveconf nft-iptables logs export_conf restore_conf exit"
+select opt in $MENU ; do 
 	if [ "$opt" = "networking" ] ; then
 		networking ;  main
 	elif [ "$opt" = "conf" ] ; then
@@ -307,17 +489,17 @@ select opt in $MENU ; do
 	elif [ "$opt" = "sysctl" ] ; then
         sysctl ; main
 	elif [ "$opt" = "filter" ] ; then
-        filter ;
+        filter ; main
     elif [ "$opt" = "nat" ] ; then
         nat ; main
 	elif [ "$opt" = "mangle" ] ; then
         mangle ; main
 	elif [ "$opt" = "start" ] ; then
-        start ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
+        start ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #starto attendo e leggo invio per tornare
 	elif [ "$opt" = "stop" ] ; then
-        stop ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
-	elif [ "$opt" = "restart" ] ; then
-        restart ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main
+        stop ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #idem come sopra
+	elif [ "$opt" = "restart" ] ; then 
+        restart ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #idem come sopra
 	elif [ "$opt" = "route" ] ; then
         route ; main
 	elif [ "$opt" = "status" ] ; then
@@ -329,11 +511,18 @@ select opt in $MENU ; do
     elif [ "$opt" = "nft-iptables" ] ; then
         nftiptables ; main
 	elif [ "$opt" = "logs" ] ; then
-        logs ;
+        logs ; main
+	elif [ "$opt" = "networkdpi" ] ; then
+		show_netdpi ; main
+    elif [ "$opt" = "export_conf" ] ; then
+		export_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
+    elif [ "$opt" = "restore_conf" ] ; then
+		restore_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
 	fi
 done
 }
+#Lancio finalmente il main in stile C
 main

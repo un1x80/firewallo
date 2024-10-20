@@ -1,0 +1,108 @@
+# English
+LANG=en
+
+#Magic_filter#################################################
+SELECT_CHAIN_PROMPT="Select the chain from the following list:"
+CHAIN_SELECTED_MSG="You have selected the chain: %s"
+LANG_NOT_FOUND="Translation file not found!"
+INVALID_SELECTION_MSG="Invalid input. Please try again." #->sbin/firewallo
+SOURCE_ADDR_PROMPT="Enter the source address (e.g., 192.168.1.1/32):"
+PROTOCOL_PROMPT="Enter the protocol (tcp or udp):"
+SRC_PORT_PROMPT="Enter the source port (e.g., 80 or 'any'):"
+DST_ADDR_PROMPT="Enter the destination address (e.g., 192.168.10.1/32):"
+DST_PORT_PROMPT="Enter the destination port (e.g., 80 or 'any'):"
+ACTION_PROMPT="Enter the action (ACCEPT, DROP, REJECT):"
+IPT_RULE_MSG="iptables rule:"
+NFT_RULE_MSG="nftables rule:"
+INT_ERROR_MSG="Internal error: NFT or IPT not set!"
+#13raw
+
+#Magic_nat_postrouting
+SRCIP_MASK_PROMPT="Enter the source IP address (srcip) and mask (e.g., 192.168.1.0/24):"
+OIF_PROMPT="Enter the output interface (oif) (e.g., eth0):"
+MASQUERADE_PROMPT="Select the type of masquerading:"
+MASQUERADE_OPTION="1) MASQUERADE"
+SNAT_OPTION="2) SNAT"
+CHOICE_PROMPT="Enter the corresponding number (1 or 2):"
+PORT_PROMPT="Enter the destination port (dport) (leave blank if not applicable):"
+SNAT_SOURCE_IP_PROMPT="Enter the IP address for SNAT (e.g., 192.168.1.1):"
+INVALID_SOURCIP_MASK_FORMAT="Invalid format for SNAT IP address."
+CONFIG_SUCCESS="MASQUERADE configuration successfully completed."
+CONFIG_ERROR="Error in MASQUERADE configuration."
+SNAT_CONFIG_SUCCESS="SNAT configuration successfully completed."
+SNAT_CONFIG_ERROR="Error in SNAT configuration."
+ERROR_HANDLER_MASQ="Invalid selection. Please enter 1 for MASQUERADE or 2 for SNAT."
+#14raw
+
+#Magic_prerouting
+PREROUTING_CONFIG_PROMPT="PREROUTING configuration with iptables and nftables"
+SRCIP_MASK_PREROUTING_PROMPT="Enter the source IP address (srcip) and mask (e.g., 192.168.1.0/24):"
+IIF_PROMPT="Enter the input interface (iif) (e.g., eth0):"
+TCP_OPTION="1) TCP"
+UDP_OPTION="2) UDP"
+PORT_DEST_PROMPT="Enter the destination port (dport) (e.g., 80):"
+INVALID_DPORT="Invalid port number."
+DEST_IP_PROMPT="Enter the destination IP address for DNAT (e.g., 192.168.10.10):"
+DEST_PORT_PROMPT="Enter the final destination port (e.g., 8080):"
+COMMENT_PROMPT="Enter the comment for the rule:"
+INVALID_DEST_IP_FORMAT="Invalid destination IP address."
+INVALID_DEST_PORT_FORMAT="Invalid destination port number."
+INVALID_COMMENT_FORMAT="The string contains invalid characters."
+DNAT_CONFIG_SUCCESS="DNAT configuration successfully completed in iptables."
+DNAT_CONFIG_ERROR="Error in DNAT configuration in iptables."
+NFT_DNAT_CONFIG_SUCCESS="DNAT configuration successfully completed in nftables."
+NFT_DNAT_CONFIG_ERROR="Error in DNAT configuration in nftables."
+INVALID_SADDR="Invalid address format. Please try again."
+ERROR_INVALID_ACTION="Invalid action. Please enter 'ACCEPT', 'DROP', or 'REJECT'."
+INVALID_PORT="Invalid  port. Please enter a valid port or 'any'."
+INVALID_ADDR="Invalid  address format. Please try again."
+INVALID_SPORT="Invalid  port. Please enter a valid port or 'any'."
+INVALID_PROTO="Invalid protocol. Please enter 'tcp' or 'udp'."
+INVALID_INTERFACE="Invalid interface name."
+INVALID_TCP_UDP_CHOICE="Invalid Choice. Insert 1 for TCP or 2 for UDP."
+#25raw
+
+#firewallo
+SAVECONF_IPT_NFT="Save Conf di IPTABLES to /etc/iptables/rules.v4 and enable it at startup."
+SELECT_IPT_OR_NFT="SELECT IPTABLES OR NFTABLES"
+#2raw
+
+#Logs
+SELECT_CHAIN_TO_VIEW="SELECT chains do you want to view"
+SELECT_LOG_TYPE="SELECT log type"
+#2raw
+
+#Export_Restore_backup
+NO_BACKUP="There are no backup files available in the current directory."
+SELECT_FILE_RESTORE="Select a backup file to restore:"
+SELECT_NUMBER_BCK="Enter the number of the backup to restore:"
+CONFIRM_RESTORE="Are you sure you want to restore configuration [y/N]: " #<- It must also be changed in firewallo. 
+RESTORE_ABORT="Restore canceled."
+RESTORED_OK="Restore completed successfully."
+RESTORE_ERROR="Errore durante il ripristino del backup."
+BACKUP_OK="Backup successfully created:"
+ERROR_BCK="Error backup not created."
+#8raw
+
+#Magic Lib
+NOT_EXIST="not exist. Create it with variables tcpports and udpports."
+ACTUAL_PORTS="Actual opened ports in"
+ACTUAL_RULES="Actual Rules in"
+GEST_PORTS="Manage ports TCP/UDP:"
+MANUAL_FILE_EDIT="Manual edit"
+ADD_TCP="Add a port or range TCP"
+REMOVE_TCP="Remove a port or range TCP"
+ADD_UDP="Add a port or range UDP"
+REMOVE_UDP="Remove a port or range UDP"
+COMPLEX_RULE="Use Wizard to create a rule"
+EXIT="Exit"
+INSERT_PORT="Insert a port or range to add"
+PORT_OR_RANGE="Port or range"
+SUCCESS_ADD="aggiunto con successo a"
+ALREADY_PRESENT="already present"
+PORT_RANGE_TO_REMOVE="Insert port or range to remove"
+REMOVED="successfully removed from"
+NOT_PRESENT="not present in"
+SELECT_AN_OPTION="Select an option: "
+ADD_RULE_TO="ADD RULE TO"
+INVALID_SELECTION="Invalid Selection!"

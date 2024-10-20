@@ -1,0 +1,212 @@
+#!/bin/bash
+
+DIRCONF="/etc/firewallo"
+source $DIRCONF/firewallo.conf
+
+color_text() {
+    local color="$1"
+    local text="$2"
+
+    # Mappa dei colori
+    case "$color" in
+        black) color_code="30" ;;
+        red) color_code="31" ;;
+        green) color_code="32" ;;
+        yellow) color_code="33" ;;
+        blue) color_code="34" ;;
+        magenta) color_code="35" ;;
+        cyan) color_code="36" ;;
+        white) color_code="37" ;;
+        *) color_code="37" ;; # Default to white if color not found
+    esac
+
+    # Restituisce la stringa colorata con reset alla fine
+    echo -e "\e[${color_code}m${text}\e[0m"
+}
+
+
+# Carica il file di traduzione
+load_translations() {
+    local lang_file="$DIRCONF/lang/firewallo.lang.$LANG"
+    if [[ -f "$lang_file" ]]; then
+        source "$lang_file"
+    else
+        echo "LANG_NOT_FOUND"
+        exit 1
+    fi
+};load_translations 
+#Infatti carico subito le traduzioni
+
+handle_error() {
+    echo "$1" 1>&2
+    color_text "red" "$INVALID_SELECTION_MSG"
+}
+
+# Funzione per leggere le variabili delle porte dai file delle catene
+read_variables() {
+# Definisce il percorso del file passato per variabile
+file_path="$DIRCONF/filter/$1"
+CATENA=$1
+    if [[ -f "$file_path" ]]; then
+        source "$file_path"
+    else
+        echo "$file_path $NOT_EXIST"
+        exit 1
+    fi
+}
+# Funzione per controllare la validità della porta o di un intervallo di porte
+validate_port() {
+    local port="$1"
+    
+    # Controllo se è "any" oppure un numero singolo valido
+    if [[ "$port" == "any" || "$port" =~ ^[0-9]+$ && "$port" -ge 1 && "$port" -le 65535 ]]; then
+        return 0  # Porta singola valida o "any"
+    
+    # Controllo se è un intervallo di porte nel formato min:max
+    elif [[ "$port" =~ ^[0-9]+:[0-9]+$ ]]; then
+        IFS=":" read -r min_port max_port <<< "$port"
+        # Verifica che entrambi i valori siano validi e min_port sia minore di max_port
+        if [[ "$min_port" -ge 1 && "$max_port" -le 65535 && "$min_port" -lt "$max_port" ]]; then
+            # Se la variabile $NFT non è vuota, sostituisci i : con -
+            if [[ -n "$NFT" ]]; then
+                new_port="${min_port}-${max_port}"
+            fi
+            return 0  # Intervallo valido
+        else
+            return 1  # Intervallo non valido
+        fi
+    else
+        return 1  # Non valido
+    fi
+}
+
+# Funzione per mostrare le porte attualmente aperte all'utente
+show_ports() {
+    echo -e "
+--- $ACTUAL_PORTS $CATENA ---"
+    color_text "magenta" "TCP: $TCPPORT"
+    color_text "cyan" "UDP: $UDPPORT"
+    echo "----------------------------------"
+    echo "---$ACTUAL_RULES:$CATENA---"
+    RULES_CAT=$(cat $DIRCONF/filter/$CATENA | grep -v 'TCPPORT=' | grep -v 'UDPPORT=' | grep -v '#')
+    color_text "yellow" "$RULES_CAT"
+    echo "----------------------------------"
+
+
+}
+# Funzione per mostrare il menu all'utente
+show_menu_add_remove() {
+    color_text "yellow" "$GEST_PORTS"
+    echo "1) $MANUAL_FILE_EDIT"
+    echo "2) $ADD_TCP"
+    echo "3) $REMOVE_TCP"
+    echo "4) $ADD_UDP"
+    echo "5) $REMOVE_UDP"
+    echo "6) $COMPLEX_RULE"
+    color_text "red" "7) $EXIT"
+}
+
+update_file() {
+    # Modifica le variabili direttamente nel file
+    sed -i "s/^TCPPORT=.*/TCPPORT=\"$TCPPORT\"/" "$file_path"
+    sed -i "s/^UDPPORT=.*/UDPPORT=\"$UDPPORT\"/" "$file_path"
+}
+# Funzione per aggiungere una porta o un range
+add_port() {
+    local protocol=$1
+    local ports_var=$2
+    local new_port
+
+    read -p "$INSERT_PORT ($protocol, ex. 80 o 100:200): " new_port
+    validate_port "$new_port" 
+    if [ "$?" = "0" ] ; then
+        # Verifica che la porta o il range non sia già presente
+        if [[ ! " ${!ports_var} " =~ " ${new_port} " ]]; then
+            eval "$ports_var=\"\${$ports_var} \$new_port\""
+            echo " $new_port $SUCCESS_ADD $protocol."
+        else
+            echo "$PORT_OR_RANGE $new_port $ALREADY_PRESENT $protocol."
+        fi
+    else 
+    handle_error "$INVALID_PORT" ; echo "PRESS ENTER ... " ; read ENTER
+    fi
+}
+
+# Funzione per rimuovere una porta o un range
+remove_port() {
+    local protocol=$1
+    local ports_var_name=$2
+    local port_to_remove
+
+    # Ottieni il valore attuale delle porte
+    ports_var_value=$(eval echo \$$ports_var_name)
+
+    read -p "$PORT_RANGE_TO_REMOVE ($protocol, ex. 80 o 100:200): " port_to_remove
+
+    # Verifica se la porta o il range esiste
+    if [[ " ${ports_var_value} " =~ " ${port_to_remove} " ]]; then
+        # Rimuove la porta o il range e ripulisce gli spazi in eccesso
+        ports_var_value=$(echo "$ports_var_value" | sed -e "s/\b$port_to_remove\b//g" -e 's/  */ /g' -e 's/^ *//g' -e 's/ *$//g')
+
+        # Assegna il nuovo valore alla variabile corretta (TCPPORT o UDPPORT)
+        if [[ "$protocol" == "TCP" ]]; then
+            TCPPORT="$ports_var_value"
+        elif [[ "$protocol" == "UDP" ]]; then
+            UDPPORT="$ports_var_value"
+        fi
+
+        echo "$PORT_OR_RANGE $port_to_remove $REMOVED $protocol." ; echo "ENTER..." ; read INVIO
+    else
+        echo "$PORT_OR_RANGE $port_to_remove $NOT_PRESENT $protocol." ; echo "ENTER..." ; read INVIO
+    fi
+}
+
+
+
+# Funzione principale di gestione delle porte
+manage_ports() {
+
+    while true; do
+        clear
+        cat $DIRCONF/motd #Visualizza il banner motd
+        show_ports
+        show_menu_add_remove
+        read -p "$SELECT_AN_OPTION" choice
+
+        case $choice in
+            1)
+                $EDITOR $file_path
+                ;;
+            2)
+                add_port "TCP" "TCPPORT"
+                update_file
+                ;;
+            3)
+                remove_port "TCP" "TCPPORT"
+                update_file
+                ;;
+            4)
+                add_port "UDP" "UDPPORT"
+                update_file
+                ;;
+            5)
+                remove_port "UDP" "UDPPORT"
+                update_file
+                ;;
+            
+            6)
+                clear
+                cat $DIRCONF/motd #Visualizza il banner motd
+                echo "$ADD_RULE_TO $CATENA"
+                $DIRBIN/wiz/magic_filter.sh $CATENA
+                ;;
+            7)
+                echo "Exit"
+                filter
+                ;;
+            *)
+                echo "$INVALID_SELECTION"
+                ;;
+        esac
+    done
+}

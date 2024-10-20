@@ -2,6 +2,7 @@
 #set -x
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
+DIRBIN="/usr/local/firewallo/bin"
 source $DIRCONF/firewallo.conf
 ctrl_if(){
 #declare -p WANIF 2> /dev/null | grep -q 'declare \-a'
@@ -76,7 +77,6 @@ fi
 echo "Flushing policies and setting up new policies for chains...... "
 
 $NFT "flush ruleset"
-
 $NFT "add table ip filter"
 $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy drop; }"
 $NFT "add chain ip filter FORWARD { type filter hook forward priority 0; policy drop;}"
@@ -90,21 +90,27 @@ lan2wan lan2dmz lan2lan lan2vpns lan2fw 	    \
 wan2wan wan2dmz wan2lan wan2vpns wan2fw 	    \
 dmz2wan dmz2dmz dmz2lan dmz2vpns dmz2fw 	    \
 fw2wan fw2dmz fw2lan fw2vpns fw2fw		        \
-vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw	";
+vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw dpi";
 
 for CAT in $CHAINS ; do
     $NFT "add chain ip filter $CAT" ;
 done
 
 #Setup Chain and conf in nat and mangle tables
-/bin/bash $DIRCONF/bin/mangle/set.mangle
-/bin/bash $DIRCONF/bin/nat/set.nat
+/bin/bash $DIRBIN/mangle/set.mangle
+/bin/bash $DIRBIN/nat/set.nat
 
 #Setup rules in nat and mangle tables
 /bin/bash $DIRCONF/mangle/firewallo.mangle
 /bin/bash $DIRCONF/nat/firewallo.nat
 
+#Setup dpi suricata rules
+if [ "$NFT" != "" ] ; then
+/bin/bash $DIRCONF/filter/dpi
+fi
+
 ############################
+$NFT "add rule ip filter dpi ip protocol tcp queue num 0 bypass "
 $NFT "add rule ip filter stato ct state related,established 									log prefix \"ACCEPT state related-established:\"	counter accept"
 $NFT "add rule ip filter stato ct state related 												log prefix \"ACCEPT state related :\"          	counter accept"
 $NFT "add rule ip filter stato ct state established 											log prefix \"ACCEPT state established:\" 		counter accept"
@@ -137,8 +143,11 @@ $NFT "add rule ip filter dnserv ip daddr $DNS2 udp sport 53  									log prefix
 $NFT "add rule ip filter dnserv ip daddr $DNS3 udp sport 53  									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
 $NFT "add rule ip filter dnserv ip daddr $DNS4 udp sport 53  									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
 
-$NFT "add rule ip filter dnserv ip $LO  tcp dport 53  											log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
-$NFT "add rule ip filter dnserv ip $LO  tcp uport 53  											log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
+$NFT "add rule ip filter dnserv ip saddr $LO  tcp dport 53										log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
+$NFT "add rule ip filter dnserv ip daddr $LO  tcp dport 53										log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
+
+$NFT "add rule ip filter dnserv ip daddr $LO  tcp sport 53										log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
+$NFT "add rule ip filter dnserv ip saddr $LO  tcp sport 53										log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
 
 #ELENCO CONTROLLATO IL 10/09/2024
 ROOTSERV="198.41.0.4 199.9.14.201 192.33.4.12 199.7.91.13 192.203.230.10 192.5.5.241 192.112.36.4 198.97.190.53 192.36.148.17 192.58.128.30 193.0.14.129 199.7.83.42 202.12.27.33"
@@ -169,7 +178,7 @@ $NFT "add rule ip filter icmp_good icmp type echo-reply    									log prefix \
 
 
 #FILTER CHAINS ATTRIBUTION IN FORWARD
-
+#$NFT "add rule ip filter FORWARD counter jump dpi"			###
 $NFT "add rule ip filter FORWARD counter jump stato"		###
 $NFT "add rule ip filter FORWARD counter jump dnserv"		###
 $NFT "add rule ip filter FORWARD counter jump icmp_good"	###
@@ -297,7 +306,7 @@ fw2wan fw2dmz fw2lan fw2vpns fw2fw               \
 vpns2wan vpns2dmz vpns2lan vpns2vpns vpns2fw     ";
 
 for CAT0 in $CHAINS0 ; do
-/bin/bash $DIRCONF/bin/filter/$CAT0  "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf"
+/bin/bash $DIRBIN/filter/set.filter "$DIRCONF/filter/$CAT0" "$DIRCONF/firewallo.conf" "$CAT0"
 done
 ###LOG DROP BY POLICY
 $NFT "add rule ip filter INPUT 		log prefix \"INPUT_DROP : \" 	flags all"
@@ -346,22 +355,22 @@ echo "##############END RESET################"
 case "$1" in
    'start')
 printf "\nStarting firewall..."
-start "" 1> $LOGF 2>> $LOGF
+start "" > $LOGF   2>&1
 printf "... ok\n"
 ;;
    'stop')
 printf "\nTerminating firewall..."
-stop "" 1> $LOGF 2>> $LOGF
+stop "" > $LOGF  2>&1
 printf "... ok\n"
  ;;
     'restart')
-    $0 stop  2> $LOGF
-    $0 start 2>> $LOGF
+    $0 stop  >  $LOGF  2>&1
+    $0 start >> $LOGF  2>&1
 ;;
 
 'reset')
 printf "\nResetting firewall..."
-reset ""   1> $LOGF 2>> $LOGF
+reset ""   > $LOGF  2>&1
 printf "... ok\n"
 ;;
    *)
