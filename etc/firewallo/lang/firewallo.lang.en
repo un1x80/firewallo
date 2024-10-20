@@ -35,7 +35,7 @@ ERROR_HANDLER_MASQ="Invalid selection. Please enter 1 for MASQUERADE or 2 for SN
 #14raw
 
 #Magic_prerouting
-PREROUTING_CONFIG_PROMPT="PREROUTING configuration with iptables and nftables"
+PREROUTING_CONFIG_PROMPT="PREROUTING configuration "
 SRCIP_MASK_PREROUTING_PROMPT="Enter the source IP address (srcip) and mask (e.g., 192.168.1.0/24):"
 IIF_PROMPT="Enter the input interface (iif) (e.g., eth0):"
 TCP_OPTION="1) TCP"
