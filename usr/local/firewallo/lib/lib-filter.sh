@@ -167,8 +167,7 @@ remove_port() {
 manage_ports() {
 
     while true; do
-        clear
-        cat $DIRCONF/motd #Visualizza il banner motd
+        banner_show #Visualizza il banner 
         show_ports
         show_menu_add_remove
         read -p "$SELECT_AN_OPTION" choice
@@ -195,8 +194,7 @@ manage_ports() {
                 ;;
             
             6)
-                clear
-                cat $DIRCONF/motd #Visualizza il banner motd
+                banner_show #Visualizza il banner 
                 echo "$ADD_RULE_TO $CATENA"
                 $DIRBIN/wiz/magic_filter.sh $CATENA
                 ;;

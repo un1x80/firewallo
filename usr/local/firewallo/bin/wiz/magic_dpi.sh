@@ -2,6 +2,7 @@
 
 # Carica la libreria
 source /usr/local/firewallo/lib/lib-wiz.sh
+source /usr/local/firewallo/lib/firewallo.lib
 
 # Carica le traduzioni
 load_translations
@@ -13,8 +14,8 @@ CHAIN_SELECTED="dpi"
 while true; do
 
   
-    clear
-    cat $DIRCONF/motd #Visualizza il banner motd
+    
+    banner_show #Visualizza il banner 
     echo ""
     echo "--------------------------------------------------"
     echo "---Network Dpi Rules-Send Traffic on DPI Engine---"

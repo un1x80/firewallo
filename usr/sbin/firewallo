@@ -8,6 +8,7 @@ DIRCONF="/etc/firewallo"
 DIRBIN="/usr/local/firewallo/bin"
 DIRLIB="/usr/local/firewallo/lib"
 source $DIRCONF/firewallo.conf
+source $DIRLIB/firewallo.lib
 source $DIRLIB/lib-wiz.sh
 source $DIRLIB/lib-filter.sh
 
@@ -49,8 +50,8 @@ conf () {
 
 #Funzione di editing del table Filter
 filter () {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
+
+banner_show #Visualizza il banner
 echo " --- FILTER MENU ---"
 MENU="
 fw2fw	fw2lan		fw2wan		fw2vpns		fw2dmz		\
@@ -75,8 +76,7 @@ done
 
 #Funzione di editing manuale del table Nat
 nat  () {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
+banner_show #Visualizza il banner 
 show_wizard_nat
 }
 
@@ -215,8 +215,7 @@ done
 
 # Funzione per monitorare i log con Ctrl+C che uccide solo journalctl
 log_filter () { 
-    clear 
-    cat $DIRCONF/motd #Visualizza il banner motd
+    banner_show #Visualizza il banner 
 
     echo "$SELECT_CHAIN_TO_VIEW"
 
@@ -260,8 +259,7 @@ log_filter () {
 
 # Funzione per selezionare il tipo di log
 logs () {
-    clear 
-    cat $DIRCONF/motd #Visualizza il banner motd
+    banner_show #Visualizza il banner
 
     echo "$SELECT_LOG_TYPE"
     MENU1=("EXIT" "live" "1 week ago" "1 day ago" "1 hour ago" "1 minute ago" )
@@ -276,8 +274,7 @@ logs () {
 }
 
 show_netdpi () {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
+banner_show #Visualizza il banner
 function show_menu {
     echo ""
     echo "======================================"
@@ -312,20 +309,17 @@ function dpi_wizard {
 # Ciclo principale del menu
 while true
 do
-    clear
-    cat $DIRCONF/motd #Visualizza il banner motd
+    banner_show #Visualizza il banner
     show_menu
     read option
 
     case $option in
         1)
-            clear
-            cat $DIRCONF/motd #Visualizza il banner motd
+            banner_show #Visualizza il banner
             suricata_wizard
             ;;
         2)
-            clear
-            cat $DIRCONF/motd #Visualizza il banner motd
+            banner_show #Visualizza il banner 
             dpi_wizard
             ;;
         3)
@@ -344,8 +338,7 @@ done
 }
 
 show_wizard_nat () {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
+banner_show #Visualizza il banner
 function show_menu_nat {
     echo " "
     echo "======================================"
@@ -361,14 +354,12 @@ function show_menu_nat {
 
 # Funzioni per le diverse opzioni
 function nat_prerouting_wizard {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
+    banner_show #Visualizza il banner 
 	$DIRBIN/wiz/magic_nat_prerouting.sh
 }
 
 function nat_postrouting_wizard {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
+    banner_show #Visualizza il banner 
 	$DIRBIN/wiz/magic_nat_postrouting.sh
 }
 function edit_manual_nat {
@@ -472,8 +463,7 @@ restore_conf() {
 
 #Funzione principale
 main () {
-clear
-cat $DIRCONF/motd #Visualizza il banner motd
+banner_show 
 echo " EDITOR: $EDITOR --- MENU MAIN ---"
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo "INTERNAL ERROR: You must set Backend select iptables o nftables"

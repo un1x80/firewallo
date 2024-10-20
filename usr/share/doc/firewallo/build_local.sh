@@ -29,9 +29,14 @@ mkdir -p /opt/firewallo
 chown root:root /opt/firewallo
 chmod 0755 /opt/firewallo
 
-# Clonazione del repository di firewallo
-echo "Clone firewallo repo..."
-git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch test --single-branch
+# Copia di firewallo su /opt/firewallo
+wd=$(pwd)
+if [[ "$wd" =~ usr/share/doc/firewallo$ ]]; then
+	cp -rf ../../../../* /opt/firewallo
+else
+    echo "I am not in the correct position to be executed. right position : 'firewallo-dir/usr/share/doc/firewallo/'."
+    exit 1
+fi
 
 # Creazione della struttura del pacchetto .deb
 mkdir -p /opt/firewallo_pkg/DEBIAN
@@ -40,7 +45,7 @@ chmod 0755 /opt/firewallo_pkg/DEBIAN
 # Creazione del file control per il pacchetto .deb
 cat <<EOF > /opt/firewallo_pkg/DEBIAN/control
 Package: firewallo
-Version: current
+Version: 24.9.1-current
 Section: utils
 Priority: optional
 Architecture: all
