@@ -1,0 +1,34 @@
+#!/bin/bash
+DIRCONF="/etc/firewallo"
+source $DIRCONF/firewallo.conf
+color_text() {
+    local color="$1"
+    local text="$2"
+
+    # Mappa dei colori
+    case "$color" in
+        black) color_code="30" ;;
+        red) color_code="31" ;;
+        green) color_code="32" ;;
+        yellow) color_code="33" ;;
+        blue) color_code="34" ;;
+        magenta) color_code="35" ;;
+        cyan) color_code="36" ;;
+        white) color_code="37" ;;
+        *) color_code="37" ;; # Default to white if color not found
+    esac
+
+    # Restituisce la stringa colorata con reset alla fine
+    echo -e "\e[${color_code}m${text}\e[0m"
+}
+
+banner_show () {
+clear
+color_text "red" '
+ _____ _                        _ _
+|  ___(_)_ __ _____      ____ _| | | ___
+| |_  | | `__/ _ \ \ /\ / / _` | | |/ _ \
+|  _| | | | |  __/\ V  V / (_| | | | (_) |
+|_|   |_|_|  \___| \_/\_/ \__,_|_|_|\___/'
+color_text "blue" "$VERS"
+}

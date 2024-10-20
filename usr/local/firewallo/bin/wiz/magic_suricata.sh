@@ -1,5 +1,6 @@
 #!/bin/bash
 source /usr/local/firewallo/lib/lib-wiz.sh
+source /usr/local/firewallo/lib/firewallo.lib
 
 # Controlla se il file esiste
 if [ -f /etc/firewallo/.sid ]; then
@@ -89,8 +90,7 @@ show_current_rules() {
 }
 
 # Main script
-clear
-cat $DIRCONF/motd # Visualizza il banner motd
+banner_show # Visualizza il banner motd
 echo ""
 echo "---------------------------------------------"
 color_text "yellow" "Wizard per la configurazione di Suricata"
