@@ -84,12 +84,18 @@
           fi
 
           # Copia del file suricata.yml personalizzato se non esiste già
-          if [ ! -f /etc/suricata/suricata.yml ]; then
+          if [ ! -f /etc/suricata/suricata.yaml ]; then
               install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.yaml /etc/suricata/suricata.yaml
+          else       
+             mv /etc/suricata/suricata.yaml /etc/suricata/suricata.yaml.bck
+             install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.yaml /etc/suricata/suricata.yaml
           fi
 
           # Copia del file suricata.service personalizzato se non esiste già
           if [ ! -f /lib/systemd/system/suricata.service ]; then
+              install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.service /lib/systemd/system/suricata.service
+          else 
+              mv /lib/systemd/system/suricata.service /lib/systemd/system/suricata.old
               install -m 644 /opt/firewallo_pkg/usr/local/firewallo/ansible/postinst/suricata.service /lib/systemd/system/suricata.service
           fi
 
