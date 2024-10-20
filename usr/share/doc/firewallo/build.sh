@@ -31,7 +31,7 @@ chmod 0755 /opt/firewallo
 
 # Clonazione del repository di firewallo
 echo "Clone firewallo repo..."
-git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch test --single-branch --force
+git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch test --single-branch
 
 # Creazione della struttura del pacchetto .deb
 mkdir -p /opt/firewallo_pkg/DEBIAN
