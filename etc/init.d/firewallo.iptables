@@ -413,7 +413,7 @@ case "$1" in
 		CHECK=$(cat /tmp/.check_error)
 		if [ "$CHECK" != "" ] ; then
 			echo "$(red_cross_mark) Started with configuration errors listed below see Option n°12 for complete Status!"
-			echo "$CHECK"
+			color_text "red" "$CHECK"
 		fi
 	else
 	printf "... error $(red_cross_mark)\n"
@@ -424,10 +424,15 @@ case "$1" in
 	stop "" > $LOGF  2>&1
 	if [ "$?" = "0" ] ; then
 	printf "... ok $(green_check_mark)\n"
+		#Controlla se ci sono errori nonostante lo start
+		CHECK=$(cat /tmp/.check_error)
+		if [ "$CHECK" != "" ] ; then
+			echo "$(red_cross_mark) Started with configuration errors listed below see Option n°12 for complete Status!"
+			color_text "red" "$CHECK"
+		fi
 	else
 	printf "... error $(red_cross_mark)\n"
 	fi
-	
 ;;
     'restart')
     $0 stop  >  $LOGF  2>&1
