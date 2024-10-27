@@ -9,8 +9,8 @@ DIRBIN="/usr/local/firewallo/bin"
 DIRLIB="/usr/local/firewallo/lib"
 source $DIRCONF/firewallo.conf
 source $DIRLIB/firewallo.lib
-source $DIRLIB/lib-wiz.sh
-source $DIRLIB/lib-filter.sh
+source $DIRLIB/wiz.lib
+source $DIRLIB/filter.lib
 
 EDITOR="nano" #setta qui l'editor vi o nano se è vuoto usa vi
 
@@ -115,6 +115,14 @@ stop
 start
 }
 
+#Funzione di reset 
+reset () {
+if  [ "$NFT" != "" ] ; then
+/etc/init.d/firewallo.nft reset
+elif [ "$IPT" != "" ] ; then
+/etc/init.d/firewallo.iptables reset
+fi
+}
 #Funzione di visualizzazione dello status
 status () {
 less $DIRCONF/status.log
@@ -191,6 +199,7 @@ select opt1 in $MENU1 ; do
         if [ "$opt1" = "nftables" ] ; then #se selezioni nft
         export IPT=""; #Svuoto IPT
 		export NFT="/usr/sbin/nft" #Setto NFT
+        /etc/init.d/firewallo.iptables reset # Elimino tutte le regole
 		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf #vuoto iptables in firewallo.conf
 		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf #vuoto anche nft 
 		printf 'NFT=\"/usr/sbin/nft\"' >> $DIRCONF/firewallo.conf #risetto nft
@@ -200,6 +209,7 @@ select opt1 in $MENU1 ; do
         elif [ "$opt1" = "iptables" ] ; then #Se selezioni iptables
         export NFT=""; #Svuoto NFT
 		export IPT="/sbin/iptables" #Setto iptables
+        /etc/init.d/firewallo.nft reset # Elimino tutte le regole
 		sed -i 's/IPT=\"\/sbin\/iptables\"//g'  $DIRCONF/firewallo.conf #Vuoto iptables e anche nft
 		sed -i 's/NFT=\"\/usr\/sbin\/nft\"//g'  $DIRCONF/firewallo.conf #
         printf 'IPT=\"/sbin/iptables\"' >> $DIRCONF/firewallo.conf #Setto iptables
@@ -373,20 +383,16 @@ do
     read option_nat
 
     case $option_nat in
-        1)
-            nat_prerouting_wizard
+        1)  nat_prerouting_wizard
             ;;
-        2)
-            nat_postrouting_wizard
+        2)  nat_postrouting_wizard
             ;;
 	    3)  edit_manual_nat
 	        ;;
-	    4)
-            echo "Exit"
+	    4)  echo "Exit"
             break
             ;;
-        *)
-            echo "Select right Option!."
+        *)  echo "Select right Option!."
             ;;
     esac
 
@@ -464,13 +470,13 @@ restore_conf() {
 #Funzione principale
 main () {
 banner_show 
-echo " EDITOR: $EDITOR --- MENU MAIN ---"
+echo "EDITOR: $EDITOR --- MENU MAIN ---"
 if [[ "$NFT" = "" && "$IPT" = "" ]] ;then
 	echo "INTERNAL ERROR: You must set Backend select iptables o nftables"
 fi
 
 #Opzioni del menu
-MENU="networking sysctl conf filter nat mangle start stop restart route networkdpi status rulesview saveconf nft-iptables logs export_conf restore_conf exit"
+MENU="networking sysctl conf filter nat mangle start stop restart reset route networkdpi status rulesview saveconf nft-iptables logs export_conf restore_conf exit"
 select opt in $MENU ; do 
 	if [ "$opt" = "networking" ] ; then
 		networking ;  main
@@ -490,6 +496,8 @@ select opt in $MENU ; do
         stop ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #idem come sopra
 	elif [ "$opt" = "restart" ] ; then 
         restart ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #idem come sopra
+    elif [ "$opt" = "reset" ] ; then 
+        reset ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main #idem come sopra
 	elif [ "$opt" = "route" ] ; then
         route ; main
 	elif [ "$opt" = "status" ] ; then

@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/local/firewallo/lib/lib-wiz.sh
+source /usr/local/firewallo/lib/wiz.lib
 source /usr/local/firewallo/lib/firewallo.lib
 
 # Controlla se il file esiste
@@ -11,19 +11,85 @@ else
     SID=1
 fi
 
-# Scrivi il nuovo valore nel file .sid
-echo $SID > /etc/firewallo/.sid
+# Array con i protocolli supportati da Suricata
+declare -A protocols_map=(
+    ["Facebook"]="facebook"
+    ["Skype"]="skype"
+    ["WhatsApp"]="whatsapp"
+    ["YouTube"]="youtube"
+    ["Netflix"]="netflix"
+    ["Dropbox"]="dropbox"
+    ["Google Drive"]="google-drive"
+    ["OneDrive"]="onedrive"
+    ["Steam"]="steam"
+    ["PlayStation Network"]="playstation-network"
+    ["Xbox Live"]="xbox-live"
+    ["Zoom"]="zoom"
+    ["Microsoft Teams"]="microsoft-teams"
+    ["Instagram"]="instagram"
+    ["Twitter"]="twitter"
+    ["Telegram"]="telegram"
+    ["TikTok"]="tiktok"
+    ["Amazon Prime Video"]="amazon-prime-video"
+    ["Spotify"]="spotify"
+    ["Apple Music"]="apple-music"
+    ["Discord"]="discord"
+    ["Gmail"]="gmail"
+    ["Bitcoin"]="bitcoin"
+    ["Ethereum"]="ethereum"
+    ["BitTorrent"]="bittorrent"
+    ["Tor"]="tor"
+    ["HTTP"]="http"
+    ["HTTPS-TLS"]="tls"
+    ["FTP"]="ftp"
+    ["SMTP"]="smtp"
+    ["SSH"]="ssh"
+    ["IMAP"]="imap"
+    ["SMB"]="smb"
+    ["DCERPC"]="dcerpc"
+    ["DNS"]="dns"
+    ["NFS"]="nfs"
+    ["NTP"]="ntp"
+    ["FTP-DATA"]="ftp-data"
+    ["TFTP"]="tftp"
+    ["IKEV2"]="ikev2"
+    ["KRB5"]="krb5"
+    ["DHCP"]="dhcp"
+    ["SNMP"]="snmp"
+    ["SIP"]="sip"
+    ["RFB"]="rfb"
+    ["MQTT"]="mqtt"
+    ["RDP"]="rdp"
+)
 
-# Array con tutti i protocolli supportati da Suricata
-protocols=(
-    "Facebook" "Skype" "WhatsApp" "YouTube"
-    "Netflix" "Dropbox" "Google Drive" "OneDrive"
-    "Steam" "PlayStation Network" "Xbox Live" "Zoom"
-    "Microsoft Teams" "Instagram" "Twitter" "Telegram"
-    "TikTok" "Amazon Prime Video" "Spotify" "Apple Music"
-    "Discord" "Gmail" "Bitcoin" "Ethereum" "BitTorrent"
-    "OpenVPN" "IPsec" "WireGuard" "SMTP" "IMAP"
-    "POP3" "Tor" "SSH" "HTTPS" "HTTP" "DNS"
+# Mappatura hostname per regole speciali
+declare -A special_rules_map=(
+    ["Facebook"]="facebook.com"
+    ["Skype"]="skype.com"
+    ["WhatsApp"]="whatsapp.com"
+    ["YouTube"]="youtube.com"
+    ["Netflix"]="netflix.com"
+    ["Dropbox"]="dropbox.com"
+    ["Google Drive"]="google.com"
+    ["OneDrive"]="onedrive.com"
+    ["Steam"]="store.steampowered.com"
+    ["PlayStation Network"]="playstation.com"
+    ["Xbox Live"]="xbox.com"
+    ["Zoom"]="zoom.us"
+    ["Microsoft Teams"]="teams.microsoft.com"
+    ["Instagram"]="instagram.com"
+    ["Twitter"]="twitter.com"
+    ["Telegram"]="telegram.org"
+    ["TikTok"]="tiktok.com"
+    ["Amazon Prime Video"]="primevideo.com"
+    ["Spotify"]="spotify.com"
+    ["Apple Music"]="music.apple.com"
+    ["Discord"]="discord.com"
+    ["Gmail"]="gmail.com"
+    ["Bitcoin"]="bitcoin.org"
+    ["Ethereum"]="ethereum.org"
+    ["BitTorrent"]="bittorrent.org"
+    ["Tor"]="torproject.org"
 )
 
 # Funzione per controllare se Suricata è attivo
@@ -41,7 +107,7 @@ show_protocols() {
     
     PS3="Inserisci il numero del protocollo che desideri bloccare o 'fine' per terminare: "
     
-    select protocol in "${protocols[@]}" "fine"; do
+    select protocol in "${!protocols_map[@]}" "fine"; do
         if [[ $protocol == "fine" ]]; then
             break
         elif [[ -n $protocol ]]; then
@@ -57,10 +123,19 @@ show_protocols() {
 create_rules() {
     for protocol in "${selected_protocols[@]}"; do
         echo "Aggiungendo regola per bloccare il traffico del protocollo $protocol..."
-        protocol=$(echo "$protocol" | tr '[:upper:]' '[:lower:]' | tr -d " ")
+        protocol_key=${protocols_map[$protocol]} # Ottieni la chiave corrispondente
 
-        # Aggiungi la regola al file delle regole di Suricata
-        rule="drop ip any any -> any any (msg:\"Blocco traffico $protocol\"; app-layer-protocol:$protocol; sid:$SID; rev:1; classtype:policy-violation;)"
+        # Verifica se ci sono regole speciali
+        if [[ -n ${special_rules_map[$protocol]} ]]; then
+            hostname=${special_rules_map[$protocol]}
+            # Crea regola per TLS
+            rule="drop tls any any -> any any (msg:\"Drop $protocol TLS\"; tls.sni:\"$hostname\"; sid:$SID; rev:1; classtype:policy-violation;)"
+        else
+            # Aggiungi la regola generale per app-layer
+            rule="drop ip any any -> any any (msg:\"Drop $protocol\"; app-layer-protocol:$protocol_key; sid:$SID; rev:1; classtype:policy-violation;)"
+        fi
+
+        # Scrivi la regola nel file delle regole di Suricata
         echo "$rule" | sudo tee -a /etc/suricata/rules/block.rules > /dev/null
         SID=$((SID + 1))
     done
@@ -113,5 +188,3 @@ restart_suricata
 
 # Mostra le regole aggiornate
 show_current_rules
-
-echo "Configurazione di Suricata completata con successo!"

@@ -166,7 +166,7 @@ logging:
       format: "[%i] <%d> -- "
       # type: json
 af-packet:
-  - interface: ens21
+  - interface: all
     threads: auto
     cluster-id: 99
     cluster-type: cluster_flow
@@ -174,7 +174,7 @@ af-packet:
     inline: yes
   - interface: default
 pcap:
-  - interface: ens19
+  - interface: all
   - interface: default
 
 pcap-file:
@@ -552,15 +552,7 @@ profiling:
     filename: pcaplog_stats.log
     append: yes
 nfq:
-#  mode: accept
-#  repeat-mark: 1
-#  repeat-mask: 1
-#  bypass-mark: 1
-#  bypass-mask: 1
-#  route-queue: 2
-#  batchcount: 20
-#  fail-open: yes
-#nflog support
+
 nflog:
   - group: 2
     buffer-size: 18432
@@ -568,16 +560,6 @@ nflog:
     qthreshold: 1
     qtimeout: 100
     max-size: 20000
-#capture:
-#netmap:
-# - interface: ens+
-# - interface: default
-#pfring:
-#  - interface: ens19
-#    threads: auto
-#    cluster-id: 99
-#    cluster-type: cluster_flow
-#  - interface: default
 
 ## Configure Suricata to load Suricata-Update managed rules.
 default-rule-path: /etc/suricata/rules

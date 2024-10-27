@@ -31,3 +31,12 @@ color_text "red" ' _____ _                        _ _
 |_|   |_|_|  \___| \_/\_/ \__,_|_|_|\___/'
 color_text "blue" "$VERS"
 }
+
+green_check_mark(){
+printf "✔️"
+}
+
+red_cross_mark() {
+printf "❌"
+}
+
