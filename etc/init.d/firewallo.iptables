@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -x 
+#set -x
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
 DIRBIN="/usr/local/firewallo/bin"
@@ -9,53 +9,56 @@ source $DIRLIB/firewallo.lib
 
 #Dichiaro gli array delle varie interfacce
 ctrl_if(){
-#declare -p WANIF 2> /dev/null | grep -q 'declare \-a'
 #Vedo se la variabile è dichiarata come array e se no la dichiaro
-ARRAYTEST=`declare -p WANIF 2> /dev/null | grep  "declare \-a"`
+ARRAYTEST=$(declare -p WANIF 2> /dev/null | grep  "declare \-a")
 if [ "$ARRAYTEST" = "" ] ; then
-    WANIF=($WANIF)
-    echo "WANIF ARRAY DECLARED" ; green_check_mark 
+	WANIF=($WANIF)
+	echo "WANIF ARRAY DECLARED $(green_check_mark)" 
 fi
 index=0
 for i in ${WANIF[*]} ; do
 	((index++))
     export 	WANIF_$index="$i"
-    declare -p WANIF_$index 2> /dev/null 
+	echo "WANIF_$index=$i"
+    #declare -p WANIF_$index 2> /dev/null
 done
-echo "ci sono $index interfaccie WAN"
+echo "WANIF TOT: $index "
 
-ARRAYTEST=`declare -p DMZIF 2> /dev/null | grep  "declare \-a"`
+ARRAYTEST=$(declare -p DMZIF 2> /dev/null | grep  "declare \-a")
 if [ "$ARRAYTEST" = "" ] ; then
-    DMZIF=($DMZIF)
-    echo Ho_dichiarato_array_DMZIF
+	DMZIF=($DMZIF)
+	echo "DMZIF ARRAY DECLARED $(green_check_mark)" 
 fi
 index=0
 for i in ${DMZIF[*]} ; do
-        ((index++))
-        export  DMZIF_$index="$i"
-        declare -p DMZIF_$index 2> /dev/null 
+    ((index++))
+	export  DMZIF_$index="$i"
+	echo "DMZIF_$index=$i"
+	#declare -p DMZIF_$index 2> /dev/null 
 done
-echo "ci sono $index interfaccie DMZ"
+echo "DMZIF TOT: $index "
 
-ARRAYTEST=`declare -p LANIF 2> /dev/null | grep  "declare \-a"`
-if [ "$ARRAYTEST" = "" ] ; then
-    LANIF=($LANIF)
-    echo Ho_dichiarato_array_LANIF
-fi
+ARRAYTEST=$(declare -p LANIF 2> /dev/null | grep  "declare \-a")
+	if [ "$ARRAYTEST" = "" ] ; then
+	LANIF=($LANIF)
+	echo "LANIF ARRAY DECLARED $(green_check_mark)" 
+	fi
 index=0
 for i in ${LANIF[*]} ; do
-        ((index++))
-        export  LANIF_$index="$i"
-        declare -p LANIF_$index 2> /dev/null 
+    ((index++))
+	export  LANIF_$index="$i"
+	echo "LANIF_$index=$i"
+	#declare -p LANIF_$index 2> /dev/null 
 done
-echo "ci sono $index interfaccie LAN"
-}
-#Starto subito la dichiarazione delle interfacce
-ctrl_if ""
+echo "LANIF TOT: $index "
 
-echo "LANIF = $LANIF"
-echo "WANIF = $WANIF"
-echo "DMZIF = $DMZIF"
+echo "Interface Attributions:"
+echo "LANIF = ${LANIF[@]}"
+echo "WANIF = ${WANIF[@]}"
+echo "DMZIF = ${DMZIF[@]}"
+echo "______________________"
+}
+
 
 start () {
 echo "### $ORARIO Start Firewall"
@@ -396,26 +399,45 @@ echo "##############END RESET################"
 
 case "$1" in
    'start')
-printf "\nStarting firewall..."
-start "" 1>> $LOGF 2>> $LOGF 
-printf "... ok\n"
+	ctrl_if ""
+	printf "\nStarting firewall..."
+				#Scrivo qualcosa xchè non lo uso frequentemente.
+				#>(...) è una process substitution che crea un processo secondario.
+				#tee /tmp/.check_error copia l'output di errore nel file /tmp/.check_error.
+				#>&2 assicura che l'output di tee venga reindirizzato nuovamente a stdout, quindi verrà stampanto in status.log
+				#questo per avere l'errore dentro status.log a terminale e anche su .check_error per il red_cross_check.
+	start "" > $LOGF 2> >(tee /tmp/.check_error >&1)
+	if [ "$?" = "0" ] ; then
+	printf "... ok $(green_check_mark)\n"
+		#Controlla se ci sono errori nonostante lo start
+		CHECK=$(cat /tmp/.check_error)
+		if [ "$CHECK" != "" ] ; then
+			echo "$(red_cross_mark) Started with configuration errors listed below see Option n°12 for complete Status!"
+			echo "$CHECK"
+		fi
+	else
+	printf "... error $(red_cross_mark)\n"
+	fi
 ;;
-   'stop')  
-printf "\nTerminating firewall..."
-stop "" 1>> $LOGF 2>> $LOGF
-printf "... ok\n" 
- ;;
+   'stop')
+	printf "\nTerminating firewall..."
+	stop "" > $LOGF  2>&1
+	if [ "$?" = "0" ] ; then
+	printf "... ok $(green_check_mark)\n"
+	else
+	printf "... error $(red_cross_mark)\n"
+	fi
+	
+;;
     'restart')
-    $0 stop  2>> $LOGF
-    $0 start 2>> $LOGF
+    $0 stop  >  $LOGF  2>&1
+    $0 start >> $LOGF  2>&1
 ;;
-
-'reset')
-printf "\nResetting firewall..."
-reset ""   1>> $LOGF 2>> $LOGF
-printf "... ok\n"
+    'reset')
+	printf "\nResetting firewall..."
+	reset ""   > $LOGF  2>&1
+	printf "... ok $(green_check_mark)\n"
 ;;
    *)
-      printf "usage $0 start|stop|restart|reset" ;;
+    printf "usage $0 start|stop|restart|reset" ;;
 esac
-

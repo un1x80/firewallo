@@ -33,7 +33,7 @@ color_text "blue" "$VERS"
 }
 
 green_check_mark(){
-printf  "✔️"
+printf "✔️"
 }
 
 red_cross_mark() {

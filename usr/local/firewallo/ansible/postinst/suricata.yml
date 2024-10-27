@@ -6,7 +6,7 @@ default-rule-path: /etc/suricata/rules
 
 # Carica solo il file delle regole dove hai inserito le regole di blocco
 rule-files:
-  - block.rules
+  - blocks.rules
 
 # Sezione per l'analisi del traffico tramite NFQUEUE
 nfq:
