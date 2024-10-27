@@ -1,0 +1,88 @@
+%YAML 1.1
+---
+
+# Suricata configura la directory delle regole
+default-rule-path: /etc/suricata/rules
+
+# Carica solo il file delle regole dove hai inserito le regole di blocco
+rule-files:
+  - block.rules
+
+# Sezione per l'analisi del traffico tramite NFQUEUE
+nfq:
+  mode: accept       # Modalità per accettare il traffico che non corrisponde alle regole di drop
+  fail-open: yes     # Fallisci in modalità aperta se Suricata si ferma
+  queues:
+    - id: 0          # Usa la coda 0 per ricevere i pacchetti
+      bypass: yes    # Non bypassare il traffico, deve essere sempre esaminato   
+      verdict: drop  # Droppa i pacchetti che corrispondono alle regole
+
+# Modulo di rilevamento dei protocolli di livello applicativo
+app-layer:
+  protocols:
+    http:
+      enabled: yes
+    tls:
+      enabled: yes
+    smb:
+      enabled: yes
+    ssh:
+      enabled: yes
+    smtp:
+      enabled: yes
+    imap:
+      enabled: yes
+    dns:
+      enabled: yes
+    ftp:
+      enabled: yes
+    dcerpc:
+      enabled: yes
+    rdp:
+      enabled: yes
+    nfs:
+      enabled: yes
+    smb:
+      enabled: yes
+    mqtt:
+      enabled: yes
+    krb5:
+      enabled: yes
+    dhcp:
+      enabled: yes
+    snmp:
+      enabled: yes
+    rfb:
+      enabled: yes
+    tftp:
+      enabled: yes
+    bitcoin:
+      enabled: yes
+    # Aggiungi altri protocolli se necessari
+
+# Configurazione del logging degli alert tramite eve.json
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: /var/log/suricata/eve.json
+      append: yes  # Non sovrascrivere il file di log, aggiungi i nuovi log
+      types:
+        - alert:  # Logga solo gli alert
+            tls:
+              enabled: yes
+              extended: no  # Non loggare informazioni extra sul TLS per ridurre i log
+            metadata: no    # Non includere metadati aggiuntivi per minimizzare i log
+
+# Logging standard disabilitato per minimizzare il rumore nei log
+logging:
+  default-log-level: error
+  outputs:
+    - console:
+        enabled: yes          # Disabilita log in console per evitare rumore
+
+# Abilita il logging degli alert relativi alle regole specifiche
+stats:
+  enabled: no                # Disabilita la raccolta di statistiche per semplificare la configurazione
+
+# Fine del file di configurazione principale

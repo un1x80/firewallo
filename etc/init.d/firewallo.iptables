@@ -1,9 +1,11 @@
 #!/bin/bash
-
+#set -x 
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
 DIRBIN="/usr/local/firewallo/bin"
+DIRLIB="/usr/local/firewallo/lib"
 source $DIRCONF/firewallo.conf
+source $DIRLIB/firewallo.lib
 
 #Dichiaro gli array delle varie interfacce
 ctrl_if(){
@@ -12,7 +14,7 @@ ctrl_if(){
 ARRAYTEST=`declare -p WANIF 2> /dev/null | grep  "declare \-a"`
 if [ "$ARRAYTEST" = "" ] ; then
     WANIF=($WANIF)
-    echo Ho_dichiarato_array_WANIF
+    echo "WANIF ARRAY DECLARED" ; green_check_mark 
 fi
 index=0
 for i in ${WANIF[*]} ; do

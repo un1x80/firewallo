@@ -3,14 +3,18 @@
 ORARIO=`date`
 DIRCONF="/etc/firewallo"
 DIRBIN="/usr/local/firewallo/bin"
+DIRLIB="/usr/local/firewallo/lib"
 source $DIRCONF/firewallo.conf
+source $DIRLIB/firewallo.lib
+
+#Dichiaro gli array delle varie interfacce
 ctrl_if(){
 #declare -p WANIF 2> /dev/null | grep -q 'declare \-a'
 #Vedo se la variabile è dichiarata come array e se no la dichiaro
 ARRAYTEST=$(declare -p WANIF 2> /dev/null | grep  "declare \-a")
 if [ "$ARRAYTEST" = "" ] ; then
-WANIF=($WANIF)
-echo Ho_dichiarato_array_WANIF
+	WANIF=($WANIF)
+	echo "WANIF ARRAY DECLARED" ; green_check_mark 
 fi
 index=0
 for i in ${WANIF[*]} ; do
@@ -18,11 +22,11 @@ for i in ${WANIF[*]} ; do
     export 	WANIF_$index="$i"
     declare -p WANIF_$index 2> /dev/null
 done
-echo "ci sono $index interfaccie WAN"
+echo " WANIF : $index "
 ARRAYTEST=$(declare -p DMZIF 2> /dev/null | grep  "declare \-a")
 if [ "$ARRAYTEST" = "" ] ; then
 DMZIF=($DMZIF)
-echo Ho_dichiarato_array_DMZIF
+echo "DMZIF ARRAY DECLARED" ; green_check_mark 
 fi
 index=0
 for i in ${DMZIF[*]} ; do
@@ -31,12 +35,13 @@ export  DMZIF_$index="$i"
 declare -p DMZIF_$index 2> /dev/null 
 
 done
-echo "ci sono $index interfaccie DMZ"
+echo "DMZIF : $index "
 
 ARRAYTEST=$(declare -p LANIF 2> /dev/null | grep  "declare \-a")
 if [ "$ARRAYTEST" = "" ] ; then
 LANIF=($LANIF)
-echo Ho_dichiarato_array_LANIF
+echo "LANIF ARRAY DECLARED" ; green_check_mark 
+
 fi
 index=0
 for i in ${LANIF[*]} ; do
@@ -45,14 +50,14 @@ export  LANIF_$index="$i"
 declare -p LANIF_$index 2> /dev/null 
 
 done
-echo "ci sono $index interfaccie LAN"
+echo "LANIF :  $index "
 }
 
 ctrl_if ""
 
-echo "LANIF = $LANIF"
-echo "WANIF = $WANIF"
-echo "DMZIF = $DMZIF"
+echo "LANIF = ${LANIF[@]}"
+echo "WANIF = ${WANIF[@]}"
+echo "DMZIF = ${DMZIF[@]}"
 
 start () {
 echo "### $ORARIO Start Firewall"
