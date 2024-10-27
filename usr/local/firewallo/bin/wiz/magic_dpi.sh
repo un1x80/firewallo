@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Carica la libreria
-source /usr/local/firewallo/lib/lib-wiz.sh
+source /usr/local/firewallo/lib/wiz.lib
 source /usr/local/firewallo/lib/firewallo.lib
 
 # Carica le traduzioni

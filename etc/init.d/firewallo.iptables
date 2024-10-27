@@ -22,7 +22,8 @@ for i in ${WANIF[*]} ; do
 	echo "WANIF_$index=$i"
     #declare -p WANIF_$index 2> /dev/null
 done
-echo "WANIF TOT: $index "
+echo "WANIF TOT: $index
+_______________________"
 
 ARRAYTEST=$(declare -p DMZIF 2> /dev/null | grep  "declare \-a")
 if [ "$ARRAYTEST" = "" ] ; then
@@ -36,7 +37,9 @@ for i in ${DMZIF[*]} ; do
 	echo "DMZIF_$index=$i"
 	#declare -p DMZIF_$index 2> /dev/null 
 done
-echo "DMZIF TOT: $index "
+echo "DMZIF TOT: $index
+_______________________"
+
 
 ARRAYTEST=$(declare -p LANIF 2> /dev/null | grep  "declare \-a")
 	if [ "$ARRAYTEST" = "" ] ; then
@@ -50,13 +53,14 @@ for i in ${LANIF[*]} ; do
 	echo "LANIF_$index=$i"
 	#declare -p LANIF_$index 2> /dev/null 
 done
-echo "LANIF TOT: $index "
+echo "LANIF TOT: $index 
+_______________________"
 
 echo "Interface Attributions:"
 echo "LANIF = ${LANIF[@]}"
 echo "WANIF = ${WANIF[@]}"
 echo "DMZIF = ${DMZIF[@]}"
-echo "______________________"
+echo "_______________________"
 }
 
 
@@ -367,7 +371,7 @@ $IPT -P INPUT 	ACCEPT
 $IPT -P FORWARD ACCEPT
 $IPT -P OUTPUT 	ACCEPT
 
-$IPT -t nat -A POSTROUTING -s $LANRANGE -o $WANIF -j MASQUERADE
+$DIRBIN/nat/set.nat
 
 echo "Firewall stopped...                                           ...OK"
 echo "##############END STOP################"

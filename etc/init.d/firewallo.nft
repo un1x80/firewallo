@@ -56,8 +56,7 @@ done
 echo "LANIF TOT: $index 
 _______________________"
 
-echo "Interface Attributions:
-_______________________"
+echo "Interface Attributions:"
 echo "LANIF = ${LANIF[@]}"
 echo "WANIF = ${WANIF[@]}"
 echo "DMZIF = ${DMZIF[@]}"
@@ -334,8 +333,7 @@ stop () {
 ########################################################################
 #################################STOP###################################
 ########################################################################
-echo "############## STOP FIREWALL##########"
-echo "Flushing policies..."
+
 $NFT "flush ruleset"
 
 echo "Setting up policies for chains..."
@@ -344,8 +342,12 @@ $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy acce
 $NFT "add chain ip filter OUTPUT { type filter hook input priority 0; policy accept; }"
 $NFT "add chain ip filter FORWARD { type filter hook input priority 0; policy accept; }"
 $NFT "add table ip nat"
-$NFT "add chain ip nat POSTROUTING"
-$NFT "add rule ip nat POSTROUTING oifname $WANIF ip saddr $LANRANGE counter masquerade"
+$NFT "add chain ip nat PREROUTING { type nat hook prerouting priority -100; policy accept; }"
+$NFT "add chain ip nat INPUT { type nat hook input priority 100; policy accept; }"
+$NFT "add chain ip nat OUTPUT { type nat hook output priority -100; policy accept; }"
+$NFT "add chain ip nat POSTROUTING { type nat hook postrouting priority 100; policy accept; }"
+$DIRBIN/nat/set.nat
+
 echo "Firewall stopped...                                           ...OK"
 echo "##############END STOP################"
 }

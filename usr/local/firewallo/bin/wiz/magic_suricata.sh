@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/local/firewallo/lib/lib-wiz.sh
+source /usr/local/firewallo/lib/wiz.lib
 source /usr/local/firewallo/lib/firewallo.lib
 
 # Controlla se il file esiste

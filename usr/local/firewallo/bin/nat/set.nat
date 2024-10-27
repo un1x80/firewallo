@@ -11,7 +11,7 @@ $NFT "add chain ip nat OUTPUT { type nat hook output priority -100; policy accep
 $NFT "add chain ip nat POSTROUTING { type nat hook postrouting priority 100; policy accept; }"
 ###RULES
 for range in ${LANRANGE[*]}; do
-	 for wanif in ${WANIF[*]} ; do
+	for wanif in ${WANIF[*]} ; do
 	$NFT "add rule ip nat POSTROUTING oifname $wanif ip saddr $range log prefix \"NAT POSTROUTING $range ifout $wanif: \" counter masquerade"
 	done
 done

@@ -9,8 +9,8 @@ DIRBIN="/usr/local/firewallo/bin"
 DIRLIB="/usr/local/firewallo/lib"
 source $DIRCONF/firewallo.conf
 source $DIRLIB/firewallo.lib
-source $DIRLIB/lib-wiz.sh
-source $DIRLIB/lib-filter.sh
+source $DIRLIB/wiz.lib
+source $DIRLIB/filter.lib
 
 EDITOR="nano" #setta qui l'editor vi o nano se è vuoto usa vi
 
