@@ -1,5 +1,7 @@
 #!/bin/bash
-
+#Questo script fa la build da locale o dal git 
+#uso ./build -> per il git ./build local per locale
+TYPE=$1
 # Abilita modalità "exit on error"
 set -e
 
@@ -29,11 +31,12 @@ mkdir -p /opt/firewallo
 chown root:root /opt/firewallo
 chmod 0755 /opt/firewallo
 
-if [ "$1" =  ""  ]; then
+#Verifica se fare install locale o dal git clone
+if [ "$TYPE" =  ""  ]; then
   # Clonazione del repository di firewallo
   echo "Clone firewallo repo..."
   git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch test --single-branch
-elif [ "$1" = "local" ]; then
+elif [ "$TYPE" = "local" ]; then
   # Copia di firewallo su /opt/firewallo
   wd=$(pwd)
   if [[ "$wd" =~ usr/share/doc/firewallo$ ]]; then
