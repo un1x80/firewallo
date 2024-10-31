@@ -337,10 +337,12 @@ stop () {
 $NFT "flush ruleset"
 
 echo "Setting up policies for chains..."
+#FILTER
 $NFT "add table ip filter"
 $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy accept; }"
 $NFT "add chain ip filter OUTPUT { type filter hook input priority 0; policy accept; }"
 $NFT "add chain ip filter FORWARD { type filter hook input priority 0; policy accept; }"
+#NAT
 $NFT "add table ip nat"
 $NFT "add chain ip nat PREROUTING { type nat hook prerouting priority -100; policy accept; }"
 $NFT "add chain ip nat INPUT { type nat hook input priority 100; policy accept; }"

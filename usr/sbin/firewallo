@@ -522,5 +522,11 @@ select opt in $MENU ; do
 	fi
 done
 }
+
+# Definisco altezza e larghezza
+rows=30
+cols=100
+# Ridimensiono il terminale
+echo -e "\e[8;${rows};${cols}t"
 #Lancio finalmente il main in stile C
 main
