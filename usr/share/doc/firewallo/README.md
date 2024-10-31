@@ -22,7 +22,12 @@ Exec firewallo from a root shell and select a number of configuration menu.
 
 ```bash
 git clone https://github.com/un1x80/firewallo.git
-dpkg-deb --build firewallo/ firewallo.deb
+cd firewallo/usr/share/firewallo/ ; ./build local
+
+or
+
+wget -qO- https://raw.githubusercontent.com/un1x80/firewallo/main/usr/share/doc/firewallo/build.sh | bash
+
 ```
 
 ## 💣Uninstall
