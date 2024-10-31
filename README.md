@@ -22,7 +22,7 @@ Exec firewallo from a root shell and select a number of configuration menu.
 
 ```bash
 git clone https://github.com/un1x80/firewallo.git
-cd firewallo/usr/share/firewallo/ ; ./build local
+cd firewallo/usr/share/doc/firewallo/ ; ./build.sh local
 ```
 or
 ```
