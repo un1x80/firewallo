@@ -35,7 +35,7 @@ chmod 0755 /opt/firewallo
 if [ "$TYPE" =  ""  ]; then
   # Clonazione del repository di firewallo
   echo "Clone firewallo repo..."
-  git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch test --single-branch
+  git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch main --single-branch
 elif [ "$TYPE" = "local" ]; then
   # Copia di firewallo su /opt/firewallo
   wd=$(pwd)
