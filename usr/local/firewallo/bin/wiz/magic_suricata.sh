@@ -129,7 +129,7 @@ create_rules() {
         if [[ -n ${special_rules_map[$protocol]} ]]; then
             hostname=${special_rules_map[$protocol]}
             # Crea regola per TLS
-            rule="drop tls any any -> any any (msg:\"Drop $protocol TLS\"; tls.sni:\"$hostname\"; sid:$SID; rev:1; classtype:policy-violation;)"
+            rule="drop tls any any -> any any (msg:\"Drop $protocol TLS\"; tls.sni; content:\"$hostname\"; nocase; sid:$SID; rev:1; classtype:policy-violation;)"
         else
             # Aggiungi la regola generale per app-layer
             rule="drop ip any any -> any any (msg:\"Drop $protocol\"; app-layer-protocol:$protocol_key; sid:$SID; rev:1; classtype:policy-violation;)"
