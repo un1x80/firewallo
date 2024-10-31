@@ -127,16 +127,19 @@ else
   exit 1
 fi
 
-echo "Do you want install firewallo? y/n" ; read Risp
-if [[ "$Risp" = "Y"] || [ "$Risp" = "Yes"] || [ "$Risp" = "yes"] ] ; 
-# Disinstallazione di una eventuale vecchia versione di firewallo
-apt remove -y firewallo || true
 
-# Installazione del nuovo pacchetto .deb
-echo "Installazione del pacchetto .deb..."
-apt install -y /opt/firewallo_pkg.deb
+echo "Do you want to install firewallo? y/n"
+read Risp
 
-echo "Install ok!"
+if [[ "$Risp" == "Y" || "$Risp" == "y" || "$Risp" == "Yes" || "$Risp" == "yes" ]]; then
+    # Disinstallazione di una eventuale vecchia versione di firewallo
+    apt remove -y firewallo || true
+
+    # Installazione del nuovo pacchetto .deb
+    echo "Installazione del pacchetto .deb..."
+    apt install -y /opt/firewallo_pkg.deb
+
+    echo "Install ok!"
 else
-return 0 
+    exit 0
 fi
