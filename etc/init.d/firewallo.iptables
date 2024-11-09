@@ -405,7 +405,7 @@ case "$1" in
    'start')
 	ctrl_if ""
 	printf "\nStarting firewall..."
-				#Scrivo qualcosa xchè non lo uso frequentemente.
+				#Scrivo quache appunto xchè non lo uso frequentemente.
 				#>(...) è una process substitution che crea un processo secondario.
 				#tee /tmp/.check_error copia l'output di errore nel file /tmp/.check_error.
 				#>&2 assicura che l'output di tee venga reindirizzato nuovamente a stdout, quindi verrà stampanto in status.log
@@ -416,7 +416,7 @@ case "$1" in
 		#Controlla se ci sono errori nonostante lo start
 		CHECK=$(cat /tmp/.check_error)
 		if [ "$CHECK" != "" ] ; then
-			echo "$(red_cross_mark) Started with configuration errors listed below see Option n°12 for complete Status!"
+			echo "$(red_cross_mark) Started with configuration errors listed below see Option n°13 for complete Status!"
 			color_text "red" "$CHECK"
 		fi
 	else
@@ -425,7 +425,7 @@ case "$1" in
 ;;
    'stop')
 	printf "\nTerminating firewall..."
-				#Scrivo qualcosa xchè non lo uso frequentemente.
+				#Scrivo qualche appunto xchè non lo uso frequentemente.
 				#>(...) è una process substitution che crea un processo secondario.
 				#tee /tmp/.check_error copia l'output di errore nel file /tmp/.check_error.
 				#>&2 assicura che l'output di tee venga reindirizzato nuovamente a stdout, quindi verrà stampanto in status.log
@@ -436,7 +436,7 @@ case "$1" in
 		#Controlla se ci sono errori nonostante lo start
 		CHECK=$(cat /tmp/.check_error)
 		if [ "$CHECK" != "" ] ; then
-			echo "$(red_cross_mark) Stopped with configuration errors listed below see Option n°12 for complete Status!"
+			echo "$(red_cross_mark) Stopped with configuration errors listed below see Option n°13 for complete Status!"
 			color_text "red" "$CHECK"
 		fi
 	else
