@@ -47,7 +47,7 @@ chmod 0755 /opt/firewallo
 if [ "$TYPE" =  "git"  ]; then
   # Clonazione del repository di firewallo
   echo "Clone firewallo repo..."
-  git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch main --single-branch
+  git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch test --single-branch
 
 elif [ "$TYPE" = "local" ]; then
   # Copia di firewallo su /opt/firewallo
@@ -130,7 +130,7 @@ echo "building .deb..."
 dpkg-deb --build /opt/firewallo_pkg "/opt/firewallo_pkg_$VERSION_$DATE.deb"
 
 # Verifica se il pacchetto è stato creato
-if [ -f /opt/firewallo_pkg.deb ]; then
+if [ -f /opt/firewallo_pkg_$VERSION_$DATE.deb ]; then
   echo ".deb successfully build : /opt/firewallo_pkg_$VERSION_$DATE.deb"
 else
   echo "Error : error on build .deb !"
