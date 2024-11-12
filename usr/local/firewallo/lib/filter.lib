@@ -103,7 +103,7 @@ show_menu_add_remove() {
     echo "4) $ADD_UDP"
     echo "5) $REMOVE_UDP"
     echo "6) $COMPLEX_RULE"
-    color_text "red" "7) $EXIT"
+    color_text "red" "q) $EXIT" # da testare se funziona
 }
 
 update_file() {
@@ -117,7 +117,7 @@ add_port() {
     local ports_var=$2
     local new_port
 
-    read -p "$INSERT_PORT ($protocol, ex. 80 o 100:200): " new_port
+    read -p "$INSERT_PORT ($protocol, ex. 80 o 100-200): " new_port
     validate_port "$new_port" 
     if [ "$?" = "0" ] ; then
         # Verifica che la porta o il range non sia già presente
@@ -141,7 +141,7 @@ remove_port() {
     # Ottieni il valore attuale delle porte
     ports_var_value=$(eval echo \$$ports_var_name)
 
-    read -p "$PORT_RANGE_TO_REMOVE ($protocol, ex. 80 o 100:200): " port_to_remove
+    read -p "$PORT_RANGE_TO_REMOVE ($protocol, ex. 80 o 100-200): " port_to_remove
 
     # Verifica se la porta o il range esiste
     if [[ " ${ports_var_value} " =~ " ${port_to_remove} " ]]; then
@@ -198,8 +198,8 @@ manage_ports() {
                 echo "$ADD_RULE_TO $CATENA"
                 $DIRBIN/wiz/magic_filter.sh $CATENA
                 ;;
-            7)
-                echo "Exit"
+            q)
+                echo "Exit" # da testare se funziona
                 filter
                 ;;
             *)

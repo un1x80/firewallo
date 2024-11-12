@@ -34,6 +34,7 @@ validate_ip_cidr() {
 }
 
 # Funzione per adattare i valori 'any' e 'range' per iptables e nftables
+# aggiungere anche nella parte di delete?
 parse_port_range() {
     local port_range="$1"
     if [[ "$port_range" == "any" ]]; then
