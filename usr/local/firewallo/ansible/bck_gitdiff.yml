@@ -30,11 +30,7 @@
 - name: Esegui operazioni Git sulla macchina locale
   hosts: localhost
   tasks:
-    - name: Configurare l'identità Git
-      command: git config --global user.email "you@example.com"
-      args:
-        chdir: /var/ansible/firewallo/repo_bck/
-
+ 
     - name: Configurare il nome utente Git
       command: git config --global Matteo.Fioriti "Matteo Fioriti"
       args:

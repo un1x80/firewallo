@@ -14,9 +14,17 @@ if [ "$EUID" -ne 0 ]; then
 fi
 #Controllo se c'è almeno un parametro
 if [ "$1" = "" ] ; then
-  echo "usage; $0 <git> or <local>"
+  echo "usage with git: $0 <git> <main|test>
+  usage with local: $0 <local>"
   exit 1
 fi
+
+#Controllo se c'è almeno un altro parametro
+if [ "$2" != "main" && "$2" != "test" ] ; then
+  echo "usage with git: $0 <git> <main|test>"
+  exit 1
+fi
+
 #Rimuovo le vecchie build se ci sono
 if [ -e /opt/firewallo ] && [ -e /opt/firewallo_pkg ] ; then 
   rm -rf /opt/firewallo ; 
@@ -47,7 +55,7 @@ chmod 0755 /opt/firewallo
 if [ "$TYPE" =  "git"  ]; then
   # Clonazione del repository di firewallo
   echo "Clone firewallo repo..."
-  git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch test --single-branch
+  git clone https://github.com/un1x80/firewallo.git /opt/firewallo --branch $2 --single-branch
 
 elif [ "$TYPE" = "local" ]; then
   # Copia di firewallo su /opt/firewallo
