@@ -18,17 +18,17 @@ apt install ./firewallo-24.9.1-amd64.deb -y
 ## 🔐Basic usage
 Exec firewallo from a root shell and select a number of configuration menu. 
 
-## 🛠️Build
-
+## 🛠️Build 
+LOCAL Build 
 ```bash
-git clone https://github.com/un1x80/firewallo.git
-cd firewallo/usr/share/firewallo/ ; ./build local
-
-or
-
-wget -qO- https://raw.githubusercontent.com/un1x80/firewallo/main/usr/share/doc/firewallo/build.sh | bash
-
+git clone -b <main|test> https://github.com/un1x80/firewallo.git
+cd firewallo/usr/share/doc/firewallo/ ; ./build.sh local 
 ```
+or GIT BUILD Test or Main
+```
+wget -qO- https://raw.githubusercontent.com/un1x80/firewallo/main/usr/share/doc/firewallo/build.sh git <test|main> | bash
+```
+
 
 ## 💣Uninstall
 

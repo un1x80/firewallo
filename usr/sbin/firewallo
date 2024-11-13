@@ -292,7 +292,7 @@ function show_menu {
     echo "======================================"
     echo "1) Protocol block"
     echo "2) Network dpi Filter"
-    echo "3) Exit"
+    echo "q) Exit"
     echo "======================================"
     echo -n "Select an option: "
 }
@@ -332,7 +332,7 @@ do
             banner_show #Visualizza il banner 
             dpi_wizard
             ;;
-        3)
+        q)
             echo "Exit"
             break
             ;;
@@ -357,7 +357,7 @@ function show_menu_nat {
     echo "1) Nat Prerouting Wizard"
     echo "2) Nat Postrouting Wizard"
     echo "3) Manual Edit File "
-    echo "4) Exit"
+    echo "q) Exit"
     echo "======================================"
     echo -n "Select an option: "
 }
@@ -389,7 +389,7 @@ do
             ;;
 	    3)  edit_manual_nat
 	        ;;
-	    4)  echo "Exit"
+	    q)  echo "Exit" # da testare se funziona
             break
             ;;
         *)  echo "Select right Option!."
