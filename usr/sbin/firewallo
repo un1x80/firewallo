@@ -180,13 +180,15 @@ WantedBy=multi-user.target
             fi 
     iptables-save > /etc/iptables/rules.v4
 	chmod 644 /etc/iptables/rules.v4
-	echo "..OK"
+	echo "Press Any key to continue ...."
+    read OK
 elif [ "$NFT" != ""  ] ; then
 	    echo "Save Conf to /etc/nftables.conf and enable nftables at startup."
 	    systemctl disable iptables-restore.service
 	    systemctl enable nftables.service
 	    nft list ruleset > /etc/nftables.conf
-	    echo "..OK"
+	    echo "Press Any key to continue ...."
+        read OK
 fi
 }
 
@@ -205,6 +207,8 @@ select opt1 in $MENU1 ; do
 		printf 'NFT=\"/usr/sbin/nft\"' >> $DIRCONF/firewallo.conf #risetto nft
 		update-alternatives --set iptables /usr/sbin/iptables-nft
 		systemctl enable nftables.service
+        echo "Press Any key to continue ...."
+        read OK
 		return
         elif [ "$opt1" = "iptables" ] ; then #Se selezioni iptables
         export NFT=""; #Svuoto NFT
@@ -216,7 +220,9 @@ select opt1 in $MENU1 ; do
 		update-alternatives --set iptables /usr/sbin/iptables-legacy
 		systemctl disable nftables.service
 		systemctl enable  iptables-restore.service
-		return
+		echo "Press Any key to continue ...."
+        read OK
+        return
         fi
 done
 }
@@ -414,8 +420,12 @@ export_conf () {
     # Verifica se il comando tar ha avuto successo
     if [[ $? -eq 0 ]]; then
         echo " $(pwd)/$nome_file"
+        echo "Press Any key to continue ...."
+        read OK
     else
         echo "$ERROR_BCK"
+        echo "Press Any key to continue ...."
+        read OK
     fi
 
 }
@@ -461,8 +471,12 @@ restore_conf() {
     # Verifica se il comando tar ha avuto successo
     if [[ $? -eq 0 ]]; then
         echo "$RESTORED_OK $file_selezionato"
+        echo "Press Any key to continue ...."
+        read OK
     else
         echo "$RESTORE_ERROR"
+        echo "Press Any key to continue ...."
+        read OK
         return 1
     fi
 }
