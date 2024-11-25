@@ -187,8 +187,8 @@ elif [ "$NFT" != ""  ] ; then
 	    systemctl disable iptables-restore.service
 	    systemctl enable nftables.service
 	    nft list ruleset > /etc/nftables.conf
-	    echo "Press Any key to continue ...."
-        read OK
+		echo "Press Any key to continue ...."
+		read OK
 fi
 }
 
@@ -527,9 +527,9 @@ select opt in $MENU ; do
 	elif [ "$opt" = "networkdpi" ] ; then
 		show_netdpi ; main
     elif [ "$opt" = "export_conf" ] ; then
-		export_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
+		export_conf ; main 
     elif [ "$opt" = "restore_conf" ] ; then
-		restore_conf ; echo "PRESS ENTER" ;read INVIO >> /dev/null 2>&1 ;main 
+		restore_conf ; main 
 	elif [ "$opt" = "exit" ] ; then
         echo ByeZzZ.
 		exit
