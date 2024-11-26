@@ -42,8 +42,6 @@ app-layer:
       enabled: yes
     nfs:
       enabled: yes
-    smb:
-      enabled: yes
     mqtt:
       enabled: yes
     krb5:

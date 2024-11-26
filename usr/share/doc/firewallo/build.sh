@@ -45,6 +45,8 @@ install_if_not_present git
 install_if_not_present iptables
 install_if_not_present nftables
 install_if_not_present dpkg-dev
+install_if_not_present tar
+install_if_not_present gzip
 
 # Creazione della directory di destinazione
 mkdir -p /opt/firewallo
