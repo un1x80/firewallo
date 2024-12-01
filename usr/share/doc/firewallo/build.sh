@@ -20,9 +20,13 @@ if [ "$1" = "" ] ; then
 fi
 
 #Controllo se c'è almeno un altro parametro
-if [ "$2" != "main" && "$2" != "test" ] ; then
+if [ "$1" = "git" ] ; then
+ if [ "$2" != "main" && "$2" != "test" ] ; then
   echo "usage with git: $0 <git> <main|test>"
   exit 1
+ fi
+elif [ "$1" = "local" ] ; then
+  echo "ok Build local....."
 fi
 
 #Rimuovo le vecchie build se ci sono
