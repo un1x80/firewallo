@@ -66,10 +66,11 @@ if [ "$TYPE" =  "git"  ]; then
 elif [ "$TYPE" = "local" ]; then
   # Copia di firewallo su /opt/firewallo
   wd=$(pwd)
-  if [[ "$wd" =~ usr/share/doc/firewallo$ ]]; then
+  if [[ "$wd" =~ usr/share/doc/firewallo$ ] || [ "$wd" = "/opt/firewallo/usr/share/doc/firewallo" ]]; then
 	  cp -rf ../../../../* /opt/firewallo
   else
-      echo "I am not in the correct position to be executed. right position : '<firewallo-dir>/usr/share/doc/firewallo/'."
+      echo "I am not in the correct position to be executed. right position : '<firewallo-dir>/usr/share/doc/firewallo/'.
+            And not in /opt/firewallo/usr/share/doc/firewallo . Clone firewallo in ANOTHER DIR not in /opt/firewallo!"
       exit 1
   fi
 fi
