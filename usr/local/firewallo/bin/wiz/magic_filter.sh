@@ -8,9 +8,9 @@ load_translations
 
 # Seleziona la catena se non ti viene passata
 if [ "$1" = "" ] ; then
-select_chain
+    select_chain
 elif [ "$1 != " ] ; then
-CHAIN_SELECTED=$1
+    CHAIN_SELECTED=$1
 fi
 
 # Chiedi i dettagli uno per uno all'utente con controlli
@@ -21,15 +21,15 @@ while true; do
     fi
 done
 
- # Mostra il menu per la scelta del protocollo (tcp o udp)
-    while true; do
-        echo ""
-        echo "$PROTOCOL_PROMPT"
-        echo "$TCP_OPTION"
-        echo "$UDP_OPTION"
-        read -e -p "$CHOICE_PROMPT" protocol_choice
+# Mostra il menu per la scelta del protocollo (tcp o udp)
+while true; do
+    echo ""
+    echo "$PROTOCOL_PROMPT"
+    echo "$TCP_OPTION"
+    echo "$UDP_OPTION"
+    read -e -p "$CHOICE_PROMPT" protocol_choice
 
-        case $protocol_choice in
+    case $protocol_choice in
             1)
                 PROTOCOL="tcp"
                 break
@@ -41,8 +41,8 @@ done
             *)
                 handle_error "$INVALID_PROTOCOL"
                 ;;
-        esac
-    done
+    esac
+done
 
 while true; do
     read -e -p "$SRC_PORT_PROMPT" SRC_PORT
