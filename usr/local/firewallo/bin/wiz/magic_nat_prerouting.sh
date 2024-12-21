@@ -11,9 +11,9 @@ configure_iptables_prerouting() {
     local srcip_mask="$1"
     local iif="$2"
     local protocol="$3"
-    local dport="$4"
+    local dport=$(parse_port_range_ipt "$4")
     local to_dest_ip="$5"
-    local to_dest_port="$6"
+    local to_dest_port=$(parse_port_range_ipt "$6")
     local comment="$7"
 
     # Configurazione della regola DNAT in iptables
@@ -39,9 +39,9 @@ configure_nftables_prerouting() {
     local srcip_mask="$1"
     local iif="$2"
     local protocol="$3"
-    local dport="$4"
+    local dport=$(parse_port_range_nft "$4")
     local to_dest_ip="$5"
-    local to_dest_port="$6"
+    local to_dest_port=$(parse_port_range_nft "$6")
     local comment="$7"
 
     # Configurazione della regola DNAT in nftables
@@ -97,7 +97,11 @@ ask_for_parameters() {
 
     while true; do
         read -e -p "$PORT_DEST_PROMPT" dport
-        validate_port $dport && break
+        if [ "$dport" = "" ] ; then  
+            echo "null dport not ok" ;
+        else
+            validate_port $dport && break
+        fi
     done
 
     while true; do
@@ -107,7 +111,11 @@ ask_for_parameters() {
 
     while true; do
         read -e -p "$DEST_PORT_PROMPT" to_dest_port
-        validate_port $to_dest_port && break
+        if [ "$to_dest_port" = "" ] ; then  
+            to_dest_port=$dport && break
+        else    
+            validate_port $to_dest_port && break
+        fi
     done
 
     while true; do
