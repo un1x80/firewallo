@@ -41,3 +41,50 @@ red_cross_mark() {
 printf "❌"
 }
 
+
+# Funzione per aggiungere regole DNS in nft mode
+add_dns_rules_nft() {
+    local dns=$1
+    $NFT "add rule ip filter dnserv ip saddr $dns tcp dport 53 log prefix \"ACCEPT dnserv $dns :\" limit rate 10/minute counter accept"
+    $NFT "add rule ip filter dnserv ip daddr $dns tcp dport 53 log prefix \"ACCEPT dnserv $dns :\" limit rate 10/minute counter accept"
+    $NFT "add rule ip filter dnserv ip saddr $dns udp dport 53 log prefix \"ACCEPT dnserv $dns :\" limit rate 10/minute counter accept"
+    $NFT "add rule ip filter dnserv ip daddr $dns udp dport 53 log prefix \"ACCEPT dnserv $dns :\" limit rate 10/minute counter accept"
+    $NFT "add rule ip filter dnserv ip saddr $dns tcp sport 53 log prefix \"ACCEPT dnserv $dns :\" limit rate 10/minute counter accept"
+    $NFT "add rule ip filter dnserv ip daddr $dns tcp sport 53 log prefix \"ACCEPT dnserv $dns :\" limit rate 10/minute counter accept"
+    $NFT "add rule ip filter dnserv ip saddr $dns udp sport 53 log prefix \"ACCEPT dnserv $dns :\" limit rate 10/minute counter accept"
+    $NFT "add rule ip filter dnserv ip daddr $dns udp sport 53 log prefix \"ACCEPT dnserv $dns :\" limit rate 10/minute counter accept"
+}
+# Funzione per aggiungere regole DNS in iptables mode
+add_dns_rules_ipt() {
+# Variabile DNS
+local dns=$1
+
+# Regole TCP dport 53
+iptables -A INPUT -s $dns -p tcp --dport 53 -m limit --limit 10/minute --limit-burst 10 -j LOG --log-prefix "ACCEPT dnserv $dns : "
+iptables -A INPUT -s $dns -p tcp --dport 53 -j ACCEPT
+
+iptables -A INPUT -d $dns -p tcp --dport 53 -m limit --limit 10/minute --limit-burst 10 -j LOG --log-prefix "ACCEPT dnserv $dns : "
+iptables -A INPUT -d $dns -p tcp --dport 53 -j ACCEPT
+
+# Regole UDP dport 53
+iptables -A INPUT -s $dns -p udp --dport 53 -m limit --limit 10/minute --limit-burst 10 -j LOG --log-prefix "ACCEPT dnserv $dns : "
+iptables -A INPUT -s $dns -p udp --dport 53 -j ACCEPT
+
+iptables -A INPUT -d $dns -p udp --dport 53 -m limit --limit 10/minute --limit-burst 10 -j LOG --log-prefix "ACCEPT dnserv $dns : "
+iptables -A INPUT -d $dns -p udp --dport 53 -j ACCEPT
+
+# Regole TCP sport 53
+iptables -A INPUT -s $dns -p tcp --sport 53 -m limit --limit 10/minute --limit-burst 10 -j LOG --log-prefix "ACCEPT dnserv $dns : "
+iptables -A INPUT -s $dns -p tcp --sport 53 -j ACCEPT
+
+iptables -A INPUT -d $dns -p tcp --sport 53 -m limit --limit 10/minute --limit-burst 10 -j LOG --log-prefix "ACCEPT dnserv $dns : "
+iptables -A INPUT -d $dns -p tcp --sport 53 -j ACCEPT
+
+# Regole UDP sport 53
+iptables -A INPUT -s $dns -p udp --sport 53 -m limit --limit 10/minute --limit-burst 10 -j LOG --log-prefix "ACCEPT dnserv $dns : "
+iptables -A INPUT -s $dns -p udp --sport 53 -j ACCEPT
+
+iptables -A INPUT -d $dns -p udp --sport 53 -m limit --limit 10/minute --limit-burst 10 -j LOG --log-prefix "ACCEPT dnserv $dns : "
+iptables -A INPUT -d $dns -p udp --sport 53 -j ACCEPT
+
+}
