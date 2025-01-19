@@ -1,4 +1,5 @@
 #!/bin/bash
+#set.filter
 CATENA=$3
 printf "\n$CATENA..."
 source $1

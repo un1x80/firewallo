@@ -1,5 +1,5 @@
 #!/bin/bash
-#MANGLE
+#set.mangle
 source /etc/firewallo/firewallo.conf
 if [ "$NFT" != "" ] ; then 
 

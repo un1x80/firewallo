@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#wiz.lib
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
 color_text() {

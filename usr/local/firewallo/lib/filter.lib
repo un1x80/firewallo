@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#filter.lib
 DIRCONF="/etc/firewallo"
 source $DIRCONF/firewallo.conf
 

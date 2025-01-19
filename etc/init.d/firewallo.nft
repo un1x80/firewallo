@@ -69,25 +69,29 @@ start () {
 #Attribuzione delle interfacce
 echo "### $ORARIO Start Firewall"
 
+#Eseguo lo script per le rotte (parte che non comptete propriamente al firewall ma introdotta per scelta storica)
 /bin/bash 	$DIRCONF/route/firewallo.route
 
-
+#Abilita il forwarding se non lo è già
 if [ -e /proc/sys/net/ipv4/ip_forward ] ; 			then
     echo 1 > /proc/sys/net/ipv4/ip_forward
 fi
+
 if [ -e /proc/sys/net/ipv4/ip_dynaddr ] ; 			then
     echo 1 > /proc/sys/net/ipv4/ip_dynaddr
 fi
+
 if [ -e /proc/sys/net/ipv4/tcp_syncookies ] ; 			then
     echo 1 > /proc/sys/net/ipv4/tcp_syncookies
 fi
+
 if [ -e /proc/sys/net/ipv4/conf/all/accept_source_route ] ; 	then
     echo 0 > /proc/sys/net/ipv4/conf/all/accept_source_route
 fi
 
 
 echo "Flushing policies and setting up new policies for chains...... "
-
+#Replica della struttura classica di ipatbles 
 $NFT "flush ruleset"
 $NFT "add table ip filter"
 $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy drop; }"
@@ -135,31 +139,24 @@ $NFT "add rule ip filter tcp_flags tcp flags syn,rst / syn,rst 									log pref
 $NFT "add rule ip filter tcp_flags tcp flags fin,syn / fin,syn 									log prefix \"DROP PortScanX-mas:\" 			counter drop"
 $NFT "add rule ip filter tcp_flags tcp flags 0x0 / fin,syn,rst,psh,ack,urg 						log prefix \"DROP PortScanX-mas:\" 			counter drop"
 
-$NFT "add rule ip filter dnserv ip daddr $DNS1 tcp dport 53 									log prefix \"ACCEPT dnserv $DNS1 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS2 tcp dport 53 									log prefix \"ACCEPT dnserv $DNS2 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS3 tcp dport 53 									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS4 tcp dport 53 									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
-
-$NFT "add rule ip filter dnserv ip daddr $DNS1 udp dport 53 									log prefix \"ACCEPT dnserv $DNS1 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS2 udp dport 53 									log prefix \"ACCEPT dnserv $DNS2 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS3 udp dport 53 									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS4 udp dport 53  									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
-
-$NFT "add rule ip filter dnserv ip daddr $DNS1 tcp sport 53  									log prefix \"ACCEPT dnserv $DNS1 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS2 tcp sport 53  									log prefix \"ACCEPT dnserv $DNS2 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS3 tcp sport 53  									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS4 tcp sport 53  									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
-
-$NFT "add rule ip filter dnserv ip daddr $DNS1 udp sport 53  									log prefix \"ACCEPT dnserv $DNS1 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS2 udp sport 53  									log prefix \"ACCEPT dnserv $DNS2 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS3 udp sport 53  									log prefix \"ACCEPT dnserv $DNS3 :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $DNS4 udp sport 53  									log prefix \"ACCEPT dnserv $DNS4 :\" 		counter accept"
-
 $NFT "add rule ip filter dnserv ip saddr $LO  tcp dport 53										log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
 $NFT "add rule ip filter dnserv ip daddr $LO  tcp dport 53										log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
 
 $NFT "add rule ip filter dnserv ip daddr $LO  tcp sport 53										log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
 $NFT "add rule ip filter dnserv ip saddr $LO  tcp sport 53										log prefix \"ACCEPT dnserv $LO :\" 			counter accept"
+
+for dns in $DNS1 $DNS2 $DNS3 $DNS4; do
+    if ! [[ $dns =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Error: Invalid DNS address $dns"
+        exit 1
+	else
+	$NFT "add rule ip filter dnserv ip daddr $dns tcp dport 53 									log prefix \"ACCEPT dnserv $dns :\" 		counter accept"
+    $NFT "add rule ip filter dnserv ip daddr $dns udp dport 53 									log prefix \"ACCEPT dnserv $dns :\" 		counter accept"
+
+    fi
+done
+
+
 
 #ELENCO CONTROLLATO IL 10/09/2024
 ROOTSERV="198.41.0.4 199.9.14.201 192.33.4.12 199.7.91.13 192.203.230.10 192.5.5.241 192.112.36.4 198.97.190.53 192.36.148.17 192.58.128.30 193.0.14.129 199.7.83.42 202.12.27.33"
