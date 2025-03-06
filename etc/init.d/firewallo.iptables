@@ -206,9 +206,9 @@ for ICMP in $ICMPaccept ; do
 $IPT -A icmp_good -p icmp --icmp-type 	$ICMP   -j ACCEPT
 done
 
-$IPT -A icmp_good -p icmp --icmp-type   ping    -j ACCEPT
+$IPT -A icmp_good -p icmp --icmp-type   echo-request    -j ACCEPT #ping
 #-m limit --limit 90/m --limit-burst 5 #echo-reply limit#
-$IPT -A icmp_good -p icmp --icmp-type   pong    -j ACCEPT
+$IPT -A icmp_good -p icmp --icmp-type   echo-reply    -j ACCEPT #pong
 #-m limit --limit 90/m --limit-burst 5 #echo-request limit#
 
     #FILTER CHAINS ATTRIBUTION IN FORWARD
@@ -296,7 +296,7 @@ $IPT -A icmp_good -p icmp --icmp-type   pong    -j ACCEPT
 	$IPT -A OUTPUT 	    -o $lanifs			-j fw2lan     	### Fire output to lan
     done
     for wanifs in ${WANIF[*]} ; do
-    	$IPT -A OUTPUT      -o $WANIF			-j fw2wan     	### Fire output to wan
+    	$IPT -A OUTPUT      -o $wanifs			-j fw2wan     	### Fire output to wan
     done
 
     #VPN CHAINS ATTRIBUTION

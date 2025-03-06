@@ -19,10 +19,9 @@ source /etc/firewallo/firewallo.conf
 if [ "$NFT" != "" ] ; then 
 
 $NFT "add table ip mangle"
-$NFT "add chain ip mangle PREROUTING { type nat hook prerouting priority -100; policy accept; }"
-$NFT "add chain ip mangle INPUT { type nat hook input priority 100; policy accept; }"
-$NFT "add chain ip mangle OUTPUT { type nat hook output priority -100; policy accept; }"
-$NFT "add chain ip mangle POSTROUTING { type nat hook postrouting priority 100; policy accept; }"
+$NFT "add chain ip mangle PREROUTING { type filter hook prerouting priority -150; policy accept; }"
+$NFT "add chain ip mangle POSTROUTING { type filter hook postrouting priority 150; policy accept; }"
+
 
 fi
 
