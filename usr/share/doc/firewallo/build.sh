@@ -46,8 +46,11 @@ fi
 
 #Rimuovo le vecchie build se ci sono
 if [ -e /opt/firewallo ] && [ -e /opt/firewallo_pkg ] ; then 
+  echo "Can i remove old builds in /opt/firewallo and /opt/firewallo_pkg? y/n" ; read yesno
+  if [ "$yesno" = "y" ] ; then
   rm -rf /opt/firewallo ; 
-  rm -rf /opt/firewallo_pkg ; 
+  rm -rf /opt/firewallo_pkg ;
+  fi 
 fi
 
 # Funzione per installare un pacchetto se non è già installato

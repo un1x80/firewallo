@@ -20,8 +20,8 @@ if [ "$NFT" != "" ] ; then
 
 $NFT "add table ip nat"
 $NFT "add chain ip nat PREROUTING { type nat hook prerouting priority -100; policy accept; }"
-$NFT "add chain ip nat INPUT { type nat hook input priority 100; policy accept; }"
-$NFT "add chain ip nat OUTPUT { type nat hook output priority -100; policy accept; }"
+#$NFT "add chain ip nat INPUT { type nat hook input priority 100; policy accept; }" -> ho scoperto dopo che in nft non esiste
+$NFT "add chain ip nat OUTPUT { type nat hook output priority 100; policy accept; }"
 $NFT "add chain ip nat POSTROUTING { type nat hook postrouting priority 100; policy accept; }"
 ###RULES
 for range in ${LANRANGE[*]}; do

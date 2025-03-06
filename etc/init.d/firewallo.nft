@@ -113,8 +113,8 @@ $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy drop
 $NFT "add chain ip filter FORWARD { type filter hook forward priority 0; policy drop;}"
 $NFT "add chain ip filter OUTPUT { type filter hook output priority 0; policy drop; }"
 
-$NFT "add rule ip filter INPUT  iifname "lo" counter accept"
-$NFT "add rule ip filter OUTPUT oifname "lo" counter accept"
+$NFT "add rule ip filter INPUT  iifname \"lo\" counter accept"
+$NFT "add rule ip filter OUTPUT oifname \"lo\" counter accept"
 
 CHAINS="icmp_good tcp_flags stato dnserv 	    \
 lan2wan lan2dmz lan2lan lan2vpns lan2fw 	    \
@@ -172,15 +172,15 @@ done
 #ELENCO CONTROLLATO IL 10/09/2024
 ROOTSERV="198.41.0.4 199.9.14.201 192.33.4.12 199.7.91.13 192.203.230.10 192.5.5.241 192.112.36.4 198.97.190.53 192.36.148.17 192.58.128.30 193.0.14.129 199.7.83.42 202.12.27.33"
 for i in $ROOTSERV ; do
-$NFT "add rule ip filter dnserv ip saddr $i tcp dport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $i tcp dport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip saddr $i udp dport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $i udp dport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip saddr $i tcp dport 53 log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $i tcp dport 53 log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip saddr $i udp dport 53 log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $i udp dport 53 log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
 
-$NFT "add rule ip filter dnserv ip saddr $i tcp sport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $i tcp sport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip saddr $i udp sport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
-$NFT "add rule ip filter dnserv ip daddr $i udp sport 53   									log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip saddr $i tcp sport 53 log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $i tcp sport 53 log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip saddr $i udp sport 53 log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
+$NFT "add rule ip filter dnserv ip daddr $i udp sport 53 log prefix \"ACCEPT dnserv rootsrv $i :\" 		counter accept"
 done
 
 #####################
@@ -203,7 +203,7 @@ $NFT "add rule ip filter FORWARD counter jump stato"		###
 $NFT "add rule ip filter FORWARD counter jump dnserv"		###
 $NFT "add rule ip filter FORWARD counter jump icmp_good"	###
 $NFT "add rule ip filter FORWARD counter jump tcp_flags"	###
-$NFT "add rule ip filter FORWARD iifname lo log prefix \"ACCEPTED FORWARD localhost : \" 	counter accept" ### Fire 2 All forward
+$NFT "add rule ip filter FORWARD iifname \"lo\" log prefix \"ACCEPTED FORWARD localhost : \" 	counter accept" ### Fire 2 All forward
 
 #LAN 2 -> XXX
     	for lanifs in ${LANIF[*]} ; do
@@ -282,7 +282,7 @@ $NFT "add rule ip filter FORWARD iifname lo log prefix \"ACCEPTED FORWARD localh
 	$NFT "add rule ip filter OUTPUT oifname $lanifs	counter jump fw2lan"    	### Fire output to lan
     done
     for wanifs in ${WANIF[*]} ; do
-    	$NFT "add rule ip filter OUTPUT oifname $WANIF	counter jump fw2wan"     	### Fire output to wan
+    	$NFT "add rule ip filter OUTPUT oifname $wanifs	counter jump fw2wan"     	### Fire output to wan
     done
 
     #VPN CHAINS ATTRIBUTION
@@ -348,13 +348,12 @@ echo "Setting up policies for chains..."
 #FILTER
 $NFT "add table ip filter"
 $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy accept; }"
-$NFT "add chain ip filter OUTPUT { type filter hook input priority 0; policy accept; }"
-$NFT "add chain ip filter FORWARD { type filter hook input priority 0; policy accept; }"
+$NFT "add chain ip filter OUTPUT { type filter hook output priority 0; policy accept; }"
+$NFT "add chain ip filter FORWARD { type filter hook forward priority 0; policy accept; }"
 #NAT
 $NFT "add table ip nat"
 $NFT "add chain ip nat PREROUTING { type nat hook prerouting priority -100; policy accept; }"
-$NFT "add chain ip nat INPUT { type nat hook input priority 100; policy accept; }"
-$NFT "add chain ip nat OUTPUT { type nat hook output priority -100; policy accept; }"
+$NFT "add chain ip nat OUTPUT { type nat hook output priority 100; policy accept; }"
 $NFT "add chain ip nat POSTROUTING { type nat hook postrouting priority 100; policy accept; }"
 $DIRBIN/nat/set.nat
 
@@ -365,13 +364,13 @@ echo "##############END STOP################"
 reset () {
 echo "############## RESET FIREWALL##########"
 echo "Flushing policies..."
-$NFT "flush ruleset"
-
+$NFT "flush ruleset"    
+$NFT "add table ip filter"
 
 echo "Setting up policies for chains..."
 $NFT "add chain ip filter INPUT { type filter hook input priority 0; policy accept; }"
-$NFT "add chain ip filter OUTPUT { type filter hook input priority 0; policy accept; }"
-$NFT "add chain ip filter FORWARD { type filter hook input priority 0; policy accept; }"
+$NFT "add chain ip filter OUTPUT { type filter hook output priority 0; policy accept; }"
+$NFT "add chain ip filter FORWARD { type filter hook forward priority 0; policy accept; }"
 echo "Firewall resetted...                                           ...OK"
 echo "##############END RESET################"
 }
