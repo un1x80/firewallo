@@ -11,8 +11,8 @@ Firewallo is a firewall manager for Debian GNU/Linux that uses iptables or nftab
 get latest version from [Releases · un1x80/firewallo · GitHub](https://github.com/un1x80/firewallo/releases)
 
 ```bash
-wget https://github.com/un1x80/firewallo/releases/download/24.9.1/firewallo-24.9.1-amd64.deb
-apt install ./firewallo-24.9.1-amd64.deb -y
+wget https://github.com/un1x80/firewallo/releases/download/current/firewallo-24.9.1.10-amd64.deb
+apt install ./firewallo-24.9.1.10-amd64.deb -y
 ```
 
 ## 🔐Basic usage
@@ -26,7 +26,8 @@ cd firewallo/usr/share/doc/firewallo/ ; ./build.sh local
 ```
 or GIT BUILD Test or Main
 ```
-wget -qO- https://raw.githubusercontent.com/un1x80/firewallo/main/usr/share/doc/firewallo/build.sh git <test|main> | bash
+wget https://raw.githubusercontent.com/un1x80/firewallo/main/usr/share/doc/firewallo/build.sh
+chmod +x build.sh ; ./build.sh git <main|test>
 ```
 
 
