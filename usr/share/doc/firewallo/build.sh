@@ -36,7 +36,7 @@ fi
 
 #Controllo se c'è almeno un altro parametro
 if [ "$1" = "git" ] ; then
- if [ "$2" != "main" && "$2" != "test" ] ; then
+ if [[ "$2" != "main" && "$2" != "test" ]] ; then
   echo "usage with git: $0 <git> <main|test>"
   exit 1
  fi
