@@ -103,3 +103,27 @@ iptables -A INPUT -d $dns -p udp --sport 53 -m limit --limit 10/minute --limit-b
 iptables -A INPUT -d $dns -p udp --sport 53 -j ACCEPT
 
 }
+check_process_firewallo(){
+if  [ "$NFT" != "" ] ; then
+CHECK_START_NFT=$(ps ax | grep [f]irewallo.nft)
+        if [ "$CHECK_START_NFT" = "" ] ; then
+            return 0
+        else
+            # Estrazione del PID dal comando ps
+            PID=$(echo "$CHECK_START_NFT" | awk '{print $1}')
+            color_text "red" "ERROR: There is another firewallo start|stop|restart process. KEEP CALM WAIT !!!  \n If you think this is in deadlock state kill this PID: $PID"
+            return 1
+        fi
+
+elif [ "$IPT" != "" ]  ; then
+CHECK_START_IPT=$(ps ax | grep [f]irewallo.iptables)
+        if [ "$CHECK_START_IPT" = "" ] ; then
+	    return 0
+        else
+   	    # Estrazione del PID dal comando ps
+            PID=$(echo "$CHECK_START_IPT" | awk '{print $1}')
+            color_text "red" "ERROR: There is another firewallo start|stop|restart process. KEEP CALM WAIT !!!  \n If you think this is in deadlock state kill this PID: $PID"
+            return 1
+   	fi
+fi
+}

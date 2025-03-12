@@ -107,6 +107,7 @@ route  () {
 
 #Funzione di start di Firewallo
 start () {
+check_process_firewallo || exit 1 ;
 if  [ "$NFT" != "" ] ; then
 /etc/init.d/firewallo.nft start
 elif [ "$IPT" != "" ]  ; then
@@ -116,6 +117,7 @@ fi
 
 #Funzione di stop di Firewallo
 stop () {
+check_process_firewallo || exit 1 ;
 if  [ "$NFT" != "" ] ; then
 /etc/init.d/firewallo.nft stop
 elif [ "$IPT" != "" ] ; then
@@ -126,12 +128,14 @@ fi
 
 #Funzione di restart 
 restart () {
+check_process_firewallo || exit 1 ;
 stop
 start
 }
 
 #Funzione di reset 
 reset () {
+check_process_firewallo || exit 1 ;
 if  [ "$NFT" != "" ] ; then
 /etc/init.d/firewallo.nft reset
 elif [ "$IPT" != "" ] ; then
