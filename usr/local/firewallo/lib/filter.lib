@@ -63,7 +63,7 @@ read_variables() {
 file_path="$DIRCONF/filter/$1"
 CATENA=$1
     if [[ -f "$file_path" ]]; then
-        source "$file_path"
+        eval "$(grep -E '^(TCPPORT|UDPPORT)=' "$file_path")"
     else
         echo "$file_path $NOT_EXIST"
         exit 1
