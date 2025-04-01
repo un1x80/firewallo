@@ -1,9 +1,9 @@
-# Firewallo
+# 🔥🛡️ Firewallo
 
 **Firewallo** is a firewall manager for Debian GNU/Linux that uses either iptables or nftables.
 This project was originally created in 2003 for personal use and is not intended for production environments.
 Firewallo currently supports IPv4 only — for best practices, it is recommended to disable IPv6 on your system.
-Dual-stack (IPv4/IPv6) support is currently under development
+Dual-stack (IPv4/IPv6) support is currently under development.
 The entire core structure has been rewritten to support nftables, following a design similar to the traditional iptables approach (using filter, nat, and mangle tables).
 Future development will focus exclusively on nftables.
 
@@ -16,7 +16,7 @@ Future development will focus exclusively on nftables.
 ---
 
 ## 🛠️ Presets and architecture decisions 
-📌 Firewallo currently supports only IPv4 by design. For best practices, it is recommended to disable IPv6 on your system
+📌 Firewallo currently supports only IPv4 by design. For best practices, it is recommended to disable IPv6 on your system.
 All chains are defined using the ip family instead of inet.
 This decision was made to avoid ambiguous rules: in nftables, if a user writes a generic rule without explicitly specifying ip or ip6, it would apply to both stacks.
 Restricting support to IPv4 ensures clear rule behavior and maintains continuity with iptables, which has historically been used in Firewallo and is inherently single-stack (requiring ip6tables for IPv6).
